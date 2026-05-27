@@ -1,0 +1,1 @@
+# accessibility-scanner-alt-text-plugin
