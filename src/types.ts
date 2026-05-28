@@ -1,0 +1,63 @@
+// Shared contract for the alt-text-scan plugin.
+// Edited only by explicit pair agreement — every other file depends on these shapes.
+
+// Minimal structural type for the Playwright Page object.
+// Replaced with `import type {Page} from 'playwright'` once Playwright is a dev dep.
+export type Page = {
+  url(): string
+  $$eval<T>(selector: string, fn: (els: Element[]) => T): Promise<T>
+}
+
+// The scanner's Finding shape. Mirrors the structure of
+// accessibility-scanner/.github/actions/find/src/types.d.ts
+export type Finding = {
+  scannerType: string
+  ruleId?: string
+  url: string
+  html?: string
+  problemShort: string
+  problemUrl: string
+  solutionShort: string
+  solutionLong?: string
+  screenshotId?: string
+}
+
+// The arguments the scanner passes to a plugin's default export.
+export type PluginArgs = {
+  page: Page
+  addFinding: (finding: Finding) => Promise<void>
+}
+
+// Normalized representation of a single <img> on the page.
+// `alt: null` means the attribute is absent; `alt: ""` means it is explicitly empty.
+export type ImageRecord = {
+  src: string | null
+  alt: string | null
+  role: string | null
+  ariaHidden: boolean
+  ariaLabel: string | null
+  ariaLabelledBy: string | null
+  isInLink: boolean
+  outerHTML: string
+}
+
+// Input handed to every rule's evaluate() function.
+export type RuleContext = {
+  url: string
+  images: ImageRecord[]
+}
+
+// What a rule emits per offending image. Translated to Finding in findings.ts.
+export type RuleResult = {
+  image: ImageRecord
+  problemShort: string
+  solutionShort: string
+  solutionLong?: string
+}
+
+// A rule is a pure, synchronous function over RuleContext.
+export type Rule = {
+  id: string
+  problemUrl: string
+  evaluate(ctx: RuleContext): RuleResult[]
+}
