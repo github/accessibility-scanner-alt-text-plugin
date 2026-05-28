@@ -1,12 +1,8 @@
 // Shared contract for the alt-text-scan plugin.
 // Edited only by explicit pair agreement — every other file depends on these shapes.
 
-// Minimal structural type for the Playwright Page object.
-// Replaced with `import type {Page} from 'playwright'` once Playwright is a dev dep.
-export type Page = {
-  url(): string
-  $$eval<T>(selector: string, fn: (els: Element[]) => T): Promise<T>
-}
+import type {Page} from 'playwright'
+export type {Page}
 
 // The scanner's Finding shape. Mirrors the structure of
 // accessibility-scanner/.github/actions/find/src/types.d.ts
