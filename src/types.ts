@@ -1,8 +1,6 @@
 // Shared contract for the alt-text-scan plugin.
-// Edited only by explicit pair agreement — every other file depends on these shapes.
 
 import type {Page} from 'playwright'
-export type {Page}
 
 // The scanner's Finding shape. Mirrors the structure of
 // accessibility-scanner/.github/actions/find/src/types.d.ts
@@ -24,8 +22,7 @@ export type PluginArgs = {
   addFinding: (finding: Finding) => Promise<void>
 }
 
-// Normalized representation of a single <img> on the page.
-// `alt: null` means the attribute is absent; `alt: ""` means it is explicitly empty.
+// Normalized representation of one <img> on the page.
 export type ImageRecord = {
   src: string | null
   alt: string | null
