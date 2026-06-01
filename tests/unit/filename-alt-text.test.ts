@@ -8,7 +8,6 @@ const baseImage = {
   ariaHidden: false,
   ariaLabel: null,
   ariaLabelledBy: null,
-  isInLink: false,
   outerHTML: '<img>',
 }
 
