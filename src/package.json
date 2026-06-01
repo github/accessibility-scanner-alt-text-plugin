@@ -1,0 +1,6 @@
+{
+  "name": "alt-text-scan",
+  "version": "1.0.0",
+  "description": "Scans pages for missing, decorative-but-meaningful, filename, placeholder, generic, and duplicated alt text.",
+  "type": "module"
+}

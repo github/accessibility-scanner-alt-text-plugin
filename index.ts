@@ -1,7 +1,7 @@
-import {extractImages} from './extract.js'
-import {allRules} from './rules/index.js'
-import {emitFindings} from './findings.js'
-import type {PluginArgs} from './types.js'
+import {extractImages} from './src/extract.js'
+import {allRules} from './src/rules/index.js'
+import {emitFindings} from './src/findings.js'
+import type {PluginArgs} from './src/types.js'
 
 export const name = 'alt-text-scan'
 

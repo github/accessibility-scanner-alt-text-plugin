@@ -1,0 +1,31 @@
+{
+  "name": "accessibility-scanner-alt-text-plugin",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Alt-text validation plugin for github/accessibility-scanner",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "prettier": "@github/prettier-config",
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  },
+  "devDependencies": {
+    "@github/prettier-config": "^0.0.6",
+    "@types/node": "^25.9.0",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "playwright": "^1.60.0",
+    "prettier": "^3.8.3",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.59.4",
+    "vitest": "^4.1.6"
+  }
+}
