@@ -11,7 +11,6 @@ export async function extractImages(page: Page): Promise<ImageRecord[]> {
       ariaHidden: el.getAttribute('aria-hidden') === 'true',
       ariaLabel: el.getAttribute('aria-label'),
       ariaLabelledBy: el.getAttribute('aria-labelledby'),
-      isInLink: el.closest('a') !== null,
       outerHTML: el.outerHTML,
     })),
   )

@@ -30,7 +30,6 @@ export type ImageRecord = {
   ariaHidden: boolean
   ariaLabel: string | null
   ariaLabelledBy: string | null
-  isInLink: boolean
   outerHTML: string
 }
 
