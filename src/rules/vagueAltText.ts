@@ -106,6 +106,7 @@ function normalizeAltText(alt: string): string {
     .toLowerCase()
     .replace(/\s+/g, ' ')
     .replace(/[.,!?;:()[\]{}'"“”‘’]+$/g, '')
+    .trim()
 }
 
 export const vagueAltText: Rule = {

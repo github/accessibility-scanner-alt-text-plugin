@@ -69,6 +69,7 @@ describe('vagueAltText', () => {
 
     it('strips trailing punctuation', () => {
       expect(evaluateAlts(['image.'])).toHaveLength(1)
+      expect(evaluateAlts(['image .'])).toHaveLength(1)
       expect(evaluateAlts(['photo!'])).toHaveLength(1)
       expect(evaluateAlts(['icon...'])).toHaveLength(1)
     })
@@ -81,6 +82,11 @@ describe('vagueAltText', () => {
 
     it('empty alt', () => {
       expect(evaluateAlts([''])).toHaveLength(0)
+    })
+
+    it('whitespace-only alt', () => {
+      expect(evaluateAlts(['   '])).toHaveLength(0)
+      expect(evaluateAlts(['\t\n'])).toHaveLength(0)
     })
 
     it('descriptive alt text', () => {
