@@ -79,6 +79,10 @@ describe('repeatedAltText', () => {
     it('treats alts differing only in trailing punctuation as the same run', () => {
       expect(evaluateAlts(['star.', 'star!', 'star...'])).toHaveLength(2)
     })
+
+    it('treats alts differing only in leading punctuation as the same run', () => {
+      expect(evaluateAlts(['"star"', '(star)', 'star'])).toHaveLength(2)
+    })
   })
 
   describe('run breakers', () => {

@@ -11,7 +11,8 @@ function normalizeAltText(alt: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, ' ')
-    .replace(/[.,!?;:()[\]{}'"“”‘’]+$/g, '')
+    .replace(/^[.,!?;:()[\]{}'"“”‘’]+/, '')
+    .replace(/[.,!?;:()[\]{}'"“”‘’]+$/, '')
     .trim()
 }
 
@@ -50,7 +51,7 @@ export const repeatedAltText: Rule = {
             image: img,
             problemShort: `Alt text is repeated across ${runLength} consecutive images:\n"${img.alt}"`,
             solutionShort:
-              'If the images are decorative, use `alt=""`. Otherwise, give each image a unique description',
+              'If these images form one visual group, describe the group once and mark repeated/decorative images with `alt=""`. Otherwise, give each image unique alt text.',
           })
         }
       }
