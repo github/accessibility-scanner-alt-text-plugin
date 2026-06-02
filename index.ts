@@ -8,7 +8,7 @@ export const name = 'alt-text-scan'
 export default async function altTextScan({page, addFinding}: PluginArgs): Promise<void> {
   const url = page.url()
 
-  // Extract images from the page. 
+  // Extract images from the page.
   let images
   try {
     images = await extractImages(page)
@@ -21,7 +21,7 @@ export default async function altTextScan({page, addFinding}: PluginArgs): Promi
 
   const ctx = {url, images}
 
-  // Enforce checks on each image against each rule. 
+  // Enforce checks on each image against each rule.
   for (const rule of allRules) {
     let results
     try {
