@@ -76,6 +76,8 @@ const VAGUE_WORDS = new Set([
   'uploaded',
 ])
 
+// Set of multi-word phrases that, on their own, describe the medium but not the content, and
+// are thus too vague.
 const VAGUE_PHRASES = new Set([
   'an image',
   'an image of',

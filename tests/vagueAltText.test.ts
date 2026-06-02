@@ -1,9 +1,3 @@
-/**
- * Unit tests for the vague-alt rule.
- *
- * Tests construct mock ImageRecord objects via makeImage() and call vagueAltText.evaluate() directly.
- */
-
 import {describe, it, expect} from 'vitest'
 import {vagueAltText} from '../src/rules/vagueAltText.js'
 import type {ImageRecord, RuleContext} from '../src/types.js'
