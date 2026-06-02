@@ -49,7 +49,7 @@ export const repeatedAltText: Rule = {
           const img = images[k]!
           findings.push({
             image: img,
-            problemShort: `Alt text is repeated across ${runLength} consecutive images:\n"${img.alt}"`,
+            problemShort: `Alt text is repeated across ${runLength} consecutive images:\n"${currAlt}"`,
             solutionShort:
               'If these images form one visual group, describe the group once and mark repeated/decorative images with `alt=""`. Otherwise, give each image unique alt text.',
           })
