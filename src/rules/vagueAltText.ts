@@ -131,7 +131,7 @@ function normalizeAltText(alt: string): string {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, ' ')
-    .replace(/[.,!?;:()[\]{}'"“”‘’]+$/g, '')
+    .replace(/[.,!?;:()[\]{}'"“”‘’]+$/, '')
     .trim()
 }
 
