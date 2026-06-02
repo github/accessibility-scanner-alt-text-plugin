@@ -19,6 +19,9 @@ const VAGUE_WORDS = new Set([
   'visual',
   'visuals',
   'media',
+  'clipart',
+  'gif',
+  'gifs',
 
   // Common UI/image labels
   'icon',
@@ -49,8 +52,15 @@ const VAGUE_WORDS = new Set([
   'screenshots',
   'figure',
   'figures',
+  'painting',
+  'paintings',
+  'map',
+  'maps',
 
   // Placeholders
+  'todo',
+  'tbd',
+  'fixme',
   'placeholder',
   'sample',
   'example',
@@ -58,6 +68,16 @@ const VAGUE_WORDS = new Set([
   'demo',
   'default',
   'untitled',
+  'null',
+  'undefined',
+  'none',
+
+  // File format / extension names
+  'jpg',
+  'jpeg',
+  'png',
+  'svg',
+  'webp',
 
   // Contextless terms
   'this',
@@ -76,8 +96,7 @@ const VAGUE_WORDS = new Set([
   'uploaded',
 ])
 
-// Set of multi-word phrases that, on their own, describe the medium but not the content, and
-// are thus too vague.
+// Set of multi-word phrases that by themselves, are too vague to be useful alt text
 const VAGUE_PHRASES = new Set([
   'an image',
   'an image of',
@@ -94,6 +113,13 @@ const VAGUE_PHRASES = new Set([
   'picture of',
   'graphic of',
   'screenshot of',
+  'image goes here',
+  'photo goes here',
+  'picture goes here',
+  'your image here',
+  'your photo here',
+  'insert image',
+  'insert photo',
 ])
 
 /**
@@ -126,7 +152,7 @@ export const vagueAltText: Rule = {
         // Report each one with offending alt text.
         .map(image => ({
           image,
-          problemShort: `alt text "${image.alt}" is too vague to describe the image`,
+          problemShort: `Alt text is too vague to describe the image:\n"${image.alt}"`,
           solutionShort: 'replace with descriptive alt text, or use `alt=""` if the image is decorative',
         }))
     )

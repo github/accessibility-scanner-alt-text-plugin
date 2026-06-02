@@ -8,7 +8,7 @@ import type {ImageRecord, RuleContext} from '../src/types.js'
  */
 function makeImage(overrides: Partial<ImageRecord> = {}): ImageRecord {
   return {
-    src: 'example source',
+    src: 'https://example.com/image.png',
     alt: null,
     role: null,
     ariaHidden: false,
@@ -25,7 +25,7 @@ function makeImage(overrides: Partial<ImageRecord> = {}): ImageRecord {
  */
 function evaluateAlts(alts: (string | null)[]) {
   const context: RuleContext = {
-    url: 'example website',
+    url: 'https://example.com',
     images: alts.map(alt => makeImage({alt})),
   }
   return vagueAltText.evaluate(context)
