@@ -11,7 +11,7 @@ const baseImage = {
   outerHTML: '<img>',
 }
 
-function makeCtx(alt: string | null): RuleContext {
+function makeContext(alt: string | null): RuleContext {
   return {url: 'https://example.com', images: [{...baseImage, alt}]}
 }
 
