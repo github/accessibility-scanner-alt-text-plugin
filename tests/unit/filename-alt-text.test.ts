@@ -17,22 +17,22 @@ function makeContext(alt: string | null): RuleContext {
 
 describe('filename-alt-text', () => {
   it('flags a .png filename as alt text', () => {
-    expect(filenameAltText.evaluate(makeCtx('12345.png'))).toHaveLength(1)
+    expect(filenameAltText.evaluate(makeContext('12345.png'))).toHaveLength(1)
   })
 
   it('flags a screenshot filename', () => {
-    expect(filenameAltText.evaluate(makeCtx('Screenshot 2024-04-28.jpg'))).toHaveLength(1)
+    expect(filenameAltText.evaluate(makeContext('Screenshot 2024-04-28.jpg'))).toHaveLength(1)
   })
 
   it('does not flag a meaningful description', () => {
-    expect(filenameAltText.evaluate(makeCtx('A dog playing in the park'))).toHaveLength(0)
+    expect(filenameAltText.evaluate(makeContext('A dog playing in the park'))).toHaveLength(0)
   })
 
   it('does not flag an empty string alt', () => {
-    expect(filenameAltText.evaluate(makeCtx(''))).toHaveLength(0)
+    expect(filenameAltText.evaluate(makeContext(''))).toHaveLength(0)
   })
 
   it('does not flag a null alt', () => {
-    expect(filenameAltText.evaluate(makeCtx(null))).toHaveLength(0)
+    expect(filenameAltText.evaluate(makeContext(null))).toHaveLength(0)
   })
 })
