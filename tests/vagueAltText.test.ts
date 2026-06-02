@@ -75,7 +75,7 @@ describe('vagueAltText', () => {
     })
   })
 
-  describe('should not flag', () => {
+  describe('should not flag non-vague alt text', () => {
     it('null alt', () => {
       expect(evaluateAlts([null])).toHaveLength(0)
     })
