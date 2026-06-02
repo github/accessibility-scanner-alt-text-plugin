@@ -1,4 +1,4 @@
-import type {ImageRecord, Rule, RuleContext, RuleResult} from '../src/types.js'
+import type {ImageRecord, Rule, RuleContext, RuleResult} from '../../src/types.js'
 
 /**
  * Builds an ImageRecord with default values so each test only specifies
