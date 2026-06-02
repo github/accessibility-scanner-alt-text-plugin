@@ -138,9 +138,9 @@ function normalizeAltText(alt: string): string {
 export const vagueAltText: Rule = {
   id: 'vague-alt',
   problemUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
-  evaluate(ctx): RuleResult[] {
+  evaluate(context): RuleResult[] {
     return (
-      ctx.images
+      context.images
 
         // Find images whose alt text is too vague.
         .filter(img => {
