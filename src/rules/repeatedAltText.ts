@@ -1,20 +1,9 @@
 import type {Rule, RuleResult} from '../types.js'
+import {normalizeAltText} from '../utils/normalizeAltText.js'
 
 // Minimum number of consecutive images sharing the same alt before the run is flagged.
 // Two repeats could be a coincidence, but three is more likely to be an issue.
 const MIN_RUN_LENGTH = 3
-
-// Duplicated from vagueAltText.ts. Will refactor into seperate util folder once
-// vagueAltText merge is completed.
-function normalizeAltText(alt: string): string {
-  return alt
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .replace(/^[.,!?;:()[\]{}'"“”‘’]+/, '')
-    .replace(/[.,!?;:()[\]{}'"“”‘’]+$/, '')
-    .trim()
-}
 
 export const repeatedAltText: Rule = {
   id: 'repeated-alt',

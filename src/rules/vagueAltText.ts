@@ -1,4 +1,5 @@
 import type {Rule, RuleResult} from '../types.js'
+import {normalizeAltText} from '../utils/normalizeAltText.js'
 
 // Set of words that by themselves, are too vague to be useful alt text
 const VAGUE_WORDS = new Set([
@@ -121,19 +122,6 @@ const VAGUE_PHRASES = new Set([
   'insert image',
   'insert photo',
 ])
-
-/**
- * Normalizes alt text for set check by lowercasing, collapsing
- * whitespace, and stripping trailing punctuation.
- */
-function normalizeAltText(alt: string): string {
-  return alt
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ')
-    .replace(/[.,!?;:()[\]{}'"“”‘’]+$/, '')
-    .trim()
-}
 
 export const vagueAltText: Rule = {
   id: 'vague-alt',
