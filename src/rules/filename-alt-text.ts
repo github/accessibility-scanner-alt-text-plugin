@@ -5,10 +5,10 @@ const FILENAME_PATTERN = /\.(png|jpg|jpeg|gif|svg|webp|bmp|ico)$/i
 export const filenameAltText: Rule = {
   id: 'filename-alt-text',
   problemUrl: 'https://www.w3.org/WAI/tutorials/images/decision-tree/',
-  evaluate(ctx: RuleContext): RuleResult[] {
+  evaluate(context: RuleContext): RuleResult[] {
     const results: RuleResult[] = []
 
-    for (const image of ctx.images) {
+    for (const image of context.images) {
       if (image.alt === null || image.alt === '') continue
       if (!FILENAME_PATTERN.test(image.alt.trim())) continue
 
