@@ -21,7 +21,7 @@ export const repeatedAltText: Rule = {
         continue
       }
 
-      // Detect length of run
+      // Detect length of consecutive alt texts
       let j = i + 1
       while (j < images.length) {
         const next = images[j]!.alt
