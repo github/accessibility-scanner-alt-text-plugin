@@ -1,4 +1,5 @@
 import type {Rule, RuleResult, RuleContext} from '../types.js'
+import {normalizeAltText} from './vagueAltText.js'
 
 // Known placeholder/boilerplate strings that signal the alt text was never written.
 const PLACEHOLDER_ALT_TEXT = new Set([
@@ -19,7 +20,7 @@ export const placeholderAltText: Rule = {
 
     for (const image of context.images) {
       if (image.alt === null || image.alt === '') continue
-      if (!PLACEHOLDER_ALT_TEXT.has(image.alt.trim().toLowerCase())) continue
+      if (!PLACEHOLDER_ALT_TEXT.has(normalizeAltText(image.alt))) continue
 
       results.push({
         image,
