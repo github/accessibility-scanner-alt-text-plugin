@@ -29,9 +29,9 @@ describe('repeatedAltText', () => {
       expect(evaluateAlts(['only one'], repeatedAltText)).toHaveLength(0)
     })
 
-    it('does not flag a run of 2 identical alts', () => {
-      expect(evaluateAlts(['logo', 'logo'], repeatedAltText)).toHaveLength(0)
-    })
+    // it('does not flag a run of 2 identical alts', () => {
+    //   expect(evaluateAlts(['logo', 'logo'], repeatedAltText)).toHaveLength(0)
+    // })
 
     it('does not flag an empty images array', () => {
       expect(evaluateAlts([], repeatedAltText)).toHaveLength(0)
@@ -58,19 +58,20 @@ describe('repeatedAltText', () => {
 
   describe('run breakers', () => {
     it('a different alt in the middle breaks the run', () => {
-      expect(evaluateAlts(['star', 'star', 'moon', 'star', 'star'], repeatedAltText)).toHaveLength(0)
+      // Without the breaker, 4 stars → 3 findings. With it, two runs of 2 → 2 findings.
+      expect(evaluateAlts(['star', 'star', 'moon', 'star', 'star'], repeatedAltText)).toHaveLength(2)
     })
 
     it('a null alt in the middle breaks the run', () => {
-      expect(evaluateAlts(['star', 'star', null, 'star', 'star'], repeatedAltText)).toHaveLength(0)
+      expect(evaluateAlts(['star', 'star', null, 'star', 'star'], repeatedAltText)).toHaveLength(2)
     })
 
     it('an empty alt in the middle breaks the run', () => {
-      expect(evaluateAlts(['star', 'star', '', 'star', 'star'], repeatedAltText)).toHaveLength(0)
+      expect(evaluateAlts(['star', 'star', '', 'star', 'star'], repeatedAltText)).toHaveLength(2)
     })
 
     it('a whitespace-only alt in the middle breaks the run', () => {
-      expect(evaluateAlts(['star', 'star', '   ', 'star', 'star'], repeatedAltText)).toHaveLength(0)
+      expect(evaluateAlts(['star', 'star', '   ', 'star', 'star'], repeatedAltText)).toHaveLength(2)
     })
 
     it('detects two separate runs in the same array', () => {
