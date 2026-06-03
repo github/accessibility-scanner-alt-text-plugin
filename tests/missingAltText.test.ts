@@ -31,8 +31,8 @@ describe('missing-alt-text', () => {
     expect(missingAltText.evaluate(makeContext(['A dog playing in the park']))).toHaveLength(0)
   })
 
-  it('does not flag whitespace-only alt', () => {
-    expect(missingAltText.evaluate(makeContext(['   ']))).toHaveLength(0)
+  it('flags whitespace-only alt', () => {
+    expect(missingAltText.evaluate(makeContext(['   ']))).toHaveLength(1)
   })
 
   it('returns one result per missing-alt image and preserves order', () => {
