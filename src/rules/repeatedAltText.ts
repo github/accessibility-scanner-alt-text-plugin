@@ -2,8 +2,7 @@ import type {Rule, RuleResult} from '../types.js'
 import {normalizeAltText} from '../utils/normalizeAltText.js'
 
 // Minimum number of consecutive images sharing the same alt before the run is flagged.
-// Two repeats could be a coincidence, but three is more likely to be an issue.
-const MIN_RUN_LENGTH = 3
+const MIN_RUN_LENGTH = 2
 
 export const repeatedAltText: Rule = {
   id: 'repeated-alt',
