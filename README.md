@@ -7,6 +7,7 @@ The plugin helps teams:
 - 🖼️ Catch vague, generic, or filler `alt` text (`"image"`, `"photo"`, `"icon"`)
 - 📛 Catch raw filenames being used as `alt` text (`"IMG_1234.png"`)
 - 🔁 Catch runs of adjacent images that all share the same `alt` text
+- 🚧 Catch boilerplate placeholder `alt` text (`"todo"`, `"tbd"`, `"fixme"`)
 - ♿ Catch images missing an `alt` attribute entirely (without flagging intentional decorative `alt=""`)
 
 > ⚠️ **Note:** This plugin is in active development alongside the a11y scanner's public preview. New rules are being added and end-to-end integration with the scanner workflow is still in progress. Always review filed issues before acting on them.
@@ -24,7 +25,7 @@ The plugin inherits the a11y scanner's general FAQ — see the link above for qu
 To use the Alt-Text Plugin, you'll need:
 
 - **The [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner)** wired into a GitHub Actions workflow in your repository
-- **The plugin's source files** available under `./.github/scanner-plugins/alt-text/` in the repository that runs the scanner workflow (see [Getting started](#getting-started))
+- **The plugin's source files** available under `./.github/scanner-plugins/alt-text-scan/` in the repository that runs the scanner workflow (see [Getting started](#getting-started))
 - **Everything required to run the scanner itself** (Actions enabled, Issues enabled, a `GH_TOKEN` PAT — see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
 
 To develop the plugin locally, you'll need:
@@ -38,9 +39,7 @@ To develop the plugin locally, you'll need:
 
 ### 1. Add the plugin to your scanner repository
 
-Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` (and any supporting files) into `./.github/scanner-plugins/alt-text/`.
-
-> 👉 The plugin name is determined by the `name` field exported from the plugin's `index.ts`. This README uses `alt-text` throughout — match whatever string the plugin actually exports.
+Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` (and any supporting files) into `./.github/scanner-plugins/alt-text-scan/`.
 
 📚 Learn more
 
@@ -51,7 +50,7 @@ Following the conventions in the scanner's [PLUGINS.md](https://github.com/githu
 
 ### 2. Enable the plugin in your workflow
 
-Add `"alt-text"` to the scanner action's `scans` input. If you don't already have a `scans` input, you'll also want to keep `"axe"` in the list — by default the scanner only runs Axe, and listing any value at all opts you out of the default.
+Add `"alt-text-scan"` to the scanner action's `scans` input. If you don't already have a `scans` input, you'll also want to keep `"axe"` in the list — by default the scanner only runs Axe, and listing any value at all opts you out of the default.
 
 ```yaml
 name: Accessibility Scanner
@@ -69,7 +68,7 @@ jobs:
           repository: REPLACE_THIS/REPLACE_THIS
           token: ${{ secrets.GH_TOKEN }}
           cache_key: REPLACE_THIS
-          scans: '["axe", "alt-text"]' # Add "alt-text" to enable this plugin
+          scans: '["axe", "alt-text-scan"]' # Add "alt-text-scan" to enable this plugin
 ```
 
 > 👉 Update all `REPLACE_THIS` placeholders with your actual values. See the [scanner's Action inputs](https://github.com/github/accessibility-scanner#action-inputs) for the full list.
@@ -99,9 +98,10 @@ The plugin runs every extracted image through an append-only registry of rules. 
 | Rule                | ID                  | Fires when                                                                                                                                                                                                                                                                                                                         | Example (flagged)                                                        |
 | ------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | **Missing alt**     | `missing-alt-text`  | The `alt` attribute is absent (`null`) or whitespace-only (`"   "`). `alt=""` is treated as intentional decorative use and is **not** flagged.                                                                                                                                                                                     | `<img src="cat.png">`<br>`<img src="cat.png" alt="   ">`                 |
-| **Vague alt**       | `vague-alt-text`    | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `placeholder`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped. | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
+| **Vague alt**       | `vague-alt-text`    | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped.        | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
 | **Filename as alt** | `filename-alt-text` | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                                             | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
 | **Repeated alt**    | `repeated-alt`      | Two or more adjacent images in the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                                           | Five consecutive `<img alt="3/5 stars">` elements                        |
+| **Placeholder alt** | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                            | `<img alt="TODO">`<br>`<img alt="insert alt text">`                       |
 
 ### Image extraction
 
@@ -115,7 +115,7 @@ Before rules run, the plugin extracts images from the page through Playwright's 
 
 ### Overlap with Axe
 
-The scanner's built-in Axe scan includes a rule called [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) that catches missing and whitespace-only `alt` attributes. If you have both `"axe"` and `"alt-text"` enabled, the same image may be flagged by both. The other three rules in this plugin (vague-alt, filename-alt, repeated-alt) are unique to the plugin and don't overlap with Axe.
+The scanner's built-in Axe scan includes a rule called [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) that catches missing and whitespace-only `alt` attributes. If you have both `"axe"` and `"alt-text-scan"` enabled, the same image may be flagged by both. The other four rules in this plugin (vague-alt, filename-alt, repeated-alt, placeholder-alt) are unique to the plugin and don't overlap with Axe.
 
 ---
 
@@ -165,6 +165,7 @@ src/
     missingAltText.ts
     vagueAltText.ts
     filename-alt-text.ts
+    placeholder-alt-text.ts
     repeatedAltText.ts
   utils/
     normalizeAltText.ts # Lowercase, trim, collapse whitespace, strip punctuation
