@@ -95,13 +95,13 @@ Trigger your scanner workflow manually or automatically based on your configurat
 
 The plugin runs every extracted image through an append-only registry of rules. Each rule returns a finding when an image fails its criteria. Findings are converted to issues by the scanner.
 
-| Rule                | ID                  | Fires when                                                                                                                                                                                                                                                                                                                         | Example (flagged)                                                        |
-| ------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| **Missing alt**     | `missing-alt-text`  | The `alt` attribute is absent (`null`) or whitespace-only (`"   "`). `alt=""` is treated as intentional decorative use and is **not** flagged.                                                                                                                                                                                     | `<img src="cat.png">`<br>`<img src="cat.png" alt="   ">`                 |
-| **Vague alt**       | `vague-alt-text`    | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped.        | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
-| **Filename as alt** | `filename-alt-text` | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                                             | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
-| **Repeated alt**    | `repeated-alt`      | Two or more adjacent images in the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                                           | Five consecutive `<img alt="3/5 stars">` elements                        |
-| **Placeholder alt** | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                            | `<img alt="TODO">`<br>`<img alt="insert alt text">`                       |
+| Rule                | ID                     | Fires when                                                                                                                                                                                                                                                                                                          | Example (flagged)                                                        |
+| ------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **Missing alt**     | `missing-alt-text`     | The `alt` attribute is absent (`null`) or whitespace-only (`"   "`). `alt=""` is treated as intentional decorative use and is **not** flagged.                                                                                                                                                                      | `<img src="cat.png">`<br>`<img src="cat.png" alt="   ">`                 |
+| **Vague alt**       | `vague-alt-text`       | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped. | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
+| **Filename as alt** | `filename-alt-text`    | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                              | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
+| **Repeated alt**    | `repeated-alt`         | Two or more adjacent images in the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                            | Five consecutive `<img alt="3/5 stars">` elements                        |
+| **Placeholder alt** | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                    | `<img alt="TODO">`<br>`<img alt="insert alt text">`                      |
 
 ### Image extraction
 
@@ -159,28 +159,30 @@ Every pull request runs `lint`, `format:check`, `typecheck`, and `test` against 
 
 ```
 src/
-  extract.ts            # Pulls visible <img> records from a Playwright page
+  extract.ts                # Pulls visible <img> records from a Playwright page
   rules/
-    index.ts            # Append-only rule registry
-    missingAltText.ts
-    vagueAltText.ts
+    index.ts                # Append-only rule registry
+    missing-alt-text.ts
+    vague-alt-text.ts
     filename-alt-text.ts
     placeholder-alt-text.ts
-    repeatedAltText.ts
+    repeated-alt-text.ts
   utils/
-    normalizeAltText.ts # Lowercase, trim, collapse whitespace, strip punctuation
-  types.ts              # Rule, RuleContext, RuleResult, ImageRecord
+    normalize-alt-text.ts   # Lowercase, trim, collapse whitespace, strip punctuation
+  types.ts                  # Rule, RuleContext, RuleResult, ImageRecord
 tests/
-  *.test.ts             # One file per rule
-  extract.test.ts       # Playwright-driven tests for the image extractor
-  utils/helpers.ts      # makeImage() and evaluateAlts() — shared across rule tests
+  unit/
+    *.test.ts               # One file per rule
+    extract.test.ts         # Playwright-driven tests for the image extractor
+  utils/
+    helpers.ts              # makeImage() and evaluateAlts() — shared across rule tests
 ```
 
 ### Adding a new rule
 
 1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape — `id`, `problemUrl`, and `evaluate(context)`).
 2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`. The registry is append-only — don't reorder existing rules.
-3. Add a `tests/<ruleName>.test.ts` file. Use `evaluateAlts(alts, rule)` and `makeImage(overrides)` from [`tests/utils/helpers.ts`](./tests/utils/helpers.ts) for the common cases; construct an explicit `RuleContext` only when you need control over `src` or other per-image fields.
+3. Add a `tests/unit/<rule-name>.test.ts` file. Use `evaluateAlts(alts, rule)` and `makeImage(overrides)` from [`tests/utils/helpers.ts`](./tests/utils/helpers.ts) for the common cases; construct an explicit `RuleContext` only when you need control over `src` or other per-image fields.
 4. Run `npm run test && npm run typecheck` locally before opening a PR. CI will re-run them.
 
 > [!IMPORTANT]
