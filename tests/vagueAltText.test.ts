@@ -10,6 +10,7 @@ describe('vagueAltText', () => {
       alt => {
         const results = evaluateAlts([alt], vagueAltText)
         expect(results).toHaveLength(1)
+        expect(results[0]).toBeDefined()
         expect(results[0]!.image.alt).toBe(alt)
       },
     )
@@ -96,11 +97,13 @@ describe('vagueAltText', () => {
 
     it('includes the offending alt text in problemShort', () => {
       const [result] = evaluateAlts(['image'], vagueAltText)
+      expect(result).toBeDefined()
       expect(result!.problemShort).toContain('image')
     })
 
     it('includes a solutionShort', () => {
       const [result] = evaluateAlts(['image'], vagueAltText)
+      expect(result).toBeDefined()
       expect(result!.solutionShort).toBeTruthy()
     })
   })
