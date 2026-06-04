@@ -5,7 +5,7 @@ import {evaluateAlts, makeImage} from './utils/helpers.js'
 
 describe('vagueAltText', () => {
   describe('flags vague single-word alt text', () => {
-    it.each(['image', 'photo', 'picture', 'icon', 'logo', 'chart', 'screenshot', 'placeholder', 'untitled', 'below'])(
+    it.each(['image', 'photo', 'picture', 'icon', 'logo', 'chart', 'screenshot', 'untitled', 'below'])(
       'flags alt="%s"',
       alt => {
         const results = evaluateAlts([alt], vagueAltText)
@@ -69,6 +69,13 @@ describe('vagueAltText', () => {
     it('alt text that contains a vague word, but is not vague by itself', () => {
       expect(evaluateAlts(['Profile photo of Ada Lovelace'], vagueAltText)).toHaveLength(0)
       expect(evaluateAlts(['Screenshot of the GitHub home page'], vagueAltText)).toHaveLength(0)
+    })
+
+    it('placeholder words that now live in placeholder-alt-text', () => {
+      expect(evaluateAlts(['todo'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['tbd'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['fixme'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['placeholder'], vagueAltText)).toHaveLength(0)
     })
   })
 

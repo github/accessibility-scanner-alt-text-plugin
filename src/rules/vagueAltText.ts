@@ -59,10 +59,7 @@ const VAGUE_WORDS = new Set([
   'maps',
 
   // Placeholders
-  'todo',
-  'tbd',
-  'fixme',
-  'placeholder',
+  // Note: todo, tbd, fixme, and placeholder live in placeholder-alt-text.ts.
   'sample',
   'example',
   'test',

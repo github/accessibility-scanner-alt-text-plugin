@@ -2,7 +2,8 @@ import type {Rule} from '../types.js'
 import {filenameAltText} from './filename-alt-text.js'
 import {vagueAltText} from './vagueAltText.js'
 import {missingAltText} from './missingAltText.js'
+import {placeholderAltText} from './placeholder-alt-text.js'
 import {repeatedAltText} from './repeatedAltText.js'
 
-// Array that stores all rules to be enforced by the scanner.
-export const allRules: Rule[] = [filenameAltText, vagueAltText, missingAltText, repeatedAltText]
+// Append-only registry. Add a rule by importing it here and pushing it onto the array.
+export const allRules: Rule[] = [filenameAltText, vagueAltText, missingAltText, placeholderAltText, repeatedAltText]
