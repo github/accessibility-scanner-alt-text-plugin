@@ -58,10 +58,7 @@ const VAGUE_WORDS = new Set([
   'maps',
 
   // Placeholders
-  'todo',
-  'tbd',
-  'fixme',
-  'placeholder',
+  // Note: todo, tbd, fixme, and placeholder live in placeholder-alt-text.ts.
   'sample',
   'example',
   'test',
@@ -126,7 +123,7 @@ const VAGUE_PHRASES = new Set([
  * Normalizes alt text for set check by lowercasing, collapsing
  * whitespace, and stripping trailing punctuation.
  */
-function normalizeAltText(alt: string): string {
+export function normalizeAltText(alt: string): string {
   return alt
     .trim()
     .toLowerCase()
