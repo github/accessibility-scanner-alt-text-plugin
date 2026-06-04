@@ -111,8 +111,6 @@ Before rules run, the plugin extracts images from the page through Playwright's 
 - Images inside `display: none` or `visibility: hidden` subtrees
 - Decorative images with `alt=""` (implicit `role="presentation"`)
 
-> 👉 If you've authored `alt=""` to intentionally hide an image from screen readers, this plugin will **not** flag it — that's correct behavior.
-
 ### Overlap with Axe
 
 The scanner's built-in Axe scan includes a rule called [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) that catches missing and whitespace-only `alt` attributes. If you have both `"axe"` and `"alt-text-scan"` enabled, the same image may be flagged by both. The other four rules in this plugin (vague-alt, filename-alt, repeated-alt, placeholder-alt) are unique to the plugin and don't overlap with Axe.
