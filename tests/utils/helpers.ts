@@ -13,6 +13,7 @@ export function makeImage(overrides: Partial<ImageRecord> = {}): ImageRecord {
     ariaLabel: null,
     ariaLabelledBy: null,
     outerHTML: '<img>',
+    boundingBox: null,
     ...overrides,
   }
 }
@@ -27,4 +28,12 @@ export function evaluateAlts(alts: (string | null)[], rule: Rule): RuleResult[] 
     images: alts.map(alt => makeImage({alt})),
   }
   return rule.evaluate(context)
+}
+
+/**
+ * Runs the given rule against a pre-built set of ImageRecords. Use when a
+ * test needs control over fields beyond `alt` (e.g. boundingBox).
+ */
+export function evaluateImages(images: ImageRecord[], rule: Rule): RuleResult[] {
+  return rule.evaluate({url: 'https://example.com', images})
 }

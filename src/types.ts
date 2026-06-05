@@ -31,6 +31,15 @@ export type ImageRecord = {
   ariaLabel: string | null
   ariaLabelledBy: string | null
   outerHTML: string
+  boundingBox: BoundingBox | null
+}
+
+// Pixel position and size of an image in the page's rendered layout.
+export type BoundingBox = {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
 // Input handed to every rule's evaluate() function.

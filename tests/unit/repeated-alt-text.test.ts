@@ -1,6 +1,13 @@
 import {describe, it, expect} from 'vitest'
 import {repeatedAltText} from '../../src/rules/repeated-alt-text.js'
-import {evaluateAlts} from '../utils/helpers.js'
+import type {BoundingBox} from '../../src/types.js'
+import {evaluateAlts, evaluateImages, makeImage} from '../utils/helpers.js'
+
+// Build a 24x24 icon at (x, y)
+function iconAt(alt: string | null, x: number, y: number, size = 24): ReturnType<typeof makeImage> {
+  const boundingBox: BoundingBox = {x, y, width: size, height: size}
+  return makeImage({alt, boundingBox})
+}
 
 describe('repeatedAltText', () => {
   describe('flags runs at or above the minimum length', () => {
@@ -101,6 +108,65 @@ describe('repeatedAltText', () => {
     it('reports the run length in the problem message', () => {
       const [first] = evaluateAlts(['x', 'x', 'x', 'x', 'x'], repeatedAltText)
       expect(first!.problemShort).toContain('5')
+    })
+  })
+
+  describe('spatial distance', () => {
+    // With size=24 and GAP_MULTIPLIER=3, the max edge-to-edge gap that
+    // still extends a run is 48px.
+
+    it('flags a tight horizontal row of icons (4px gap between 24px icons)', () => {
+      const images = [iconAt('star', 0, 0), iconAt('star', 28, 0), iconAt('star', 56, 0), iconAt('star', 84, 0)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(3)
+    })
+
+    it('flags a tight vertical column of icons (4px gap between 24px icons)', () => {
+      const images = [iconAt('star', 0, 0), iconAt('star', 0, 28), iconAt('star', 0, 56)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(2)
+    })
+
+    it('does not flag two images spaced far apart (gap > 3x larger dim)', () => {
+      // 200px vertical gap between 24px icons = 8.3x larger dim, over threshold
+      const images = [iconAt('star', 0, 0), iconAt('star', 0, 224)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(0)
+    })
+
+    it('breaks the run when a far image follows a tight cluster', () => {
+      // First 3 are close (4px apart), 4th is 200px away from the 3rd.
+      const images = [iconAt('star', 0, 0), iconAt('star', 28, 0), iconAt('star', 56, 0), iconAt('star', 256, 0)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(2)
+    })
+
+    it('starts a new run after a spatial break', () => {
+      // Close pair, big gap, close pair
+      const images = [iconAt('star', 0, 0), iconAt('star', 28, 0), iconAt('star', 500, 0), iconAt('star', 528, 0)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(2)
+    })
+
+    it('treats a gap exactly at the threshold as still part of the run', () => {
+      // Threshold = 3 * 24 = 72. A gap of exactly 72 shouldn't break the run.
+      const images = [iconAt('star', 0, 0), iconAt('star', 96, 0), iconAt('star', 192, 0)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(2)
+    })
+
+    it('does not break the run when an image lacks a measurable bounding box', () => {
+      // Middle image has no layout box, so run extends through
+      const images = [iconAt('star', 0, 0), makeImage({alt: 'star', boundingBox: null}), iconAt('star', 56, 0)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(2)
+    })
+
+    it('groups overlapping images (gap = 0) regardless of large size', () => {
+      // Two 200x200 images overlapping by 50px
+      const big = (alt: string, x: number): ReturnType<typeof makeImage> => iconAt(alt, x, 0, 200)
+      const images = [big('hero', 0), big('hero', 150), big('hero', 300)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(2)
+    })
+
+    it('scales the allowed gap with image size (larger images tolerate larger gaps)', () => {
+      // Two 200x200 images with 300px gap = 1.5x larger dim, which is under N=3
+      const big = (alt: string, x: number): ReturnType<typeof makeImage> => iconAt(alt, x, 0, 200)
+      const images = [big('hero', 0), big('hero', 500)]
+      expect(evaluateImages(images, repeatedAltText)).toHaveLength(1)
     })
   })
 
