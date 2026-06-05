@@ -5,7 +5,7 @@ import {normalizeAltText} from '../utils/normalize-alt-text.js'
 const MIN_RUN_LENGTH = 2
 
 export const repeatedAltText: Rule = {
-  id: 'repeated-alt',
+  id: 'repeated-alt-text',
   problemUrl: 'https://www.w3.org/WAI/tutorials/images/groups/',
   evaluate(context): RuleResult[] {
     const findings: RuleResult[] = []

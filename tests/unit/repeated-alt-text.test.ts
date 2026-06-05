@@ -106,7 +106,7 @@ describe('repeatedAltText', () => {
 
   describe('rule metadata', () => {
     it('has the expected id', () => {
-      expect(repeatedAltText.id).toBe('repeated-alt')
+      expect(repeatedAltText.id).toBe('repeated-alt-text')
     })
 
     it('has a problemUrl pointing at a WCAG / W3C resource', () => {
