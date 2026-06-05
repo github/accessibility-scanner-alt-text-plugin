@@ -1,6 +1,6 @@
 # Alt-Text Plugin for the Accessibility Scanner
 
-The Alt-Text Plugin is a [plugin](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner) that flags low-quality `alt` text on images. It catches the cases that axe-core's built-in `image-alt` rule does not, helping teams ship images with descriptive, screen-reader-friendly alternative text.
+The Alt-Text Plugin is a [plugin](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner) that flags low-quality `alt` text on images. It complements axe-core's built-in `image-alt` rule by flagging additional low-quality patterns, helping teams ship images with descriptive, screen-reader-friendly alternative text.
 
 The plugin helps teams:
 
