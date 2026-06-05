@@ -1,0 +1,50 @@
+name: Test
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event.pull_request.draft == false }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24, 26]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # extract.test.ts drives a real Chromium via Playwright.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test

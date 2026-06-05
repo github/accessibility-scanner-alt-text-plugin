@@ -37,7 +37,8 @@ describe('placeholder-alt-text', () => {
 
   it('includes a solutionShort telling the engineer to replace the placeholder', () => {
     const [result] = placeholderAltText.evaluate(makeContext('todo'))
-    expect(result.solutionShort).toContain('Replace the placeholder')
+    expect(result).toBeDefined()
+    expect(result!.solutionShort).toContain('Replace the placeholder')
   })
 
   it('does not flag a meaningful description', () => {
