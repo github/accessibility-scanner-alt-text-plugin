@@ -113,7 +113,7 @@ describe('repeatedAltText', () => {
 
   describe('spatial distance', () => {
     // With size=24 and GAP_MULTIPLIER=3, the max edge-to-edge gap that
-    // still extends a run is 48px.
+    // still extends a run is 72px.
 
     it('flags a tight horizontal row of icons (4px gap between 24px icons)', () => {
       const images = [iconAt('star', 0, 0), iconAt('star', 28, 0), iconAt('star', 56, 0), iconAt('star', 84, 0)]
