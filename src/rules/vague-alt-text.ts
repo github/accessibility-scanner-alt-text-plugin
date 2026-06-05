@@ -121,7 +121,7 @@ const VAGUE_PHRASES = new Set([
 ])
 
 export const vagueAltText: Rule = {
-  id: 'vague-alt',
+  id: 'vague-alt-text',
   problemUrl: 'https://www.w3.org/WAI/WCAG21/Understanding/non-text-content.html',
   evaluate(context): RuleResult[] {
     return (

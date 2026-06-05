@@ -110,7 +110,7 @@ describe('vagueAltText', () => {
 
   describe('rule metadata', () => {
     it('has a stable id', () => {
-      expect(vagueAltText.id).toBe('vague-alt')
+      expect(vagueAltText.id).toBe('vague-alt-text')
     })
 
     it('points problemUrl correctly', () => {
