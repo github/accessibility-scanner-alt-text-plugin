@@ -15,7 +15,7 @@
   },
   "prettier": "@github/prettier-config",
   "engines": {
-    "node": "^20.19.0 || ^22.13.0 || >=24"
+    "node": "^22.13.0 || ^24 || ^26"
   },
   "devDependencies": {
     "@github/prettier-config": "^0.0.6",
