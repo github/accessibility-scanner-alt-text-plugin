@@ -122,10 +122,14 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 When a rule fires, the plugin emits a finding with the following shape (matching the scanner's [`Finding` type](https://github.com/github/accessibility-scanner/blob/main/.github/actions/find/src/types.d.ts)):
 
-- `problemShort` — one-sentence description of what's wrong, including the offending alt text where applicable
-- `solutionShort` — one-sentence description of how to fix it
-- `problemUrl` — link to the relevant WCAG technique or W3C tutorial
+- `scannerType` — always `'alt-text-scan'`, identifying which plugin produced the finding
+- `ruleId` — the ID of the rule that fired (e.g. `'vague-alt-text'`)
+- `url` — the page URL where the image was found
 - `html` — the offending `<img>` element's outer HTML
+- `problemShort` — one-sentence description of what's wrong, including the offending alt text where applicable
+- `problemUrl` — link to the relevant WCAG technique or W3C tutorial
+- `solutionShort` — one-sentence description of how to fix it
+- `solutionLong` — optional longer explanation when one-sentence isn't enough
 
 The scanner uses these fields to file or update a GitHub issue.
 
@@ -152,7 +156,7 @@ npm ci
 | `npm run format`       | Rewrites files with Prettier                  |
 | `npm run format:check` | Reports formatting violations without writing |
 
-Every pull request runs `lint`, `format:check`, `typecheck`, and `test` against Node 22, 24, and 26 in CI. Workflow definitions live in [`.github/workflows/`](./.github/workflows/).
+Pull requests trigger two CI workflows: [`lint.yml`](./.github/workflows/lint.yml) runs `lint` and `format:check` on Node 24, and [`test.yml`](./.github/workflows/test.yml) runs `typecheck` and `test` across Node 22, 24, and 26.
 
 ### Project layout
 
