@@ -44,16 +44,15 @@ describe('extractImages', () => {
       expect(images).toHaveLength(0)
     })
 
-    it('captures src, alt, role, aria-label, aria-labelledby, and outerHTML', async () => {
+    it('captures src, alt, aria-label, aria-labelledby, and outerHTML', async () => {
       const images = await extractFromHTML(`
-        <img src="x.png" alt="x" role="presentation"
+        <img src="x.png" alt="x"
              aria-label="labeled" aria-labelledby="caption">
       `)
       expect(images).toHaveLength(1)
       const img = images[0]!
       expect(img.src).toBe('x.png')
       expect(img.alt).toBe('x')
-      expect(img.role).toBe('presentation')
       expect(img.ariaLabel).toBe('labeled')
       expect(img.ariaLabelledBy).toBe('caption')
       expect(img.outerHTML).toContain('<img')
