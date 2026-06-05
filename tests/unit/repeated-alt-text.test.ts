@@ -1,6 +1,6 @@
 import {describe, it, expect} from 'vitest'
-import {repeatedAltText} from '../src/rules/repeatedAltText.js'
-import {evaluateAlts} from './utils/helpers.js'
+import {repeatedAltText} from '../../src/rules/repeated-alt-text.js'
+import {evaluateAlts} from '../utils/helpers.js'
 
 describe('repeatedAltText', () => {
   describe('flags runs at or above the minimum length', () => {

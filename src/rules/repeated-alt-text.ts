@@ -1,5 +1,5 @@
 import type {Rule, RuleResult} from '../types.js'
-import {normalizeAltText} from '../utils/normalizeAltText.js'
+import {normalizeAltText} from '../utils/normalize-alt-text.js'
 
 // Minimum number of consecutive images sharing the same alt before the run is flagged.
 const MIN_RUN_LENGTH = 2

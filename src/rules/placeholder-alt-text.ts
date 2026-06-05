@@ -1,5 +1,5 @@
 import type {Rule, RuleResult, RuleContext} from '../types.js'
-import {normalizeAltText} from '../utils/normalizeAltText.js'
+import {normalizeAltText} from '../utils/normalize-alt-text.js'
 
 // Known placeholder/boilerplate strings that signal the alt text was never written.
 const PLACEHOLDER_ALT_TEXT = new Set([

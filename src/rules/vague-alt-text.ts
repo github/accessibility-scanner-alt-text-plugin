@@ -1,5 +1,5 @@
 import type {Rule, RuleResult} from '../types.js'
-import {normalizeAltText} from '../utils/normalizeAltText.js'
+import {normalizeAltText} from '../utils/normalize-alt-text.js'
 
 // Set of words that by themselves, are too vague to be useful alt text
 const VAGUE_WORDS = new Set([
