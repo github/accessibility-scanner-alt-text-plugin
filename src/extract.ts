@@ -1,8 +1,8 @@
 import type {Page} from 'playwright'
 import type {ImageRecord} from './types.js'
 
-// Returns one ImageRecord per image in the accessibility tree. getByRole('img')
-// filters out anything not seen by assistive tech.
+// Returns one ImageRecord per HTML <img> element that is exposed in the accessibility tree.
+// Using getByRole('img') filters out elements that assistive tech cannot perceive.
 export async function extractImages(page: Page): Promise<ImageRecord[]> {
   return page.getByRole('img').evaluateAll(els =>
     els
