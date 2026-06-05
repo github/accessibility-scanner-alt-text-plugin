@@ -30,7 +30,7 @@ To use the Alt-Text Plugin, you'll need:
 
 To develop the plugin locally, you'll need:
 
-- **Node.js** matching the `engines` field in [`package.json`](./package.json) — currently `^20.19.0 || ^22.13.0 || >=24`
+- **Node.js** matching the `engines` field in [`package.json`](./package.json) — currently `^22.13.0 || ^24 || ^26`
 - **npm** (ships with Node)
 
 ---
@@ -105,8 +105,9 @@ The plugin runs every extracted image through an append-only registry of rules. 
 
 ### Image extraction
 
-Before rules run, the plugin extracts images from the page through Playwright's accessibility tree (`page.getByRole('img')`). This means the following are filtered out automatically and never reach the rules:
+Before rules run, the plugin extracts images from the page through Playwright's accessibility tree (`page.getByRole('img')`) and then narrows the result set to actual `<img>` elements. This means the following are filtered out automatically and never reach the rules:
 
+- Non-`<img>` elements with `role="img"` (e.g. `<svg role="img">`, `<div role="img">`) — this plugin's rules only apply to HTML `<img>` tags
 - Images inside `aria-hidden="true"` subtrees
 - Images inside `display: none` or `visibility: hidden` subtrees
 - Decorative images with `alt=""` (implicit `role="presentation"`)
@@ -151,13 +152,15 @@ npm ci
 | `npm run format`       | Rewrites files with Prettier                  |
 | `npm run format:check` | Reports formatting violations without writing |
 
-Every pull request runs `lint`, `format:check`, `typecheck`, and `test` against Node 20, 22, and 24 in CI.
+Every pull request runs `lint`, `format:check`, `typecheck`, and `test` against Node 22, 24, and 26 in CI. Workflow definitions live in [`.github/workflows/`](./.github/workflows/).
 
 ### Project layout
 
 ```
+index.ts                    # Plugin entry point: exports `name` and the default scan function
 src/
   extract.ts                # Pulls visible <img> records from a Playwright page
+  findings.ts               # Translates each RuleResult into the scanner's Finding shape
   rules/
     index.ts                # Append-only rule registry
     missing-alt-text.ts
@@ -167,21 +170,21 @@ src/
     repeated-alt-text.ts
   utils/
     normalize-alt-text.ts   # Lowercase, trim, collapse whitespace, strip punctuation
-  types.ts                  # Rule, RuleContext, RuleResult, ImageRecord
+  types.ts                  # Rule, RuleContext, RuleResult, ImageRecord, Finding
 tests/
+  extract.test.ts           # Playwright-driven tests for the image extractor
   unit/
     *.test.ts               # One file per rule
-    extract.test.ts         # Playwright-driven tests for the image extractor
   utils/
     helpers.ts              # makeImage() and evaluateAlts() — shared across rule tests
 ```
 
 ### Adding a new rule
 
-1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape — `id`, `problemUrl`, and `evaluate(context)`).
+1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape — `id`, `problemUrl`, and `evaluate(context)`). Filenames under `src/` and `tests/` must be kebab-case; ESLint's `check-file/filename-naming-convention` rule enforces this.
 2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`. The registry is append-only — don't reorder existing rules.
 3. Add a `tests/unit/<rule-name>.test.ts` file. Use `evaluateAlts(alts, rule)` and `makeImage(overrides)` from [`tests/utils/helpers.ts`](./tests/utils/helpers.ts) for the common cases; construct an explicit `RuleContext` only when you need control over `src` or other per-image fields.
-4. Run `npm run test && npm run typecheck` locally before opening a PR. CI will re-run them.
+4. Run `npm run test && npm run typecheck && npm run lint` locally before opening a PR. CI will re-run them.
 
 > [!IMPORTANT]
 > Image extraction happens once per page, before any rule runs. Rules see the same filtered list of images regardless of which rules are enabled. Don't reach into the DOM from a rule — work from the `ImageRecord[]` the rule's context provides.
