@@ -1,7 +1,7 @@
 import {describe, it, expect} from 'vitest'
-import {vagueAltText} from '../src/rules/vagueAltText.js'
-import type {RuleContext} from '../src/types.js'
-import {evaluateAlts, makeImage} from './utils/helpers.js'
+import {vagueAltText} from '../../src/rules/vague-alt-text.js'
+import type {RuleContext} from '../../src/types.js'
+import {evaluateAlts, makeImage} from '../utils/helpers.js'
 
 describe('vagueAltText', () => {
   describe('flags vague single-word alt text', () => {

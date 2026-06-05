@@ -1,7 +1,7 @@
 import {describe, it, expect} from 'vitest'
-import {missingAltText} from '../src/rules/missingAltText.js'
-import type {RuleContext} from '../src/types.js'
-import {evaluateAlts, makeImage} from './utils/helpers.js'
+import {missingAltText} from '../../src/rules/missing-alt-text.js'
+import type {RuleContext} from '../../src/types.js'
+import {evaluateAlts, makeImage} from '../utils/helpers.js'
 
 describe('missing-alt-text', () => {
   it('flags an image with no alt attribute (alt === null)', () => {
