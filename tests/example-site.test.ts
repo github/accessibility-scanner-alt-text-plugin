@@ -47,10 +47,10 @@ describe('example site-with-errors', () => {
     })
 
     const ruleIds = new Set(findings.map(f => f.ruleId))
-    expect(ruleIds).toContain('missing-alt-text')
-    expect(ruleIds).toContain('placeholder-alt-text')
-    expect(ruleIds).toContain('filename-alt-text')
-    expect(ruleIds).toContain('vague-alt-text')
-    expect(ruleIds).toContain('repeated-alt-text')
+
+    const {allRules} = await import('../src/rules/index.js')
+    for (const rule of allRules) {
+      expect(ruleIds).toContain(rule.id)
+    }
   })
 })
