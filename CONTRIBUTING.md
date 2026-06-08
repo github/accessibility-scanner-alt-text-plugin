@@ -12,10 +12,10 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 
 ## Prerequisites for running and testing code
 
-These are one time installations required to be able to test your changes locally as part of the pull request (PR) submission process.
+These are one-time installations required to be able to test your changes locally as part of the pull request (PR) submission process.
 
-1. install Node.js (see `engines` in [package.json](package.json) for supported versions) [through download](https://nodejs.org/en/download) | [through Homebrew](https://formulae.brew.sh/formula/node)
-1. install dependencies: `npm install`
+1. Install Node.js (see `engines` in [package.json](package.json) for supported versions) [through download](https://nodejs.org/en/download) | [through Homebrew](https://formulae.brew.sh/formula/node)
+1. Install dependencies: `npm install`
 
 ## Submitting a pull request
 
