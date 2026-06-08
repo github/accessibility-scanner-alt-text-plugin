@@ -24,8 +24,8 @@ placeholder SVG (`assets/img/test-image.svg`); only the `alt` attribute differs.
 | _(no `alt` attribute)_       | `missing-alt-text`     | The `alt` attribute is absent entirely.          |
 | `TODO`                       | `placeholder-alt-text` | `TODO` is known placeholder/boilerplate text.    |
 | `screenshot_2024.png`        | `filename-alt-text`    | The alt text is a raw image filename.            |
-| `image`                      | `vague-alt-text`            | A single generic word that describes nothing.    |
-| `company logo` (×2 in a row) | `repeated-alt-text`         | Two consecutive images share identical alt text. |
+| `image`                      | `vague-alt-text`       | A single generic word that describes nothing.    |
+| `company logo` (×2 in a row) | `repeated-alt-text`    | Two consecutive images share identical alt text. |
 
 ## Run it locally
 
