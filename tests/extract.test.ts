@@ -66,6 +66,15 @@ describe('extractImages', () => {
       `)
       expect(images.map(i => i.src)).toEqual(['a.png', 'b.png', 'c.png'])
     })
+
+    it('captures a bounding box for a rendered image', async () => {
+      const images = await extractFromHTML(`<img src="x.png" alt="x" style="width:50px;height:40px;display:block">`)
+      expect(images).toHaveLength(1)
+      const box = images[0]!.boundingBox
+      expect(box).not.toBeNull()
+      expect(box!.width).toBe(50)
+      expect(box!.height).toBe(40)
+    })
   })
 
   describe('excludes images hidden via aria-hidden', () => {
