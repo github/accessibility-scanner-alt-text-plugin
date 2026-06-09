@@ -20,3 +20,7 @@ updates:
           - '*'
     schedule:
       interval: 'weekly'
+  - package-ecosystem: 'bundler'
+    directory: '/example/site-with-errors'
+    schedule:
+      interval: 'weekly'
