@@ -20,6 +20,14 @@ The plugin inherits the a11y scanner's general FAQ — see the link above for qu
 
 ---
 
+## Background
+
+This plugin exists to catch low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot — patterns like vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. Scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
+
+The rule registry is append-only and the project is under active development alongside the scanner's public preview. Roadmap and open work live in this repo's [Issues](https://github.com/github/accessibility-scanner-alt-text-plugin/issues). See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to contribute, including local setup, expected checks, and PR conventions.
+
+---
+
 ## Requirements
 
 To use the Alt-Text Plugin, you'll need:
@@ -207,11 +215,11 @@ tests/
 
 ## Maintainers
 
-🔧 Maintained alongside the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner). See the scanner's [CODEOWNERS](https://github.com/github/accessibility-scanner/blob/main/.github/CODEOWNERS) for the responsible team.
+🔧 Maintained alongside the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner). See [CODEOWNERS](./.github/CODEOWNERS) for the responsible team.
 
 ## Support
 
-❓ For support, please open an issue in this repository, or refer to the scanner's [SUPPORT](https://github.com/github/accessibility-scanner/blob/main/SUPPORT.md) document for guidance that applies across the project.
+❓ For support, please open an issue in this repository. See [SUPPORT.md](./SUPPORT.md) for support expectations, or refer to the scanner's [SUPPORT](https://github.com/github/accessibility-scanner/blob/main/SUPPORT.md) document for guidance that applies across the project.
 
 ## Acknowledgement
 
