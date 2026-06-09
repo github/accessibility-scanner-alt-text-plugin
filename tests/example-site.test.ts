@@ -53,4 +53,20 @@ describe('example site-with-errors', () => {
       expect(ruleIds).toContain(rule.id)
     }
   })
+
+  it('produces no findings for an image with valid alt text', async () => {
+    await page.setContent(
+      `<!doctype html><html><body><img src="/assets/img/test-image.svg" alt="A blue square with the word test in white text"></body></html>`,
+    )
+
+    const findings: Finding[] = []
+    await altTextScan({
+      page,
+      addFinding: async finding => {
+        findings.push(finding)
+      },
+    })
+
+    expect(findings).toHaveLength(0)
+  })
 })

@@ -1,11 +1,11 @@
 # site-with-errors
 
-A small Jekyll site used to exercise the
-[accessibility-scanner-alt-text-plugin](../../README.md) against realistic
-sample content. It mirrors the `site-with-errors` fixture from
+A small Jekyll site that demos the
+[`accessibility-scanner-alt-text-plugin`](../../README.md). It mirrors the
+`site-with-errors` fixture from
 [`github/accessibility-scanner`](https://github.com/github/accessibility-scanner)
-and adds an [`alt-text-errors.html`](alt-text-errors.html) page whose images each
-intentionally trip one of the plugin's rules.
+and adds a [page whose images each intentionally trip one of the plugin's
+rules](alt-text-errors.html).
 
 Use it for:
 
