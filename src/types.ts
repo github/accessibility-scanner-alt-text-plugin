@@ -60,5 +60,8 @@ export type RuleResult = {
 export type Rule = {
   id: string
   problemUrl: string
+  // Whether the rule runs when the consumer hasn't explicitly configured it.
+  // Optional; treated as `true` when absent.
+  defaultEnabled?: boolean
   evaluate(ctx: RuleContext): RuleResult[]
 }

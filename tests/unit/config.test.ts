@@ -25,35 +25,54 @@ describe('loadConfig', () => {
     await rm(dir, {recursive: true, force: true})
   })
 
-  it('returns empty disabledRules when the file is missing', async () => {
+  it('returns empty overrides when the file is missing', async () => {
     const cfg = await loadConfig(configPath, KNOWN)
-    expect(cfg.disabledRules.size).toBe(0)
+    expect(cfg.ruleOverrides.size).toBe(0)
   })
 
-  it('returns empty disabledRules when the file is an empty object', async () => {
+  it('returns empty overrides when the file is an empty object', async () => {
     await writeFile(configPath, '{}')
     const cfg = await loadConfig(configPath, KNOWN)
-    expect(cfg.disabledRules.size).toBe(0)
+    expect(cfg.ruleOverrides.size).toBe(0)
   })
 
-  it('returns empty disabledRules when disabledRules is an empty array', async () => {
-    await writeFile(configPath, JSON.stringify({disabledRules: []}))
+  it('returns empty overrides when rules is an empty object', async () => {
+    await writeFile(configPath, JSON.stringify({rules: {}}))
     const cfg = await loadConfig(configPath, KNOWN)
-    expect(cfg.disabledRules.size).toBe(0)
+    expect(cfg.ruleOverrides.size).toBe(0)
   })
 
-  it('returns the disabled rule ids when valid', async () => {
-    await writeFile(configPath, JSON.stringify({disabledRules: ['repeated-alt-text', 'placeholder-alt-text']}))
+  it('returns the overrides when valid', async () => {
+    await writeFile(
+      configPath,
+      JSON.stringify({rules: {'repeated-alt-text': false, 'placeholder-alt-text': false, 'vague-alt-text': true}}),
+    )
     const cfg = await loadConfig(configPath, KNOWN)
-    expect([...cfg.disabledRules].sort()).toEqual(['placeholder-alt-text', 'repeated-alt-text'])
+    expect(cfg.ruleOverrides.get('repeated-alt-text')).toBe(false)
+    expect(cfg.ruleOverrides.get('placeholder-alt-text')).toBe(false)
+    expect(cfg.ruleOverrides.get('vague-alt-text')).toBe(true)
+    expect(cfg.ruleOverrides.size).toBe(3)
   })
 
   it('warns and ignores unknown rule ids', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    await writeFile(configPath, JSON.stringify({disabledRules: ['repeated-alt-text', 'no-such-rule']}))
+    await writeFile(configPath, JSON.stringify({rules: {'repeated-alt-text': false, 'no-such-rule': false}}))
     const cfg = await loadConfig(configPath, KNOWN)
-    expect([...cfg.disabledRules]).toEqual(['repeated-alt-text'])
+    expect([...cfg.ruleOverrides.keys()]).toEqual(['repeated-alt-text'])
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('no-such-rule'))
+    warn.mockRestore()
+  })
+
+  it('warns and ignores non-boolean values', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    await writeFile(
+      configPath,
+      JSON.stringify({rules: {'vague-alt-text': false, 'repeated-alt-text': 'off', 'placeholder-alt-text': 1}}),
+    )
+    const cfg = await loadConfig(configPath, KNOWN)
+    expect([...cfg.ruleOverrides.keys()]).toEqual(['vague-alt-text'])
+    expect(cfg.ruleOverrides.get('vague-alt-text')).toBe(false)
+    expect(warn).toHaveBeenCalledTimes(2)
     warn.mockRestore()
   })
 
@@ -61,26 +80,32 @@ describe('loadConfig', () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {})
     await writeFile(configPath, '{ this is not json')
     const cfg = await loadConfig(configPath, KNOWN)
-    expect(cfg.disabledRules.size).toBe(0)
+    expect(cfg.ruleOverrides.size).toBe(0)
     expect(err).toHaveBeenCalled()
     err.mockRestore()
   })
 
-  it('ignores non-string entries in disabledRules', async () => {
-    await writeFile(configPath, JSON.stringify({disabledRules: ['vague-alt-text', 123, null, {}]}))
+  it('ignores rules when it is not a plain object', async () => {
+    await writeFile(configPath, JSON.stringify({rules: ['repeated-alt-text']}))
     const cfg = await loadConfig(configPath, KNOWN)
-    expect([...cfg.disabledRules]).toEqual(['vague-alt-text'])
+    expect(cfg.ruleOverrides.size).toBe(0)
   })
 
-  it('ignores disabledRules when it is not an array', async () => {
-    await writeFile(configPath, JSON.stringify({disabledRules: 'repeated-alt-text'}))
+  it('ignores rules when it is a string', async () => {
+    await writeFile(configPath, JSON.stringify({rules: 'repeated-alt-text'}))
     const cfg = await loadConfig(configPath, KNOWN)
-    expect(cfg.disabledRules.size).toBe(0)
+    expect(cfg.ruleOverrides.size).toBe(0)
   })
 
   it('ignores top-level non-object JSON', async () => {
     await writeFile(configPath, JSON.stringify(['repeated-alt-text']))
     const cfg = await loadConfig(configPath, KNOWN)
-    expect(cfg.disabledRules.size).toBe(0)
+    expect(cfg.ruleOverrides.size).toBe(0)
+  })
+
+  it('ignores top-level keys other than rules', async () => {
+    await writeFile(configPath, JSON.stringify({somethingElse: {'vague-alt-text': false}}))
+    const cfg = await loadConfig(configPath, KNOWN)
+    expect(cfg.ruleOverrides.size).toBe(0)
   })
 })

@@ -8,18 +8,15 @@ import type {PluginArgs} from './src/types.js'
 export const name = 'alt-text-scan'
 
 // Config lives in the consumer's repo at `.github/scanner-plugins/<name>/config.json`.
-// `process.cwd()` is the consumer repo root when invoked by the scanner action.
 const configPath = join(process.cwd(), '.github', 'scanner-plugins', name, 'config.json')
 const knownRuleIds = new Set(allRules.map(r => r.id))
-
-// Read the config once per scanner process; the same config applies to every URL.
 const configPromise = loadConfig(configPath, knownRuleIds)
 
 export default async function altTextScan({page, addFinding}: PluginArgs): Promise<void> {
   const url = page.url()
 
-  const {disabledRules} = await configPromise
-  const enabledRules = allRules.filter(rule => !disabledRules.has(rule.id))
+  const {ruleOverrides} = await configPromise
+  const enabledRules = allRules.filter(rule => ruleOverrides.get(rule.id) ?? rule.defaultEnabled ?? true)
 
   // Extract images from the page.
   let images

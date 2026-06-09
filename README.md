@@ -145,7 +145,7 @@ The scanner uses these fields to file or update a GitHub issue.
 
 ## Configuration
 
-Every rule is enabled by default. To disable specific rules, add a `config.json` file next to the plugin's `index.ts` in your scanner repository:
+To override the default enabled state of one or more rules, add a `config.json` file next to the plugin's `index.ts` in your scanner repository:
 
 ```
 .github/scanner-plugins/alt-text-scan/
@@ -155,14 +155,20 @@ Every rule is enabled by default. To disable specific rules, add a `config.json`
 
 ```json
 {
-  "disabledRules": ["repeated-alt-text", "placeholder-alt-text"]
+  "rules": {
+    "repeated-alt-text": false,
+    "placeholder-alt-text": false
+  }
 }
 ```
 
-- `disabledRules` accepts any rule ID listed in the [Rules](#rules) table above.
-- Unknown rule IDs are logged as warnings and ignored (typo guard).
-- A missing or malformed `config.json` causes the plugin to run with all rules enabled — the config is strictly additive: it can only ever turn rules off, never on.
+- Each key under `rules` is a rule ID from the [Rules](#rules) table above; the value is `true` (run the rule) or `false` (skip it).
+- Rules you don't list keep their default behavior. Today every rule defaults to enabled.
+- Unknown rule IDs and non-boolean values are logged as warnings and ignored (typo guard).
+- A missing or malformed `config.json` causes the plugin to run with all defaults.
 - The plugin reads the config once at startup, not per URL.
+
+The top-level shape (`{"rules": {...}}`) leaves room for future non-rule settings without breaking existing configs.
 
 ---
 
