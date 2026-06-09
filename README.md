@@ -168,8 +168,6 @@ To override the default enabled state of one or more rules, add a `config.json` 
 - A missing or malformed `config.json` causes the plugin to run with all defaults.
 - The plugin reads the config once at startup, not per URL.
 
-The top-level shape (`{"rules": {...}}`) leaves room for future non-rule settings without breaking existing configs.
-
 ---
 
 ## Development
