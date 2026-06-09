@@ -1,0 +1,32 @@
+---
+layout: page
+title: Alt Text Errors
+permalink: /alt-text-errors/
+---
+
+<!--
+  Each <img> on this page intentionally uses bad alt text to exercise a single
+  rule in the accessibility-scanner-alt-text-plugin. See README.md in this
+  folder for the full image-to-rule mapping.
+
+  Every image points at the same throwaway SVG; the scanner only inspects the
+  `alt` attribute, not the image itself.
+-->
+
+<h1>Alt text errors</h1>
+
+<!-- Rule: missing-alt-text — the alt attribute is absent entirely. -->
+<img src="/assets/img/test-image.svg" />
+
+<!-- Rule: placeholder-alt-text — "TODO" is boilerplate placeholder text. -->
+<img src="/assets/img/test-image.svg" alt="TODO" />
+
+<!-- Rule: filename-alt-text — the alt text is a raw image filename. -->
+<img src="/assets/img/test-image.svg" alt="screenshot_2024.png" />
+
+<!-- Rule: vague-alt-text — "image" says nothing about the content. -->
+<img src="/assets/img/test-image.svg" alt="image" />
+
+<!-- Rule: repeated-alt-text — two consecutive images share identical alt text. -->
+<img src="/assets/img/test-image.svg" alt="company logo" />
+<img src="/assets/img/test-image.svg" alt="company logo" />
