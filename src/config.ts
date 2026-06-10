@@ -10,7 +10,10 @@ export async function loadConfig(configPath: string, knownRuleIds: ReadonlySet<s
   let raw: string
   try {
     raw = await readFile(configPath, 'utf8')
-  } catch {
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException)?.code !== 'ENOENT') {
+      console.error(`[alt-text-scan] failed to read ${configPath}; running with default rule settings:`, err)
+    }
     return EMPTY_CONFIG
   }
 
