@@ -172,7 +172,7 @@ A JSON Schema is published at [`schema/config.schema.json`](./schema/config.sche
 
 ```json
 {
-  "$schema":   "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
   "rules": {
     "repeated-alt-text": false
   }
