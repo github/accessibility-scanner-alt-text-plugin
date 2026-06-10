@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
+  "title": "alt-text-scan plugin configuration",
+  "description": "Configuration for the alt-text-scan plugin used by the GitHub Accessibility Scanner. See https://github.com/github/accessibility-scanner-alt-text-plugin#configuration for details.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional reference to this schema for editor-time validation. Ignored at scanner runtime."
+    },
+    "rules": {
+      "type": "object",
+      "description": "Per-rule enable/disable overrides. Rules not listed keep their default behavior (today, every rule defaults to enabled).",
+      "additionalProperties": false,
+      "properties": {
+        "missing-alt-text": {
+          "type": "boolean",
+          "description": "Flags <img> elements where the alt attribute is absent or whitespace-only. alt=\"\" is treated as intentional decorative use and is not flagged."
+        },
+        "vague-alt-text": {
+          "type": "boolean",
+          "description": "Flags alt text that is a generic single word (image, photo, icon, logo, screenshot, etc.) or short filler phrase (an image of, a photo of)."
+        },
+        "filename-alt-text": {
+          "type": "boolean",
+          "description": "Flags alt text that ends in a common image file extension (.png, .jpg, .jpeg, .gif, .svg, .webp, .bmp, .ico)."
+        },
+        "placeholder-alt-text": {
+          "type": "boolean",
+          "description": "Flags alt text matching a known boilerplate string (todo, tbd, fixme, placeholder, alt text, insert alt text, image alt)."
+        },
+        "repeated-alt-text": {
+          "type": "boolean",
+          "description": "Flags two or more adjacent images in the rendered page that share the same normalized alt text."
+        }
+      }
+    }
+  }
+}

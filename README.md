@@ -168,6 +168,21 @@ To override the default enabled state of one or more rules, add a `config.json` 
 - A missing or malformed `config.json` causes the plugin to run with all defaults.
 - The plugin reads the config once at startup, not per URL.
 
+### Editor autocomplete and validation
+
+A JSON Schema is published at [`schema/config.schema.json`](./schema/config.schema.json). Add a `$schema` line at the top of your `config.json` to get autocomplete, hover docs, and inline validation in editors that support JSON Schema (VS Code, JetBrains IDEs, etc.):
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
+  "rules": {
+    "repeated-alt-text": false
+  }
+}
+```
+
+The `$schema` line is optional and is ignored by the plugin at runtime. It only powers editor-time validation.
+
 ---
 
 ## Development
