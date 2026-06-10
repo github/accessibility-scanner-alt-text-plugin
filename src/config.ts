@@ -12,10 +12,10 @@ export async function loadConfig(configPath: string, knownRuleIds: ReadonlySet<s
     raw = await readFile(configPath, 'utf8')
   } catch (err) {
     if (err instanceof Error && 'code' in err && err.code === 'ENOENT') {
-      return EMPTY_CONFIG
+      return emptyConfig()
     }
     console.log(`[alt-text-scan] failed to read ${configPath}; running with default rule settings:`, err)
-    return EMPTY_CONFIG
+    return emptyConfig()
   }
 
   let parsed: unknown
@@ -23,7 +23,7 @@ export async function loadConfig(configPath: string, knownRuleIds: ReadonlySet<s
     parsed = JSON.parse(raw)
   } catch (err) {
     console.error(`[alt-text-scan] failed to parse ${configPath}; running with default rule settings:`, err)
-    return EMPTY_CONFIG
+    return emptyConfig()
   }
 
   return {ruleOverrides: collectRuleOverrides(parsed, knownRuleIds)}
