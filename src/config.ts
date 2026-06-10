@@ -4,7 +4,7 @@ export type PluginConfig = {
   ruleOverrides: ReadonlyMap<string, boolean>
 }
 
-const EMPTY_CONFIG: PluginConfig = {ruleOverrides: new Map()}
+const emptyConfig = (): PluginConfig => ({ruleOverrides: new Map()})
 
 export async function loadConfig(configPath: string, knownRuleIds: ReadonlySet<string>): Promise<PluginConfig> {
   let raw: string
