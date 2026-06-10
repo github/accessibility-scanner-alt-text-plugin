@@ -172,14 +172,14 @@ A JSON Schema is published at [`schema/config.schema.json`](./schema/config.sche
 
 ```json
 {
-  "$schema": "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
+  "$schema":   "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
   "rules": {
     "repeated-alt-text": false
   }
 }
 ```
 
-The `$schema` line is optional and is ignored by the plugin at runtime. 
+The `$schema` line is optional and is ignored by the plugin at runtime.
 
 ---
 
