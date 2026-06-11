@@ -26,12 +26,12 @@ describe('loadConfig', () => {
   })
 
   it('logs and returns empty when read fails for a non-ENOENT reason', async () => {
-    const log = vi.spyOn(console, 'log').mockImplementation(() => {})
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     // Pointing at a directory makes readFile fail with EISDIR rather than ENOENT.
     const cfg = await loadConfig(dir, KNOWN)
     expect(cfg.ruleOverrides.size).toBe(0)
-    expect(log).toHaveBeenCalled()
-    log.mockRestore()
+    expect(warn).toHaveBeenCalled()
+    warn.mockRestore()
   })
 
   it('returns empty overrides when the file is an empty object', async () => {

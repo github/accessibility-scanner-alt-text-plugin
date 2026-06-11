@@ -14,7 +14,7 @@ export async function loadConfig(configPath: string, knownRuleIds: ReadonlySet<s
     if (err instanceof Error && 'code' in err && err.code === 'ENOENT') {
       return emptyConfig()
     }
-    console.log(`[alt-text-scan] failed to read ${configPath}; running with default rule settings:`, err)
+    console.warn(`[alt-text-scan] failed to read ${configPath}; running with default rule settings:`, err)
     return emptyConfig()
   }
 
