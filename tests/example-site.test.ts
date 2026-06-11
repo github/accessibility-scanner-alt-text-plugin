@@ -1,11 +1,12 @@
 import {readFileSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'
-import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest'
+import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi} from 'vitest'
 import {chromium, type Browser, type Page} from 'playwright'
 import altTextScan from '../index.js'
 import type {Finding} from '../src/types.js'
 
 const errorsPagePath = fileURLToPath(new URL('../example/site-with-errors/alt-text-errors.html', import.meta.url))
+const fixtureWithDisabledRule = fileURLToPath(new URL('./fixtures/with-disabled-rule', import.meta.url))
 
 // Strips the Jekyll/Liquid front matter so the raw <img> markup can be loaded
 // directly into Playwright without running a Jekyll build.
@@ -68,5 +69,36 @@ describe('example site-with-errors', () => {
     })
 
     expect(findings).toHaveLength(0)
+  })
+
+  it('skips a rule disabled in the consumer config.json', async () => {
+    const originalCwd = process.cwd()
+    process.chdir(fixtureWithDisabledRule)
+    vi.resetModules()
+    try {
+      const {default: altTextScanWithConfig} = await import('../index.js')
+
+      const body = loadErrorsPageBody()
+      await page.setContent(`<!doctype html><html><body>${body}</body></html>`)
+
+      const findings: Finding[] = []
+      await altTextScanWithConfig({
+        page,
+        addFinding: async finding => {
+          findings.push(finding)
+        },
+      })
+
+      const ruleIds = new Set(findings.map(f => f.ruleId))
+      // The disabled rule must not fire.
+      expect(ruleIds.has('missing-alt-text')).toBe(false)
+      const {allRules} = await import('../src/rules/index.js')
+      for (const rule of allRules) {
+        if (rule.id === 'missing-alt-text') continue
+        expect(ruleIds).toContain(rule.id)
+      }
+    } finally {
+      process.chdir(originalCwd)
+    }
   })
 })

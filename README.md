@@ -22,9 +22,9 @@ The plugin inherits the a11y scanner's general FAQ — see the link above for qu
 
 ## Background
 
-This plugin exists to catch low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot — patterns like vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. Scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
+This plugin exists to catch low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot — patterns like vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. The scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
 
-The rule registry is append-only and the project is under active development alongside the scanner's public preview. Roadmap and open work live in this repo's [Issues](https://github.com/github/accessibility-scanner-alt-text-plugin/issues). See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to contribute, including local setup, expected checks, and PR conventions.
+The project is under active development alongside the scanner's public preview. Roadmap and open work live in this repo's [Issues](https://github.com/github/accessibility-scanner-alt-text-plugin/issues). See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to contribute, including local setup, expected checks, and PR conventions.
 
 ---
 
@@ -140,6 +140,46 @@ When a rule fires, the plugin emits a finding with the following shape (matching
 - `solutionLong` — optional longer explanation when one-sentence isn't enough
 
 The scanner uses these fields to file or update a GitHub issue.
+
+---
+
+## Configuration
+
+To override the default enabled state of one or more rules, add a `config.json` file next to the plugin's `index.ts` in your scanner repository:
+
+```
+.github/scanner-plugins/alt-text-scan/
+├── index.ts
+└── config.json   ← optional
+```
+
+```json
+{
+  "rules": {
+    "repeated-alt-text": false,
+    "placeholder-alt-text": false
+  }
+}
+```
+
+- Each key under `rules` is a rule ID from the [Rules](#rules) table above; the value is `true` (run the rule) or `false` (skip it).
+- Rules you don't list keep their default behavior. Today every rule defaults to enabled.
+- Unknown rule IDs and non-boolean values are logged as warnings and ignored (typo guard).
+- A missing or malformed `config.json` causes the plugin to run with all defaults.
+- The plugin reads the config once at startup, not per URL.
+
+A JSON Schema is published at [`schema/config.schema.json`](./schema/config.schema.json). Add a `$schema` line at the top of your `config.json` to get autocomplete, hover docs, and inline validation in editors that support JSON Schema (VS Code, JetBrains IDEs, etc.):
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/github/accessibility-scanner-alt-text-plugin/main/schema/config.schema.json",
+  "rules": {
+    "repeated-alt-text": false
+  }
+}
+```
+
+The `$schema` line is optional and is ignored by the plugin at runtime.
 
 ---
 
