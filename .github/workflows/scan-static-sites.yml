@@ -32,7 +32,7 @@ jobs:
         uses: github/accessibility-scanner@1b9502344c5fa3ecc95e88c5d97da9e498a73ef4 # v3.2.0
         with:
           urls: ${{ matrix.urls }}
-          cache_key: cached_findings-${{ matrix.id }}-${{ replace(github.ref_name, '/', '-') }}.json
+          cache_key: cached_findings-${{ matrix.id }}-${{ github.ref_name }}.json
           repository: ${{ matrix.repository }}
           token: ${{ secrets.GH_TOKEN }}
           skip_copilot_assignment: true
