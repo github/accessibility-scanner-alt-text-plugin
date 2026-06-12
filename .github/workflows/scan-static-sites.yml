@@ -1,0 +1,39 @@
+name: Scan static GitHub sites (alt-text plugin)
+
+# Manually triggered workflow that runs the accessibility scanner with the
+# alt-text-scan plugin enabled against public GitHub static sites. Any issues
+# opened by the scanner are routed to a test repository for validation.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: octodex
+            urls: https://octodex.github.com/
+            repository: github/accessibility-scanner-testing
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Stage alt-text plugin
+        run: |
+          mkdir -p .github/scanner-plugins/alt-text-scan
+          cp -r index.ts src .github/scanner-plugins/alt-text-scan/
+
+      - name: Run accessibility scanner
+        uses: github/accessibility-scanner@1b9502344c5fa3ecc95e88c5d97da9e498a73ef4 # v3.2.0
+        with:
+          urls: ${{ matrix.urls }}
+          cache_key: cached_findings-${{ matrix.id }}-${{ replace(github.ref_name, '/', '-') }}.json
+          repository: ${{ matrix.repository }}
+          token: ${{ secrets.GH_TOKEN }}
+          skip_copilot_assignment: true
+          scans: '["axe", "alt-text-scan"]'
