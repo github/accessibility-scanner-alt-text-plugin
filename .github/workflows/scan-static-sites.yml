@@ -19,6 +19,15 @@ jobs:
           - id: octodex
             urls: https://octodex.github.com/
             repository: github/accessibility-scanner-testing
+          - id: universe
+            urls: https://githubuniverse.com/
+            repository: github/accessibility-scanner-testing
+          - id: shop
+            urls: https://thegithubshop.com/
+            repository: github/accessibility-scanner-testing
+          - id: blog
+            urls: https://github.blog/
+            repository: github/accessibility-scanner-testing
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
