@@ -91,7 +91,7 @@ jobs:
           scans: '["axe", "alt-text-scan"]' # Add "alt-text-scan" to enable this plugin
 ```
 
-> 👉 Replace every `REPLACE_THIS` with your actual values. See the [scanner's Action inputs](https://github.com/github/accessibility-scanner#action-inputs) for the full list.
+> 👉 Update all `REPLACE_THIS` placeholders with your actual values. See the [scanner's Action inputs](https://github.com/github/accessibility-scanner#action-inputs) for the full list.
 
 📚 Learn more
 
@@ -192,8 +192,6 @@ A JSON Schema is published at [`schema/config.schema.json`](./schema/config.sche
 ```
 
 The `$schema` line is optional and is ignored by the plugin at runtime.
-
-> 📝 While this repository is in private preview, the raw `$schema` URL above will only resolve once the repo is public. Editors that can't fetch the schema simply skip validation; the plugin itself is unaffected.
 
 ---
 
