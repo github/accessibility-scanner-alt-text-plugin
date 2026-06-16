@@ -36,6 +36,8 @@ To use the Alt-Text Plugin, you'll need:
 - **The plugin's source files** available under `./.github/scanner-plugins/alt-text-scan/` in the repository that runs the scanner workflow (see [Getting started](#getting-started))
 - **Everything required to run the scanner itself** (Actions enabled, Issues enabled, a `GH_TOKEN` PAT — see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
 
+This plugin is currently consumed from source by copying the plugin files into the repository that runs the scanner workflow.
+
 To develop the plugin locally, you'll need:
 
 - **Node.js** matching the `engines` field in [`package.json`](./package.json) — currently `^22.13.0 || ^24 || ^26`
@@ -47,7 +49,17 @@ To develop the plugin locally, you'll need:
 
 ### 1. Add the plugin to your scanner repository
 
-Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` (and any supporting files) into `./.github/scanner-plugins/alt-text-scan/`.
+Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` and supporting files into `./.github/scanner-plugins/alt-text-scan/`.
+
+```text
+.github/
+└── scanner-plugins/
+    └── alt-text-scan/
+        ├── index.ts
+        ├── src/
+        ├── schema/
+        └── config.json   # optional
+```
 
 📚 Learn more
 
@@ -137,7 +149,7 @@ When a rule fires, the plugin emits a finding with the following shape, matching
 - `problemShort` — one-sentence description of what's wrong, including the offending alt text where applicable
 - `problemUrl` — link to the relevant WCAG technique or W3C tutorial
 - `solutionShort` — one-sentence description of how to fix it
-- `solutionLong` — optional longer explanation when one-sentence isn't enough
+- `solutionLong` — optional longer explanation when one sentence isn't enough
 
 The scanner uses these fields to file or update a GitHub issue.
 
