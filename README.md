@@ -140,7 +140,7 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 ## Output
 
-When a rule fires, the plugin emits a finding with the following shape, matching the scanner's `Finding` type:
+When a rule fires, the plugin emits a finding with the following shape (matching the scanner's [Finding type](https://github.com/github/accessibility-scanner/blob/main/.github/actions/find/src/types.d.ts)):
 
 - `scannerType` — always `'alt-text-scan'`, identifying which plugin produced the finding
 - `ruleId` — the ID of the rule that fired (e.g. `'vague-alt-text'`)
@@ -252,20 +252,6 @@ tests/
 
 > [!IMPORTANT]
 > Image extraction happens once per page, before any rule runs. Rules see the same filtered list of images regardless of which rules are enabled. Don't reach into the DOM from a rule — work from the `ImageRecord[]` the rule's context provides.
-
----
-
-## Example site
-
-This repository includes an example site under [`example/site-with-errors/`](./example/site-with-errors/) that intentionally triggers the plugin's rules.
-
-Use it for:
-
-- Manual testing
-- Automated testing
-- Understanding which patterns map to which rules
-
-See [`example/site-with-errors/README.md`](./example/site-with-errors/README.md) for more details.
 
 ---
 
