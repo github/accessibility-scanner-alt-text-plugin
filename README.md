@@ -1,16 +1,16 @@
 # Alt-Text Plugin for the Accessibility Scanner
 
-The Alt-Text Plugin is a [plugin](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner) that flags low-quality `alt` text on images. It complements axe-core's built-in `image-alt` rule by flagging additional low-quality patterns, helping teams ship images with descriptive, screen-reader-friendly alternative text.
+The Alt-Text Plugin is a [plugin](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner) that flags low-quality `alt` text on images. It complements axe-core's built-in `image-alt` rule, helping teams ship images with descriptive, screen-reader-friendly alternative text.
 
 The plugin helps teams:
 
 - 🖼️ Catch vague, generic, or filler `alt` text (`"image"`, `"photo"`, `"icon"`)
-- 📛 Catch raw filenames being used as `alt` text (`"IMG_1234.png"`)
-- 🔁 Catch runs of adjacent images that all share the same `alt` text
+- 📛 Catch raw filenames used as `alt` text (`"IMG_1234.png"`)
+- 🔁 Catch runs of adjacent images that share the same `alt` text
 - 🚧 Catch boilerplate placeholder `alt` text (`"todo"`, `"tbd"`, `"fixme"`)
 - ♿ Catch images missing an `alt` attribute entirely (without flagging intentional decorative `alt=""`)
 
-> ⚠️ **Note:** This plugin is in active development alongside the a11y scanner's public preview. New rules are being added and end-to-end integration with the scanner workflow is still in progress. Always review filed issues before acting on them.
+> ⚠️ **Note:** This plugin is in active development alongside the a11y scanner's public preview. New rules are still being added and end-to-end integration with the scanner's issue-filing workflow is still maturing. Always review filed issues before acting on them.
 
 ---
 
@@ -22,7 +22,7 @@ The plugin inherits the a11y scanner's general FAQ — see the link above for qu
 
 ## Background
 
-This plugin exists to catch low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot — patterns like vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. The scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
+This plugin catches low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot — vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. The scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
 
 The project is under active development alongside the scanner's public preview. Roadmap and open work live in this repo's [Issues](https://github.com/github/accessibility-scanner-alt-text-plugin/issues). See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to contribute, including local setup, expected checks, and PR conventions.
 
@@ -33,10 +33,12 @@ The project is under active development alongside the scanner's public preview. 
 To use the Alt-Text Plugin, you'll need:
 
 - **The [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner)** wired into a GitHub Actions workflow in your repository
-- **The plugin's source files** available under `./.github/scanner-plugins/alt-text-scan/` in the repository that runs the scanner workflow (see [Getting started](#getting-started))
+- **The plugin's source files** copied into `./.github/scanner-plugins/alt-text-scan/` in the repository that runs the scanner workflow (see [Getting started](#getting-started))
 - **Everything required to run the scanner itself** (Actions enabled, Issues enabled, a `GH_TOKEN` PAT — see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
 
-To develop the plugin locally, you'll need:
+This plugin is currently consumed from source: copy the plugin files into the repository that runs the scanner workflow.
+
+To develop the plugin locally, you'll also need:
 
 - **Node.js** matching the `engines` field in [`package.json`](./package.json) — currently `^22.13.0 || ^24 || ^26`
 - **npm** (ships with Node)
@@ -47,7 +49,17 @@ To develop the plugin locally, you'll need:
 
 ### 1. Add the plugin to your scanner repository
 
-Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` (and any supporting files) into `./.github/scanner-plugins/alt-text-scan/`.
+Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` and supporting files into `./.github/scanner-plugins/alt-text-scan/`.
+
+```text
+.github/
+└── scanner-plugins/
+    └── alt-text-scan/
+        ├── index.ts
+        ├── src/
+        ├── schema/
+        └── config.json   # optional
+```
 
 📚 Learn more
 
@@ -58,7 +70,7 @@ Following the conventions in the scanner's [PLUGINS.md](https://github.com/githu
 
 ### 2. Enable the plugin in your workflow
 
-Add `"alt-text-scan"` to the scanner action's `scans` input. If you don't already have a `scans` input, you'll also want to keep `"axe"` in the list — by default the scanner only runs Axe, and listing any value at all opts you out of the default.
+Add `"alt-text-scan"` to the scanner action's `scans` input. If you don't already set `scans`, keep `"axe"` in the list too — the scanner only runs Axe by default, and providing any value at all opts you out of that default.
 
 ```yaml
 name: Accessibility Scanner
@@ -90,7 +102,7 @@ jobs:
 
 ### 3. Run your first scan
 
-Trigger your scanner workflow manually or automatically based on your configuration. The plugin will run on every URL the scanner visits, extract every image that's exposed to assistive technology, and file a GitHub issue for each rule violation it finds.
+Trigger your scanner workflow manually or on its configured schedule. The plugin runs on every URL the scanner visits, extracts each image exposed to assistive technology, and emits a finding for every rule violation. The scanner then turns those findings into GitHub issues.
 
 📚 Learn more
 
@@ -101,19 +113,19 @@ Trigger your scanner workflow manually or automatically based on your configurat
 
 ## Rules
 
-The plugin runs every extracted image through an append-only registry of rules. Each rule returns a finding when an image fails its criteria. Findings are converted to issues by the scanner.
+The plugin runs every extracted image through an append-only registry of rules. Each rule returns a finding when an image fails its criteria, and the scanner turns each finding into an issue.
 
 | Rule                | ID                     | Fires when                                                                                                                                                                                                                                                                                                          | Example (flagged)                                                        |
 | ------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | **Missing alt**     | `missing-alt-text`     | The `alt` attribute is absent (`null`) or whitespace-only (`"   "`). `alt=""` is treated as intentional decorative use and is **not** flagged.                                                                                                                                                                      | `<img src="cat.png">`<br>`<img src="cat.png" alt="   ">`                 |
 | **Vague alt**       | `vague-alt-text`       | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped. | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
 | **Filename as alt** | `filename-alt-text`    | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                              | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
-| **Repeated alt**    | `repeated-alt-text`    | Two or more adjacent images in the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                            | Five consecutive `<img alt="3/5 stars">` elements                        |
+| **Repeated alt**    | `repeated-alt-text`    | Two or more adjacent images on the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                            | Five consecutive `<img alt="3/5 stars">` elements                        |
 | **Placeholder alt** | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                    | `<img alt="TODO">`<br>`<img alt="insert alt text">`                      |
 
 ### Image extraction
 
-Before rules run, the plugin extracts images from the page through Playwright's accessibility tree (`page.getByRole('img')`) and then narrows the result set to actual `<img>` elements. This means the following are filtered out automatically and never reach the rules:
+Before rules run, the plugin extracts images from the page through Playwright's accessibility tree (`page.getByRole('img')`) and narrows the result to actual `<img>` elements. The following are filtered out automatically and never reach the rules:
 
 - Non-`<img>` elements with `role="img"` (e.g. `<svg role="img">`, `<div role="img">`) — this plugin's rules only apply to HTML `<img>` tags
 - Images inside `aria-hidden="true"` subtrees
@@ -130,14 +142,14 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 When a rule fires, the plugin emits a finding with the following shape (matching the scanner's [`Finding` type](https://github.com/github/accessibility-scanner/blob/main/.github/actions/find/src/types.d.ts)):
 
-- `scannerType` — always `'alt-text-scan'`, identifying which plugin produced the finding
+- `scannerType` — always `'alt-text-scan'`; identifies which plugin produced the finding
 - `ruleId` — the ID of the rule that fired (e.g. `'vague-alt-text'`)
 - `url` — the page URL where the image was found
 - `html` — the offending `<img>` element's outer HTML
 - `problemShort` — one-sentence description of what's wrong, including the offending alt text where applicable
 - `problemUrl` — link to the relevant WCAG technique or W3C tutorial
 - `solutionShort` — one-sentence description of how to fix it
-- `solutionLong` — optional longer explanation when one-sentence isn't enough
+- `solutionLong` — optional longer explanation when one sentence isn't enough
 
 The scanner uses these fields to file or update a GitHub issue.
 
@@ -147,7 +159,7 @@ The scanner uses these fields to file or update a GitHub issue.
 
 To override the default enabled state of one or more rules, add a `config.json` file next to the plugin's `index.ts` in your scanner repository:
 
-```
+```text
 .github/scanner-plugins/alt-text-scan/
 ├── index.ts
 └── config.json   ← optional
@@ -208,9 +220,10 @@ Pull requests trigger two CI workflows: [`lint.yml`](./.github/workflows/lint.ym
 
 ### Project layout
 
-```
+```text
 index.ts                    # Plugin entry point: exports `name` and the default scan function
 src/
+  config.ts                 # Loads & validates .github/scanner-plugins/alt-text-scan/config.json
   extract.ts                # Pulls visible <img> records from a Playwright page
   findings.ts               # Translates each RuleResult into the scanner's Finding shape
   rules/
@@ -225,8 +238,10 @@ src/
   types.ts                  # Rule, RuleContext, RuleResult, ImageRecord, Finding
 tests/
   extract.test.ts           # Playwright-driven tests for the image extractor
+  example-site.test.ts      # Runs the plugin against the example/site-with-errors fixture
+  fixtures/                 # Static HTML fixtures used by the extractor tests
   unit/
-    *.test.ts               # One file per rule
+    *.test.ts               # One file per rule, plus config.test.ts for the loader
   utils/
     helpers.ts              # makeImage() and evaluateAlts() — shared across rule tests
 ```
@@ -236,22 +251,22 @@ tests/
 1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape — `id`, `problemUrl`, and `evaluate(context)`). Filenames under `src/` and `tests/` must be kebab-case; ESLint's `check-file/filename-naming-convention` rule enforces this.
 2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`. The registry is append-only — don't reorder existing rules.
 3. Add a `tests/unit/<rule-name>.test.ts` file. Use `evaluateAlts(alts, rule)` and `makeImage(overrides)` from [`tests/utils/helpers.ts`](./tests/utils/helpers.ts) for the common cases; construct an explicit `RuleContext` only when you need control over `src` or other per-image fields.
-4. Run `npm run test && npm run typecheck && npm run lint` locally before opening a PR. CI will re-run them.
+4. Run `npm run test && npm run typecheck && npm run lint` locally before opening a PR. CI re-runs them.
 
 > [!IMPORTANT]
-> Image extraction happens once per page, before any rule runs. Rules see the same filtered list of images regardless of which rules are enabled. Don't reach into the DOM from a rule — work from the `ImageRecord[]` the rule's context provides.
+> Image extraction happens once per page, before any rule runs, so every rule sees the same filtered list regardless of which rules are enabled. Don't reach into the DOM from a rule — work from the `ImageRecord[]` the rule's context provides.
 
 ---
 
 ## Feedback
 
-💬 We welcome your feedback! To submit feedback or report issues, please create an issue in this repository. For broader feedback on the a11y scanner itself, file it in the [scanner repository](https://github.com/github/accessibility-scanner/issues).
+💬 We welcome your feedback! To submit feedback or report issues, please open an issue in this repository. For broader feedback on the a11y scanner itself, file it in the [scanner repository](https://github.com/github/accessibility-scanner/issues).
 
 ---
 
 ## License
 
-📄 This project is licensed under the terms of the MIT open source license. Please refer to the [LICENSE](./LICENSE) file for the full terms.
+📄 This project is licensed under the terms of the MIT open source license. See the [LICENSE](./LICENSE) file for the full terms.
 
 ## Maintainers
 
@@ -259,7 +274,7 @@ tests/
 
 ## Support
 
-❓ For support, please open an issue in this repository. See [SUPPORT.md](./SUPPORT.md) for support expectations, or refer to the scanner's [SUPPORT](https://github.com/github/accessibility-scanner/blob/main/SUPPORT.md) document for guidance that applies across the project.
+❓ For support, please open an issue in this repository. See [SUPPORT.md](./SUPPORT.md) for support expectations, or the scanner's [SUPPORT](https://github.com/github/accessibility-scanner/blob/main/SUPPORT.md) document for guidance that applies across the project.
 
 ## Acknowledgement
 
