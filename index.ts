@@ -35,7 +35,8 @@ export default async function altTextScan({page, addFinding}: PluginArgs): Promi
   for (const rule of enabledRules) {
     let results
     try {
-      results = rule.evaluate(ctx)
+      // Rules may be sync or async; await both shapes uniformly.
+      results = await rule.evaluate(ctx)
     } catch (err) {
       console.error(`[alt-text-scan] rule "${rule.id}" threw on ${url}:`, err)
       continue
