@@ -51,6 +51,9 @@ describe('example site-with-errors', () => {
 
     const {allRules} = await import('../src/rules/index.js')
     for (const rule of allRules) {
+      // Opt-in rules (defaultEnabled === false) don't run without explicit
+      // configuration, so they're not expected to produce findings here.
+      if (rule.defaultEnabled === false) continue
       expect(ruleIds).toContain(rule.id)
     }
   })
@@ -95,6 +98,7 @@ describe('example site-with-errors', () => {
       const {allRules} = await import('../src/rules/index.js')
       for (const rule of allRules) {
         if (rule.id === 'missing-alt-text') continue
+        if (rule.defaultEnabled === false) continue
         expect(ruleIds).toContain(rule.id)
       }
     } finally {

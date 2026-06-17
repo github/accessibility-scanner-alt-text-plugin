@@ -1,6 +1,6 @@
 import {describe, it, expect} from 'vitest'
 import {vagueAltText} from '../../src/rules/vague-alt-text.js'
-import type {RuleContext} from '../../src/types.js'
+import type {RuleContext, RuleResult} from '../../src/types.js'
 import {evaluateAlts, makeImage} from '../utils/helpers.js'
 
 describe('vagueAltText', () => {
@@ -90,7 +90,7 @@ describe('vagueAltText', () => {
           makeImage({alt: 'photo', src: 'c.png'}),
         ],
       }
-      const results = vagueAltText.evaluate(context)
+      const results = vagueAltText.evaluate(context) as RuleResult[]
       expect(results).toHaveLength(2)
       expect(results.map(r => r.image.src)).toEqual(['a.png', 'c.png'])
     })
