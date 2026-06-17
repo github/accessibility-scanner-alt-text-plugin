@@ -4,3 +4,4 @@ coverage/
 .vitest/
 *.log
 .DS_Store
+.env
