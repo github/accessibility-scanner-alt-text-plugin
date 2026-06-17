@@ -1,8 +1,4 @@
 // Public entry-point for the judge layer.
-//
-// Consumers (the rule, the probe, tests) call createJudge() and never reference
-// concrete implementations directly. Mode selection is driven by the
-// ALT_TEXT_JUDGE_MODE env var unless overridden via the options argument.
 
 import {AzureAugmentedJudge, NotImplementedAzureVisionClient} from './azure-augmented-judge.js'
 import type {AzureVisionClient} from './azure-augmented-judge.js'
@@ -21,14 +17,8 @@ export type {AzureVisionApiClientConfig} from './azure-vision-api-client.js'
 export {SYSTEM_PROMPT, VERDICT_SCHEMA} from './prompt.js'
 
 export type CreateJudgeOptions = {
-  // Overrides ALT_TEXT_JUDGE_MODE. Defaults to 'copilot' when neither is set.
   mode?: JudgeMode
-  // Forwarded to the inner CopilotJudge.
   copilot?: CopilotJudgeConfig
-  // Required for azure-augmented mode. When omitted, the factory auto-constructs
-  // an AzureVisionApiClient if AZURE_VISION_ENDPOINT and AZURE_VISION_KEY are set,
-  // and falls back to NotImplementedAzureVisionClient (which throws on use)
-  // otherwise — so misconfiguration surfaces with a clear error on first call.
   visionClient?: AzureVisionClient
 }
 

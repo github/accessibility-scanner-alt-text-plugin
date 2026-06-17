@@ -3,10 +3,7 @@
 // Reads test cases from tests/fixtures/alt-quality/cases.json, sends each
 // (image, alt, context) tuple through a JudgeAltText, and reports per-case
 // verdicts plus overall agreement against the expected verdicts.
-//
-// What this script verifies: that the same prompt + schema + fetch path the
-// production rule uses (CopilotJudge, AzureAugmentedJudge, …) reproduces
-// expert ground truth on a curated fixture.
+
 //
 // Run:
 //   GITHUB_MODELS_TOKEN=<pat-with-models:read> npm run probe

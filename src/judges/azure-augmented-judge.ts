@@ -1,48 +1,26 @@
 // AzureAugmentedJudge — decorator over a JudgeAltText (typically CopilotJudge)
 // that runs an Azure Computer Vision pre-pass and folds the result into the
 // context handed to the inner judge.
-//
-// The decorator class, the AzureVisionClient interface, and the context
-// composition logic are all production code today. The only piece that is
-// not implemented is a real AzureVisionClient — see NotImplementedAzureVisionClient
-// at the bottom of this file. To enable azure-augmented mode in production:
-//
-//   1. npm install @azure/ai-vision-image-analysis (or your preferred SDK)
-//   2. Create src/judges/azure-vision-api-client.ts implementing AzureVisionClient
-//      against the SDK; shape the SDK response into AzureVisionAnalysis.
-//   3. Wire it into the factory:
-//        createJudge({mode: 'azure-augmented', visionClient: new AzureVisionApiClient(creds)})
-//
-// No other file in the codebase has to change.
 
 import type {JudgeAltText, JudgeInput, JudgeVerdict} from './types.js'
 
-// Narrowed shape of an Azure AI Vision 4.0 Image Analysis response — only the
-// fields we actually feed into the Copilot judge.
+// Narrowed shape of an Azure AI Vision 4.0 Image Analysis response
 export type AzureVisionAnalysis = {
   caption?: {text: string; confidence: number}
   denseCaptions?: Array<{text: string; confidence: number}>
-  // OCR result, concatenated to a single string. Useful for images-of-text
-  // (logos, screenshots, charts with embedded labels) where GPT-4o is shakier.
   readText?: string
   tags?: Array<{name: string; confidence: number}>
 }
 
-// The capability the decorator depends on. Abstracted so the SDK choice
-// (Azure SDK v4 vs REST) is swappable, and so tests can mock it cheaply.
 export interface AzureVisionClient {
   analyze(imageDataUrl: string): Promise<AzureVisionAnalysis>
 }
 
 export type AzureAugmentedJudgeConfig = {
-  // The judge that does the actual reasoning. Typically a CopilotJudge.
   inner: JudgeAltText
-  // The Azure CV client. Today this is NotImplementedAzureVisionClient by
-  // default; replace with a real client to enable the mode.
   vision: AzureVisionClient
   // Tags below this confidence are dropped before being passed to the model.
   tagConfidenceThreshold?: number
-  // Maximum number of tags forwarded to the inner judge.
   maxTags?: number
 }
 
@@ -67,9 +45,8 @@ export class AzureAugmentedJudge implements JudgeAltText {
     try {
       analysis = await this.vision.analyze(input.imageDataUrl)
     } catch (err) {
-      // Azure CV is auxiliary grounding, not a hard dependency. If it fails
-      // (image too small, transient 5xx, rate-limit, etc.), degrade gracefully
-      // to Copilot-only for this image rather than failing the whole judgment.
+      // If it fails (image too small, transient 5xx, rate-limit, etc.), degrade
+      // to Copilot-only for this image
       console.warn(
         `[alt-text-quality] Azure pre-pass failed; falling back to Copilot-only for this image. ${err instanceof Error ? err.message : String(err)}`,
       )
@@ -93,19 +70,28 @@ export class AzureAugmentedJudge implements JudgeAltText {
       if (top.length) parts.push(`Azure CV tags: ${top.join(', ')}`)
     }
     if (parts.length === 0) return original
-    return `${original}\n\nAzure Computer Vision pre-analysis (use as supplementary signals; the page's own context above is authoritative):\n${parts.join('\n')}`
+    const preamble =
+      'Azure Computer Vision pre-analysis (supplementary signals only — treat with skepticism). ' +
+      "The page's own context above and your own direct view of the image are authoritative and override these signals. " +
+      'Azure can be wrong: ignore any OCR text that does not visibly appear in the image, and disregard tags that ' +
+      'conflict with what you see. ' +
+      'When the image is a link, button, or other functional control, these signals describe the picture itself, ' +
+      "not the control's purpose — do not let them push you toward a longer or more literal description, and do not " +
+      'penalize a concise alt that correctly conveys where the link goes or what the control does. ' +
+      'Lean on these signals mainly to confirm fine-grained, hard-to-read details ' +
+      '(exact line numbers, filenames, digits, embedded labels) that you would otherwise be unsure of:'
+    return `${original}\n\n${preamble}\n${parts.join('\n')}`
   }
 }
 
-// Today's placeholder AzureVisionClient. Throws on use with a clear message
-// pointing at the file-level setup instructions. Replace with a real SDK-backed
-// client when adopting Azure.
+// Fallback AzureVisionClient used when azure-augmented mode is selected but no
+// Azure credentials are configured.
 export class NotImplementedAzureVisionClient implements AzureVisionClient {
   async analyze(_imageDataUrl: string): Promise<AzureVisionAnalysis> {
     throw new Error(
-      'AzureAugmentedJudge was invoked but no real AzureVisionClient is wired. ' +
-        'See src/judges/azure-augmented-judge.ts for the integration steps, then pass ' +
-        'a real client via createJudge({mode: "azure-augmented", visionClient}).',
+      'AzureAugmentedJudge was invoked but no Azure Vision credentials are configured. ' +
+        'Set AZURE_VISION_ENDPOINT and AZURE_VISION_KEY so createJudge() auto-wires AzureVisionApiClient, ' +
+        'or pass an explicit client via createJudge({mode: "azure-augmented", visionClient}).',
     )
   }
 }
