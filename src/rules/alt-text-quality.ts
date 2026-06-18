@@ -107,6 +107,8 @@ export const altTextQuality: Rule = {
           imageDataUrl: dataUrl,
           alt: image.alt,
           context: buildContextString(image, context.url),
+          naturalWidth: image.naturalWidth,
+          naturalHeight: image.naturalHeight,
         })
       } catch (err) {
         console.error(`[alt-text-quality] judge failed for ${resolved}:`, err)

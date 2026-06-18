@@ -32,23 +32,18 @@ export type ImageRecord = {
   ariaLabelledBy: string | null
   outerHTML: string
   boundingBox: BoundingBox | null
+  // Intrinsic (natural) pixel dimensions of the image bitmap, independent of
+  // CSS rendering. 0 when unknown (e.g. some SVGs, broken or not-yet-loaded
+  // images). Used to skip images too small to be worth model-backed judging.
+  naturalWidth: number
+  naturalHeight: number
 
-  // Surrounding context — populated by extractImages and consumed by rules
-  // that need to know how the image relates to its neighbours (notably
-  // alt-text-quality, which must distinguish functional images, captioned
-  // images, and prose-adjacent images).
-
-  // Closest ancestor <a href="…">. Null when the image is not in a link.
   inLink: {href: string} | null
-  // True when the image's closest ancestor button (HTML <button> or
-  // role="button") exists. Used together with inLink for "functional image"
-  // detection.
+  // True when the image's closest ancestor button exists. Used together with inLink for "functional image" detection.
   inButton: boolean
-  // Trimmed text content of an associated <figcaption> (image inside a
-  // <figure> with a sibling <figcaption>). Null when no figcaption exists.
+  // Trimmed text content of an associated <figcaption>, if it exists.
   figcaption: string | null
-  // Trimmed text content of the closest enclosing block-level element,
-  // truncated for prompt size. Null when no nearby text exists.
+  // Trimmed text content of the closest enclosing block-level element.
   nearbyText: string | null
 }
 
@@ -74,9 +69,7 @@ export type RuleResult = {
   solutionLong?: string
 }
 
-// A rule evaluates a RuleContext and returns its findings. Most rules are
-// pure and synchronous; rules that call out to a model or other I/O may
-// return a Promise. The plugin entry awaits both shapes uniformly.
+// A rule evaluates a RuleContext and returns its findings.
 export type Rule = {
   id: string
   problemUrl: string

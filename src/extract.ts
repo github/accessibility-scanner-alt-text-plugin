@@ -62,6 +62,10 @@ export async function extractImages(page: Page): Promise<ImageRecord[]> {
             ariaLabelledBy: el.getAttribute('aria-labelledby'),
             outerHTML: el.outerHTML,
             boundingBox,
+            // Intrinsic bitmap size, independent of CSS scaling. 0 when the
+            // browser cannot determine it (e.g. some SVGs or unloaded images).
+            naturalWidth: (el as HTMLImageElement).naturalWidth,
+            naturalHeight: (el as HTMLImageElement).naturalHeight,
             inLink,
             inButton,
             figcaption,

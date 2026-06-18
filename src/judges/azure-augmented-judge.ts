@@ -22,37 +22,61 @@ export type AzureAugmentedJudgeConfig = {
   // Tags below this confidence are dropped before being passed to the model.
   tagConfidenceThreshold?: number
   maxTags?: number
+  // Skip the Azure pre-pass when either known intrinsic dimension is at or below
+  // this many pixels. Azure Image Analysis requires images greater than 50x50
+  // and returns 400 InvalidImageSize otherwise; the inner judge (Copilot) still
+  // runs on skipped images.
+  minImageDimension?: number
 }
 
 const DEFAULT_TAG_CONFIDENCE = 0.7
 const DEFAULT_MAX_TAGS = 8
+// Azure's documented hard minimum: images must be greater than 50x50 px.
+const DEFAULT_MIN_IMAGE_DIMENSION = 50
 
 export class AzureAugmentedJudge implements JudgeAltText {
   private readonly inner: JudgeAltText
   private readonly vision: AzureVisionClient
   private readonly tagConfidenceThreshold: number
   private readonly maxTags: number
+  private readonly minImageDimension: number
 
   constructor(config: AzureAugmentedJudgeConfig) {
     this.inner = config.inner
     this.vision = config.vision
     this.tagConfidenceThreshold = config.tagConfidenceThreshold ?? DEFAULT_TAG_CONFIDENCE
     this.maxTags = config.maxTags ?? DEFAULT_MAX_TAGS
+    this.minImageDimension = config.minImageDimension ?? DEFAULT_MIN_IMAGE_DIMENSION
   }
 
   async judge(input: JudgeInput): Promise<JudgeVerdict> {
     let analysis: AzureVisionAnalysis | null = null
-    try {
-      analysis = await this.vision.analyze(input.imageDataUrl)
-    } catch (err) {
-      // If it fails (image too small, transient 5xx, rate-limit, etc.), degrade
-      // to Copilot-only for this image
-      console.warn(
-        `[alt-text-quality] Azure pre-pass failed; falling back to Copilot-only for this image. ${err instanceof Error ? err.message : String(err)}`,
-      )
+    if (this.belowSizeFloor(input)) {
+      // Too small for Azure to analyze usefully (it returns 400
+      // InvalidImageSize below its minimum).
+    } else {
+      try {
+        analysis = await this.vision.analyze(input.imageDataUrl)
+      } catch (err) {
+        // If it fails (image too small, transient 5xx, rate-limit, etc.), degrade
+        // to Copilot-only for this image
+        console.warn(
+          `[alt-text-quality] Azure pre-pass failed; falling back to Copilot-only for this image. ${err instanceof Error ? err.message : String(err)}`,
+        )
+      }
     }
     const enriched = analysis ? this.composeContext(input.context, analysis) : input.context
     return this.inner.judge({...input, context: enriched})
+  }
+
+  // True when the intrinsic size is known and at or below the floor in either
+  // dimension. Azure requires both dimensions strictly greater than the floor,
+  // so anything <= it is skipped. Unknown size (0/undefined — e.g. some SVGs) is
+  // not treated as too small, so the Azure pre-pass still runs.
+  private belowSizeFloor(input: JudgeInput): boolean {
+    const {naturalWidth, naturalHeight} = input
+    if (!naturalWidth || !naturalHeight) return false
+    return naturalWidth <= this.minImageDimension || naturalHeight <= this.minImageDimension
   }
 
   private composeContext(original: string, a: AzureVisionAnalysis): string {

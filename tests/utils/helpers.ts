@@ -14,6 +14,8 @@ export function makeImage(overrides: Partial<ImageRecord> = {}): ImageRecord {
     ariaLabelledBy: null,
     outerHTML: '<img>',
     boundingBox: null,
+    naturalWidth: 0,
+    naturalHeight: 0,
     inLink: null,
     inButton: false,
     figcaption: null,
