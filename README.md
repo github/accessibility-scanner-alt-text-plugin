@@ -122,6 +122,7 @@ The plugin runs every extracted image through an append-only registry of rules. 
 | **Filename as alt** | `filename-alt-text`    | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                              | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
 | **Repeated alt**    | `repeated-alt-text`    | Two or more adjacent images on the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                            | Five consecutive `<img alt="3/5 stars">` elements                        |
 | **Placeholder alt** | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                    | `<img alt="TODO">`<br>`<img alt="insert alt text">`                      |
+| **Alt quality** (opt-in) | `alt-text-quality` | A vision model judges the alt text against the image itself and flags it when the text is inaccurate, incomplete, or otherwise low-quality — plausible-looking alt that the deterministic rules can't catch. **Disabled by default**; requires a GitHub Models token (optionally Azure AI Vision). See [Alt-text quality](#alt-text-quality-model-backed-opt-in).                                                                | `<img src="jane-doe-ceo.jpg" alt="a person">`                            |
 
 ### Image extraction
 
@@ -135,6 +136,40 @@ Before rules run, the plugin extracts images from the page through Playwright's 
 ### Overlap with Axe
 
 The scanner's built-in Axe scan includes a rule called [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) that catches missing and whitespace-only `alt` attributes. If you have both `"axe"` and `"alt-text-scan"` enabled, the same image may be flagged by both. The other four rules in this plugin (`vague-alt-text`, `filename-alt-text`, `repeated-alt-text`, `placeholder-alt-text`) are unique to the plugin and don't overlap with Axe.
+
+### Alt-text quality (model-backed, opt-in)
+
+The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image and its alt text to a vision model, which judges whether the alt text actually and sufficiently describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of a named individual.
+
+Because it makes a per-image model call (cost and latency), it is **disabled by default**. To turn it on:
+
+1. Enable the rule in `config.json` (see [Configuration](#configuration)):
+
+   ```json
+   {
+     "rules": {
+       "alt-text-quality": true
+     }
+   }
+   ```
+
+2. Provide a GitHub Models token as the `GITHUB_MODELS_TOKEN` environment variable (a PAT with the `models:read` scope).
+
+Optionally, supply Azure AI Vision credentials (`AZURE_VISION_ENDPOINT` and `AZURE_VISION_KEY`) to add an OCR-and-tags pre-pass that enriches the model's context. When both are present the plugin selects this augmented mode automatically; set `ALT_TEXT_JUDGE_MODE` to `copilot` or `azure-augmented` to force a mode.
+
+In a workflow, provide these as repository secrets at the **job** level so the scanner's sub-actions inherit them into the process that runs the plugin. GitHub disallows secret names beginning with `GITHUB_`, so store the token under a different name (e.g. `GH_MODELS_TOKEN`) and map it:
+
+```yaml
+jobs:
+  accessibility_scanner:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+      AZURE_VISION_ENDPOINT: ${{ secrets.AZURE_VISION_ENDPOINT }} # optional
+      AZURE_VISION_KEY: ${{ secrets.AZURE_VISION_KEY }} # optional
+    steps:
+      # ...as in "Enable the plugin in your workflow" above
+```
 
 ---
 
@@ -175,7 +210,7 @@ To override the default enabled state of one or more rules, add a `config.json` 
 ```
 
 - Each key under `rules` is a rule ID from the [Rules](#rules) table above; the value is `true` (run the rule) or `false` (skip it).
-- Rules you don't list keep their default behavior. Today every rule defaults to enabled.
+- Rules you don't list keep their default behavior. Every rule defaults to enabled except `alt-text-quality`, which is opt-in (see [Alt-text quality](#alt-text-quality-model-backed-opt-in)).
 - Unknown rule IDs and non-boolean values are logged as warnings and ignored (typo guard).
 - A missing or malformed `config.json` causes the plugin to run with all defaults.
 - The plugin reads the config once at startup, not per URL.
