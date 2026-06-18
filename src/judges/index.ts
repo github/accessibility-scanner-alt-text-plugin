@@ -24,8 +24,15 @@ export type CreateJudgeOptions = {
 
 function resolveMode(opts: CreateJudgeOptions): JudgeMode {
   if (opts.mode) return opts.mode
+  // An explicit env override always wins.
   const env = process.env['ALT_TEXT_JUDGE_MODE']
   if (env === 'copilot' || env === 'azure-augmented') return env
+  // No explicit mode: enable the Azure pre-pass automatically when Azure
+  // credentials are configured; otherwise stay Copilot-only. Mirrors
+  // resolveVisionClient, which auto-wires the real client on the same signal.
+  if (process.env['AZURE_VISION_ENDPOINT'] && process.env['AZURE_VISION_KEY']) {
+    return 'azure-augmented'
+  }
   return 'copilot'
 }
 

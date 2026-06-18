@@ -11,7 +11,8 @@
 // Optional env:
 //   PROBE_MODEL              — model id, default "openai/gpt-4o"
 //   PROBE_CASES              — path to a cases.json
-//   ALT_TEXT_JUDGE_MODE      — "copilot" (default) or "azure-augmented"
+//   ALT_TEXT_JUDGE_MODE      — force "copilot" or "azure-augmented". When unset,
+//                              auto-selects azure-augmented if AZURE_VISION_* are set.
 //   PROBE_MIN_INTERVAL_MS    — minimum ms between cases (rate-limit pacing).
 //                              Set to 3500 for Azure F0's 20-calls/min ceiling.
 
@@ -35,8 +36,7 @@ type ProbeCase = {
 
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
-// Reads intrinsic pixel dimensions straight from the image bytes — the same
-// bytes the judge (and Azure) receive. This mirrors what the browser reports as
+// Reads intrinsic pixel dimensions straight from the image bytes. This mirrors what the browser reports as
 // naturalWidth/naturalHeight in production.
 function intrinsicSize(buf: Buffer): {width: number; height: number} {
   const none = {width: 0, height: 0}
@@ -102,7 +102,11 @@ async function main(): Promise<void> {
   const cases = JSON.parse(await readFile(casesPath, 'utf8')) as ProbeCase[]
   const baseDir = dirname(casesPath)
 
-  const mode = process.env['ALT_TEXT_JUDGE_MODE'] ?? 'copilot'
+  // Mirror createJudge()'s resolution for display: explicit env wins, else
+  // auto-select azure-augmented when Azure credentials are present.
+  const mode =
+    process.env['ALT_TEXT_JUDGE_MODE'] ||
+    (process.env['AZURE_VISION_ENDPOINT'] && process.env['AZURE_VISION_KEY'] ? 'azure-augmented' : 'copilot')
   const model = process.env['PROBE_MODEL'] ?? 'openai/gpt-4o'
   const minIntervalMs = Number(process.env['PROBE_MIN_INTERVAL_MS'] ?? '0')
 
