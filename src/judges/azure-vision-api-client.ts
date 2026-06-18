@@ -1,21 +1,12 @@
 // Real Azure AI Vision (Image Analysis 4.0) client. Implements the
 // AzureVisionClient interface that AzureAugmentedJudge depends on.
-//
-// Auth is via subscription key (Ocp-Apim-Subscription-Key header). For
-// production deployments, prefer Azure managed identity; this client is
-// designed for local development and CI where a key is the simplest path.
-//
-// Docs: https://learn.microsoft.com/azure/ai-services/computer-vision/concept-describe-images-40
-//       https://learn.microsoft.com/rest/api/computervision/image-analysis/analyze-image
 
 import {Buffer} from 'node:buffer'
 import type {AzureVisionAnalysis, AzureVisionClient} from './azure-augmented-judge.js'
 
 export type AzureVisionApiClientConfig = {
-  // Resource endpoint, e.g. "https://alt-text-scanner-plugin.cognitiveservices.azure.com/".
-  // Trailing slash is optional. Defaults to AZURE_VISION_ENDPOINT.
+  // Defaults to AZURE_VISION_ENDPOINT.
   endpoint?: string
-  // Subscription key from the resource's "Keys and endpoint" page.
   // Defaults to AZURE_VISION_KEY.
   key?: string
   // Image Analysis API version. Defaults to the GA version.
@@ -23,17 +14,11 @@ export type AzureVisionApiClientConfig = {
   // Comma-separated feature list. The decorator's composeContext can use any
   // subset of: caption, denseCaptions, read, tags. Note: caption and
   // denseCaptions are restricted to specific regions (East US, West US,
-  // West Europe, etc.) — West US 2 does NOT support them. Default is the
-  // always-available subset; override per-region if your resource supports more.
+  // West Europe, etc.)
   features?: string
 }
 
 const DEFAULT_API_VERSION = '2024-02-01'
-// Read (OCR) + tags are available in every region. Caption / denseCaptions
-// require East US, West US, West Europe, North Europe, Southeast Asia,
-// East Asia, France Central, Korea Central, West Central US, Switzerland
-// North, or Australia East. Override via AZURE_VISION_FEATURES if your
-// resource is in one of those regions.
 const DEFAULT_FEATURES = 'read,tags'
 
 // Narrowed shape of the Image Analysis 4.0 response.
@@ -63,9 +48,7 @@ export class AzureVisionApiClient implements AzureVisionClient {
       )
     }
     if (!key) {
-      throw new Error(
-        'AzureVisionApiClient requires a key. Set AZURE_VISION_KEY or pass {key} to the constructor.',
-      )
+      throw new Error('AzureVisionApiClient requires a key. Set AZURE_VISION_KEY or pass {key} to the constructor.')
     }
     this.endpoint = endpoint.replace(/\/$/, '')
     this.key = key
