@@ -3,6 +3,7 @@
 
 import {Buffer} from 'node:buffer'
 import type {AzureVisionAnalysis, AzureVisionClient} from './azure-augmented-judge.js'
+import {fetchWithRetry} from '../utils/fetch-with-retry.js'
 
 export type AzureVisionApiClientConfig = {
   // Defaults to AZURE_VISION_ENDPOINT.
@@ -63,7 +64,7 @@ export class AzureVisionApiClient implements AzureVisionClient {
     url.searchParams.set('api-version', this.apiVersion)
     url.searchParams.set('features', this.features)
 
-    const res = await fetch(url, {
+    const res = await fetchWithRetry(url, {
       method: 'POST',
       headers: {
         'Ocp-Apim-Subscription-Key': this.key,
