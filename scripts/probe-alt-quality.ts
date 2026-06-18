@@ -35,6 +35,64 @@ type ProbeCase = {
 
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
+// Reads intrinsic pixel dimensions straight from the image bytes — the same
+// bytes the judge (and Azure) receive. This mirrors what the browser reports as
+// naturalWidth/naturalHeight in production.
+function intrinsicSize(buf: Buffer): {width: number; height: number} {
+  const none = {width: 0, height: 0}
+
+  // PNG: 8-byte signature, then an IHDR chunk with width@16, height@20 (BE).
+  if (buf.length >= 24 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
+    return {width: buf.readUInt32BE(16), height: buf.readUInt32BE(20)}
+  }
+
+  // GIF: 'GIF8', then logical-screen width@6, height@8 (little-endian).
+  if (buf.length >= 10 && buf[0] === 0x47 && buf[1] === 0x49 && buf[2] === 0x46 && buf[3] === 0x38) {
+    return {width: buf.readUInt16LE(6), height: buf.readUInt16LE(8)}
+  }
+
+  // WebP: 'RIFF'....'WEBP' followed by a VP8 / VP8L / VP8X chunk.
+  if (buf.length >= 30 && buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP') {
+    const chunk = buf.toString('ascii', 12, 16)
+    if (chunk === 'VP8 ') {
+      // Lossy: ...0x9d 0x01 0x2a, then 14-bit width then 14-bit height (LE).
+      return {width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff}
+    }
+    if (chunk === 'VP8L' && buf.length >= 25) {
+      // Lossless: 0x2f signature@20, then packed 14-bit (width-1), (height-1).
+      const bits = buf.readUInt32LE(21)
+      return {width: (bits & 0x3fff) + 1, height: ((bits >> 14) & 0x3fff) + 1}
+    }
+    if (chunk === 'VP8X') {
+      // Extended: 24-bit (width-1)@24, 24-bit (height-1)@27 (little-endian).
+      const width = (buf.readUInt8(24) | (buf.readUInt8(25) << 8) | (buf.readUInt8(26) << 16)) + 1
+      const height = (buf.readUInt8(27) | (buf.readUInt8(28) << 8) | (buf.readUInt8(29) << 16)) + 1
+      return {width, height}
+    }
+  }
+
+  // JPEG: scan segments for a Start-Of-Frame marker carrying the dimensions.
+  if (buf.length >= 4 && buf[0] === 0xff && buf[1] === 0xd8) {
+    let off = 2
+    while (off + 9 < buf.length) {
+      if (buf[off] !== 0xff) {
+        off++
+        continue
+      }
+      const marker = buf.readUInt8(off + 1)
+      // SOF0..SOF15 carry size, except DHT(C4), JPG(C8) and DAC(CC).
+      if (marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc) {
+        return {height: buf.readUInt16BE(off + 5), width: buf.readUInt16BE(off + 7)}
+      }
+      const segLen = buf.readUInt16BE(off + 2)
+      if (segLen < 2) break
+      off += 2 + segLen
+    }
+  }
+
+  return none
+}
+
 async function main(): Promise<void> {
   const here = dirname(fileURLToPath(import.meta.url))
   const casesPath = process.env['PROBE_CASES']
@@ -71,11 +129,15 @@ async function main(): Promise<void> {
     process.stdout.write(`[${c.id}] `)
     try {
       const dataUrl = await loadImageAsDataUrl(c.image, {baseDir})
+      const bytes = Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64')
+      const {width: naturalWidth, height: naturalHeight} = intrinsicSize(bytes)
       const start = Date.now()
       const verdict = await judge.judge({
         imageDataUrl: dataUrl,
         alt: c.alt,
         context: c.context ?? '',
+        naturalWidth,
+        naturalHeight,
       })
       const latencyMs = Date.now() - start
 
@@ -88,6 +150,7 @@ async function main(): Promise<void> {
       }
 
       console.log(`${verdict.verdict} (conf ${verdict.confidence.toFixed(2)}, ${latencyMs}ms)${agreeMark}`)
+      if (naturalWidth > 0 && naturalHeight > 0) console.log(`    size:     ${naturalWidth}×${naturalHeight}`)
       console.log(`    alt:      ${JSON.stringify(c.alt)}`)
       if (c.expected !== undefined) console.log(`    expected: ${c.expected}`)
       if (verdict.issue) console.log(`    issue:    ${verdict.issue}`)
