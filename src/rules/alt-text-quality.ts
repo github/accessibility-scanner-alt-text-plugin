@@ -41,7 +41,10 @@ function resolveImageUrl(src: string, pageUrl: string): string | null {
 // structured fields populated by extractImages. This is the production-side
 // equivalent of the hand-written `context` in the probe's cases.json.
 function buildContextString(image: ImageRecord, pageUrl: string): string {
-  const parts: string[] = [`Page URL: ${pageUrl}`, `Image HTML: ${image.outerHTML}`]
+  const parts: string[] = [`Page URL: ${pageUrl}`]
+  if (image.pageTitle) parts.push(`Page title: ${JSON.stringify(image.pageTitle)}`)
+  if (image.sectionHeading) parts.push(`Nearest heading above the image: ${JSON.stringify(image.sectionHeading)}`)
+  parts.push(`Image HTML: ${image.outerHTML}`)
   if (image.inLink) parts.push(`The image is the only/primary content of a link with href="${image.inLink.href}".`)
   if (image.inButton) parts.push('The image is inside a button (or role="button" element).')
   if (image.figcaption) parts.push(`Adjacent figcaption: ${JSON.stringify(image.figcaption)}`)

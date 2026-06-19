@@ -152,4 +152,45 @@ describe('extractImages', () => {
       expect(images).toHaveLength(1)
     })
   })
+
+  describe('page title and section heading context', () => {
+    it('captures the page <title>, normalized', async () => {
+      await page.setContent(
+        `<!doctype html><html><head><title>  Acid Erosion   of Rocks  </title></head><body><img src="x.png" alt="x"></body></html>`,
+      )
+      const images = await extractImages(page)
+      expect(images[0]!.pageTitle).toBe('Acid Erosion of Rocks')
+    })
+
+    it('is null when the page has no title', async () => {
+      const images = await extractFromHTML(`<img src="x.png" alt="x">`)
+      expect(images[0]!.pageTitle).toBeNull()
+    })
+
+    it('captures the nearest heading preceding the image', async () => {
+      const images = await extractFromHTML(`
+        <h1>Page Heading</h1>
+        <h2>Puffins and Acid Erosion</h2>
+        <p><img src="x.png" alt="x"></p>
+      `)
+      expect(images[0]!.sectionHeading).toBe('Puffins and Acid Erosion')
+    })
+
+    it('ignores headings that come after the image', async () => {
+      const images = await extractFromHTML(`
+        <h2>Before</h2>
+        <img src="x.png" alt="x">
+        <h2>After</h2>
+      `)
+      expect(images[0]!.sectionHeading).toBe('Before')
+    })
+
+    it('is null when no heading precedes the image', async () => {
+      const images = await extractFromHTML(`
+        <img src="x.png" alt="x">
+        <h2>After</h2>
+      `)
+      expect(images[0]!.sectionHeading).toBeNull()
+    })
+  })
 })

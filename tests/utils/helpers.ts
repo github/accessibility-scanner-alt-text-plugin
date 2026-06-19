@@ -20,6 +20,8 @@ export function makeImage(overrides: Partial<ImageRecord> = {}): ImageRecord {
     inButton: false,
     figcaption: null,
     nearbyText: null,
+    pageTitle: null,
+    sectionHeading: null,
     ...overrides,
   }
 }
