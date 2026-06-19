@@ -107,4 +107,22 @@ describe('alt-text-quality', () => {
     expect(fake.calls[0]!.context).toContain('Dogs of the World')
     expect(fake.calls[0]!.context).toContain('Working Breeds')
   })
+
+  it('strips src/srcset values from the image HTML in the judge context', async () => {
+    const fake = new FakeJudge(() => verdict())
+    __setJudge(fake)
+    await run([
+      makeImage({
+        src: DATA_URL,
+        alt: 'a dog',
+        outerHTML:
+          '<img src="https://cdn.example.com/secret?sig=abc123" srcset="https://cdn.example.com/secret-2x?sig=def456 2x" alt="a dog">',
+      }),
+    ])
+    const context = fake.calls[0]!.context
+    expect(context).not.toContain('sig=abc123')
+    expect(context).not.toContain('sig=def456')
+    expect(context).toContain('src="(omitted)"')
+    expect(context).toContain('srcset="(omitted)"')
+  })
 })

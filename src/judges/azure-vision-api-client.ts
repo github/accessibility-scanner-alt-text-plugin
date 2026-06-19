@@ -84,7 +84,7 @@ export class AzureVisionApiClient implements AzureVisionClient {
 }
 
 function decodeDataUrl(dataUrl: string): Buffer {
-  const match = /^data:[^;]+;base64,(.+)$/.exec(dataUrl)
+  const match = /^data:[^,]*;base64,(.+)$/s.exec(dataUrl)
   if (!match) throw new Error('AzureVisionApiClient.analyze expects a base64 data URL.')
   return Buffer.from(match[1]!, 'base64')
 }

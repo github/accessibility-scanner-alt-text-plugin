@@ -40,11 +40,25 @@ function resolveImageUrl(src: string, pageUrl: string): string | null {
 // Build the natural-language context string handed to the judge from the
 // structured fields populated by extractImages. This is the production-side
 // equivalent of the hand-written `context` in the probe's cases.json.
+
+// Cap on the image HTML included in the prompt, after src/srcset are stripped.
+const MAX_IMAGE_HTML = 500
+
+// The judge already sees the image via its data URL, so the raw src/srcset add
+// only token cost and risk leaking signed CDN URLs or query params to the
+// model. Strip those values and cap the length before including the HTML.
+function sanitizeImageHtml(outerHTML: string): string {
+  const stripped = outerHTML
+    .replace(/\s+src\s*=\s*("[^"]*"|'[^']*')/gi, ' src="(omitted)"')
+    .replace(/\s+srcset\s*=\s*("[^"]*"|'[^']*')/gi, ' srcset="(omitted)"')
+  return stripped.length > MAX_IMAGE_HTML ? `${stripped.slice(0, MAX_IMAGE_HTML)}…` : stripped
+}
+
 function buildContextString(image: ImageRecord, pageUrl: string): string {
   const parts: string[] = [`Page URL: ${pageUrl}`]
   if (image.pageTitle) parts.push(`Page title: ${JSON.stringify(image.pageTitle)}`)
   if (image.sectionHeading) parts.push(`Nearest heading above the image: ${JSON.stringify(image.sectionHeading)}`)
-  parts.push(`Image HTML: ${image.outerHTML}`)
+  parts.push(`Image HTML: ${sanitizeImageHtml(image.outerHTML)}`)
   if (image.inLink) parts.push(`The image is inside a link with href="${image.inLink.href}".`)
   if (image.inButton) parts.push('The image is inside a button (or role="button" element).')
   if (image.figcaption) parts.push(`Adjacent figcaption: ${JSON.stringify(image.figcaption)}`)
