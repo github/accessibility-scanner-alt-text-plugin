@@ -2,7 +2,6 @@ import type {Page} from 'playwright'
 import type {ImageRecord} from './types.js'
 
 // Maximum number of characters of nearby prose forwarded to model-backed rules.
-// Long enough to convey context, short enough to keep prompts cheap and focused.
 const NEARBY_TEXT_MAX = 600
 
 // Returns one ImageRecord per HTML <img> element that is exposed in the accessibility tree.
@@ -29,12 +28,10 @@ export async function extractImages(page: Page): Promise<ImageRecord[]> {
           const linkEl = el.closest('a[href]') as HTMLAnchorElement | null
           const inLink = linkEl ? {href: linkEl.getAttribute('href') ?? ''} : null
 
-          // Closest ancestor button — either a <button> element or any
-          // element with role="button".
+          // Closest ancestor button
           const inButton = el.closest('button, [role="button"]') !== null
 
-          // Associated <figcaption>: image must be inside a <figure>; the
-          // figcaption can be a sibling above or below the image.
+          // Associated <figcaption>: image must be inside a <figure>
           let figcaption: string | null = null
           const figure = el.closest('figure')
           if (figure) {
@@ -43,29 +40,24 @@ export async function extractImages(page: Page): Promise<ImageRecord[]> {
             if (text) figcaption = text
           }
 
-          // Nearby prose: text content of the closest block-level ancestor,
-          // minus the image's own subtree, truncated to keep prompts bounded.
+          // Nearby prose
           let nearbyText: string | null = null
           const block = el.closest('p, li, section, article, main, aside, blockquote, td, th, div')
           if (block) {
-            const clone = block.cloneNode(true) as HTMLElement
-            // Remove img tags from the clone so their alt text doesn't pollute
-            // the prose snippet handed to the model.
-            for (const innerImg of Array.from(clone.querySelectorAll('img'))) innerImg.remove()
-            const text = (clone.textContent ?? '').replace(/\s+/g, ' ').trim()
+            const text = (block.textContent ?? '').replace(/\s+/g, ' ').trim()
             if (text) {
               nearbyText = text.length > maxNearby ? `${text.slice(0, maxNearby)}…` : text
             }
           }
 
-          // Nearest heading that precedes the image in document order. Headings
-          // are already in order, so the last one before the image wins.
+          // Nearest heading that precedes the image in document order.
           let sectionHeading: string | null = null
-          for (const h of headings) {
-            if (h.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) {
-              const text = (h.textContent ?? '').replace(/\s+/g, ' ').trim()
-              if (text) sectionHeading = text
-            } else {
+          for (let i = headings.length - 1; i >= 0; i--) {
+            const h = headings[i]!
+            if (!(h.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING)) continue
+            const text = (h.textContent ?? '').replace(/\s+/g, ' ').trim()
+            if (text) {
+              sectionHeading = text
               break
             }
           }

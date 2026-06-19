@@ -12,11 +12,7 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
-    # Plugin config for the model-backed alt-text-quality rule. Set at the job
-    # level (not step level) so the scanner's composite sub-actions inherit it
-    # into the Node process that runs the plugin. Secret names can't start with
-    # GITHUB_, so the Models token is stored as GH_MODELS_TOKEN here. The judge
-    # auto-selects azure-augmented mode when both AZURE_VISION_* are present.
+    # Plugin config for the model-backed alt-text-quality rule.
     env:
       GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
       AZURE_VISION_ENDPOINT: ${{ secrets.AZURE_VISION_ENDPOINT }}

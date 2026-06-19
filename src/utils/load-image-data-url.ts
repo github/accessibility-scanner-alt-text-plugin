@@ -1,10 +1,6 @@
 // Loads an image from any of: an http(s) URL, an absolute filesystem path,
 // or a path relative to a given base directory. Returns the bytes encoded as
 // a data URL suitable for vision-model `image_url` fields.
-//
-// Used by the offline probe (where images come from cases.json paths or URLs)
-// and by the production rule (where images come from the page's <img src>
-// resolved against the page URL).
 
 import {readFile} from 'node:fs/promises'
 import {extname, isAbsolute, resolve} from 'node:path'
@@ -25,7 +21,7 @@ function guessMime(p: string): string {
   return MIME_BY_EXT[extname(p).toLowerCase()] ?? 'application/octet-stream'
 }
 
-// Downstream consumers (the Azure client's decoder, the probe's byte parser)
+// Downstream consumers (e.g. the Azure client's decoder, the probe's byte parser)
 // assume a base64 data URL. A pass-through `data:` URL may instead be plain or
 // percent-encoded (common for inline SVG), so re-encode those to base64 to keep
 // the function's contract consistent.

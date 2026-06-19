@@ -1,4 +1,4 @@
-// AzureAugmentedJudge — decorator over a JudgeAltText (typically CopilotJudge)
+// AzureAugmentedJudge — decorator over a JudgeAltText
 // that runs an Azure Computer Vision pre-pass and folds the result into the
 // context handed to the inner judge.
 
@@ -23,9 +23,7 @@ export type AzureAugmentedJudgeConfig = {
   tagConfidenceThreshold?: number
   maxTags?: number
   // Skip the Azure pre-pass when either known intrinsic dimension is at or below
-  // this many pixels. Azure Image Analysis requires images greater than 50x50
-  // and returns 400 InvalidImageSize otherwise; the inner judge (Copilot) still
-  // runs on skipped images.
+  // this many pixels
   minImageDimension?: number
 }
 
@@ -70,9 +68,7 @@ export class AzureAugmentedJudge implements JudgeAltText {
   }
 
   // True when the intrinsic size is known and at or below the floor in either
-  // dimension. Azure requires both dimensions strictly greater than the floor,
-  // so anything <= it is skipped. Unknown size (0/undefined — e.g. some SVGs) is
-  // not treated as too small, so the Azure pre-pass still runs.
+  // dimension.
   private belowSizeFloor(input: JudgeInput): boolean {
     const {naturalWidth, naturalHeight} = input
     if (!naturalWidth || !naturalHeight) return false

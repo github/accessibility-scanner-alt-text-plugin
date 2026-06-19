@@ -1,14 +1,5 @@
 // alt-text-quality — model-backed rule that judges whether each image's alt
 // text is appropriate given the image and its surrounding page context.
-//
-// Architecture:
-//   • This rule is a thin orchestrator. It does not contain prompt text,
-//     schema, or HTTP code. Those live in src/judges/.
-//   • A JudgeAltText is injected via createJudge() — today CopilotJudge,
-//     later AzureAugmentedJudge wrapping CopilotJudge. Swapping the judge
-//     does not change this file.
-//   • The rule is async and opt-in (defaultEnabled: false) because it
-//     requires a model token and incurs API cost.
 
 import {createJudge} from '../judges/index.js'
 import type {JudgeAltText, JudgeVerdict} from '../judges/index.js'
@@ -16,7 +7,7 @@ import type {Rule, RuleContext, RuleResult, ImageRecord} from '../types.js'
 import {loadImageAsDataUrl} from '../utils/load-image-data-url.js'
 
 // Lazily build the judge so missing tokens surface only when the rule actually
-// runs (not at import time, which would break tests of other rules).
+// runs
 let cachedJudge: JudgeAltText | null = null
 function getJudge(): JudgeAltText {
   if (!cachedJudge) cachedJudge = createJudge()
@@ -38,15 +29,12 @@ function resolveImageUrl(src: string, pageUrl: string): string | null {
 }
 
 // Build the natural-language context string handed to the judge from the
-// structured fields populated by extractImages. This is the production-side
-// equivalent of the hand-written `context` in the probe's cases.json.
+// structured fields populated by extractImages
 
-// Cap on the image HTML included in the prompt, after src/srcset are stripped.
 const MAX_IMAGE_HTML = 500
 
 // The judge already sees the image via its data URL, so the raw src/srcset add
-// only token cost and risk leaking signed CDN URLs or query params to the
-// model. Strip those values and cap the length before including the HTML.
+// only token cost and risk leaking data to the model. Strip those values and cap the length.
 function sanitizeImageHtml(outerHTML: string): string {
   const stripped = outerHTML
     .replace(/\s+src\s*=\s*("[^"]*"|'[^']*')/gi, ' src="(omitted)"')
