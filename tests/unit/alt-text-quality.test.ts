@@ -1,0 +1,108 @@
+import {describe, it, expect, afterEach, vi} from 'vitest'
+import {altTextQuality, __setJudge} from '../../src/rules/alt-text-quality.js'
+import type {JudgeAltText, JudgeInput, JudgeVerdict} from '../../src/judges/index.js'
+import type {ImageRecord, RuleResult} from '../../src/types.js'
+import {makeImage} from '../utils/helpers.js'
+
+// A data: URL is returned unchanged by loadImageAsDataUrl, so using one as the
+// image src keeps these tests fully offline.
+const DATA_URL = 'data:image/png;base64,iVBORw0KGgo='
+
+// Records every input it receives and returns whatever the responder produces,
+// letting each test drive the rule with a scripted verdict (or a thrown error).
+class FakeJudge implements JudgeAltText {
+  readonly calls: JudgeInput[] = []
+  constructor(private readonly responder: (input: JudgeInput) => JudgeVerdict) {}
+  async judge(input: JudgeInput): Promise<JudgeVerdict> {
+    this.calls.push(input)
+    return this.responder(input)
+  }
+}
+
+function verdict(overrides: Partial<JudgeVerdict> = {}): JudgeVerdict {
+  return {step: 4, reasoning: 'reasoning', verdict: 'ok', issue: '', confidence: 0.9, ...overrides}
+}
+
+async function run(images: ImageRecord[]): Promise<RuleResult[]> {
+  return (await altTextQuality.evaluate({url: 'https://example.com', images})) as RuleResult[]
+}
+
+describe('alt-text-quality', () => {
+  afterEach(() => {
+    __setJudge(null)
+    vi.restoreAllMocks()
+  })
+
+  it('is opt-in (disabled by default)', () => {
+    expect(altTextQuality.defaultEnabled).toBe(false)
+  })
+
+  it('produces no finding for an "ok" verdict', async () => {
+    __setJudge(new FakeJudge(() => verdict({verdict: 'ok'})))
+    const results = await run([makeImage({src: DATA_URL, alt: 'A dog playing in the park'})])
+    expect(results).toHaveLength(0)
+  })
+
+  it('maps a "needs-fix" verdict to a finding with the issue, alt, and reasoning', async () => {
+    __setJudge(
+      new FakeJudge(() => verdict({verdict: 'needs-fix', issue: 'redundant-prefix', reasoning: 'Drop the prefix.'})),
+    )
+    const results = await run([makeImage({src: DATA_URL, alt: 'Image of a dog'})])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.problemShort).toContain('redundant-prefix')
+    expect(results[0]!.problemShort).toContain('Image of a dog')
+    expect(results[0]!.solutionLong).toBe('Drop the prefix.')
+  })
+
+  it('maps a "decorative" verdict to an empty-alt recommendation', async () => {
+    __setJudge(new FakeJudge(() => verdict({verdict: 'decorative', reasoning: 'It is a spacer.'})))
+    const results = await run([makeImage({src: DATA_URL, alt: 'horizontal spacer'})])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.problemShort).toContain('decorative')
+    expect(results[0]!.solutionShort).toContain('alt=""')
+  })
+
+  it('skips images with alt === null without calling the judge', async () => {
+    const fake = new FakeJudge(() => verdict())
+    __setJudge(fake)
+    const results = await run([makeImage({src: DATA_URL, alt: null})])
+    expect(results).toHaveLength(0)
+    expect(fake.calls).toHaveLength(0)
+  })
+
+  it('skips images with no src without calling the judge', async () => {
+    const fake = new FakeJudge(() => verdict({verdict: 'needs-fix'}))
+    __setJudge(fake)
+    const results = await run([makeImage({src: '', alt: 'a dog'})])
+    expect(results).toHaveLength(0)
+    expect(fake.calls).toHaveLength(0)
+  })
+
+  it('isolates per-image judge failures and keeps evaluating the rest', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const fake = new FakeJudge(input => {
+      if (input.alt === 'boom') throw new Error('judge failed')
+      return verdict({verdict: 'needs-fix', issue: 'vague'})
+    })
+    __setJudge(fake)
+    const results = await run([makeImage({src: DATA_URL, alt: 'boom'}), makeImage({src: DATA_URL, alt: 'a dog'})])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.image.alt).toBe('a dog')
+  })
+
+  it('passes intrinsic image dimensions through to the judge', async () => {
+    const fake = new FakeJudge(() => verdict())
+    __setJudge(fake)
+    await run([makeImage({src: DATA_URL, alt: 'a dog', naturalWidth: 800, naturalHeight: 600})])
+    expect(fake.calls[0]!.naturalWidth).toBe(800)
+    expect(fake.calls[0]!.naturalHeight).toBe(600)
+  })
+
+  it('includes page title and section heading in the judge context', async () => {
+    const fake = new FakeJudge(() => verdict())
+    __setJudge(fake)
+    await run([makeImage({src: DATA_URL, alt: 'a dog', pageTitle: 'Dogs of the World', sectionHeading: 'Working Breeds'})])
+    expect(fake.calls[0]!.context).toContain('Dogs of the World')
+    expect(fake.calls[0]!.context).toContain('Working Breeds')
+  })
+})
