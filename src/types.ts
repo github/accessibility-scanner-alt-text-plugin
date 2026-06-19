@@ -43,12 +43,13 @@ export type ImageRecord = {
   // Trimmed text content of an associated <figcaption>, if it exists.
   figcaption: string | null
   // Trimmed text content of the closest enclosing block-level element.
-  nearbyText: string | null  // Trimmed text of the page's <title>, used as topical context for the
+  nearbyText: string | null // Trimmed text of the page's <title>, used as topical context for the
   // model-backed rule.
   pageTitle: string | null
   // Trimmed text of the nearest heading (h1–h6) preceding the image in
   // document order, naming the section the image sits under.
-  sectionHeading: string | null}
+  sectionHeading: string | null
+}
 
 // Pixel position and size of an image in the page's rendered layout.
 export type BoundingBox = {

@@ -101,7 +101,9 @@ describe('alt-text-quality', () => {
   it('includes page title and section heading in the judge context', async () => {
     const fake = new FakeJudge(() => verdict())
     __setJudge(fake)
-    await run([makeImage({src: DATA_URL, alt: 'a dog', pageTitle: 'Dogs of the World', sectionHeading: 'Working Breeds'})])
+    await run([
+      makeImage({src: DATA_URL, alt: 'a dog', pageTitle: 'Dogs of the World', sectionHeading: 'Working Breeds'}),
+    ])
     expect(fake.calls[0]!.context).toContain('Dogs of the World')
     expect(fake.calls[0]!.context).toContain('Working Breeds')
   })

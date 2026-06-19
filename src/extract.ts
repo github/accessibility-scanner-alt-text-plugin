@@ -8,14 +8,14 @@ const NEARBY_TEXT_MAX = 600
 // Returns one ImageRecord per HTML <img> element that is exposed in the accessibility tree.
 // Using getByRole('img') filters out elements that assistive tech cannot perceive.
 export async function extractImages(page: Page): Promise<ImageRecord[]> {
-  return page.getByRole('img').evaluateAll(
-    (els, maxNearby) => {
-      // Page-level topic, captured once and shared by every image record.
-      const pageTitle = (document.title ?? '').replace(/\s+/g, ' ').trim() || null
-      // All headings in document order, used to find each image's section.
-      const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
+  return page.getByRole('img').evaluateAll((els, maxNearby) => {
+    // Page-level topic, captured once and shared by every image record.
+    const pageTitle = (document.title ?? '').replace(/\s+/g, ' ').trim() || null
+    // All headings in document order, used to find each image's section.
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'))
 
-      return els
+    return (
+      els
         // getByRole('img') also matches SVG/div with role="img", so filter those out.
         .filter(el => el.tagName === 'IMG')
         .map(el => {
@@ -90,7 +90,6 @@ export async function extractImages(page: Page): Promise<ImageRecord[]> {
             sectionHeading,
           }
         })
-    },
-    NEARBY_TEXT_MAX,
-  )
+    )
+  }, NEARBY_TEXT_MAX)
 }

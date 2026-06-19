@@ -3,6 +3,7 @@
 import {AzureAugmentedJudge, NotImplementedAzureVisionClient} from './azure-augmented-judge.js'
 import type {AzureVisionClient} from './azure-augmented-judge.js'
 import {AzureVisionApiClient} from './azure-vision-api-client.js'
+import {CachingJudge, CachingVisionClient} from './caching.js'
 import {CopilotJudge} from './copilot-judge.js'
 import type {CopilotJudgeConfig} from './copilot-judge.js'
 import type {JudgeAltText, JudgeMode} from './types.js'
@@ -13,6 +14,7 @@ export type {CopilotJudgeConfig} from './copilot-judge.js'
 export {AzureAugmentedJudge, NotImplementedAzureVisionClient} from './azure-augmented-judge.js'
 export type {AzureVisionClient, AzureVisionAnalysis, AzureAugmentedJudgeConfig} from './azure-augmented-judge.js'
 export {AzureVisionApiClient} from './azure-vision-api-client.js'
+export {CachingJudge, CachingVisionClient} from './caching.js'
 export type {AzureVisionApiClientConfig} from './azure-vision-api-client.js'
 export {SYSTEM_PROMPT, VERDICT_SCHEMA} from './prompt.js'
 
@@ -24,12 +26,8 @@ export type CreateJudgeOptions = {
 
 function resolveMode(opts: CreateJudgeOptions): JudgeMode {
   if (opts.mode) return opts.mode
-  // An explicit env override always wins.
   const env = process.env['ALT_TEXT_JUDGE_MODE']
   if (env === 'copilot' || env === 'azure-augmented') return env
-  // No explicit mode: enable the Azure pre-pass automatically when Azure
-  // credentials are configured; otherwise stay Copilot-only. Mirrors
-  // resolveVisionClient, which auto-wires the real client on the same signal.
   if (process.env['AZURE_VISION_ENDPOINT'] && process.env['AZURE_VISION_KEY']) {
     return 'azure-augmented'
   }
@@ -47,9 +45,15 @@ function resolveVisionClient(opts: CreateJudgeOptions): AzureVisionClient {
 export function createJudge(opts: CreateJudgeOptions = {}): JudgeAltText {
   const mode = resolveMode(opts)
   const copilot = new CopilotJudge(opts.copilot)
-  if (mode === 'copilot') return copilot
-  return new AzureAugmentedJudge({
-    inner: copilot,
-    vision: resolveVisionClient(opts),
-  })
+  // The judgment cache (hash(image, alt, context) -> verdict) wraps the
+  // outermost judge, so a hit skips everything below it — including the Azure
+  // pre-pass. The vision-extraction cache (image bytes -> Azure analysis) wraps
+  // just the Azure client, where two-stage mode gets most of its reuse.
+  if (mode === 'copilot') return new CachingJudge(copilot)
+  return new CachingJudge(
+    new AzureAugmentedJudge({
+      inner: copilot,
+      vision: new CachingVisionClient(resolveVisionClient(opts)),
+    }),
+  )
 }
