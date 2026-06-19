@@ -45,7 +45,7 @@ function buildContextString(image: ImageRecord, pageUrl: string): string {
   if (image.pageTitle) parts.push(`Page title: ${JSON.stringify(image.pageTitle)}`)
   if (image.sectionHeading) parts.push(`Nearest heading above the image: ${JSON.stringify(image.sectionHeading)}`)
   parts.push(`Image HTML: ${image.outerHTML}`)
-  if (image.inLink) parts.push(`The image is the only/primary content of a link with href="${image.inLink.href}".`)
+  if (image.inLink) parts.push(`The image is inside a link with href="${image.inLink.href}".`)
   if (image.inButton) parts.push('The image is inside a button (or role="button" element).')
   if (image.figcaption) parts.push(`Adjacent figcaption: ${JSON.stringify(image.figcaption)}`)
   if (image.nearbyText) parts.push(`Surrounding body text: ${JSON.stringify(image.nearbyText)}`)
