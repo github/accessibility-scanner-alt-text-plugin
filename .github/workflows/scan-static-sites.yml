@@ -19,6 +19,7 @@ jobs:
           - id: octodex
             urls: |
               https://octodex.github.com/
+              https://octodex.github.com/bombacat/
             repository: github/accessibility-scanner-testing
           - id: universe
             urls: |
