@@ -17,16 +17,32 @@ jobs:
       matrix:
         include:
           - id: octodex
-            urls: https://octodex.github.com/
+            urls: |
+              https://octodex.github.com/
+              https://octodex.github.com/bombacat/
             repository: github/accessibility-scanner-testing
           - id: universe
-            urls: https://githubuniverse.com/
+            urls: |
+              https://githubuniverse.com/
+              https://githubuniverse.com/pricing
+              https://reg.githubuniverse.com/flow/github/universe26/attendee-portal/page/sponsors
+              https://githubuniverse.com/#videos
             repository: github/accessibility-scanner-testing
           - id: shop
-            urls: https://thegithubshop.com/
+            urls: |
+              https://thegithubshop.com/
+              https://thegithubshop.com/collections/all
+              https://thegithubshop.com/collections/apparel
+              https://thegithubshop.com/collections/lifestyle
+              https://thegithubshop.com/collections/new-arrivals
             repository: github/accessibility-scanner-testing
           - id: blog
-            urls: https://github.blog/
+            urls: |
+              https://github.blog/
+              https://github.blog/news-insights/
+              https://github.blog/engineering/
+              https://github.blog/open-source/
+              https://github.blog/ai-and-ml/
             repository: github/accessibility-scanner-testing
     steps:
       - name: Checkout repository
