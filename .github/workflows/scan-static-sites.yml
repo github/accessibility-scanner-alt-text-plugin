@@ -1,0 +1,64 @@
+name: Scan static GitHub sites (alt-text plugin)
+
+# Manually triggered workflow that runs the accessibility scanner with the
+# alt-text-scan plugin enabled against public GitHub static sites. Any issues
+# opened by the scanner are routed to a test repository for validation.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: octodex
+            urls: |
+              https://octodex.github.com/
+              https://octodex.github.com/bombacat/
+            repository: github/accessibility-scanner-testing
+          - id: universe
+            urls: |
+              https://githubuniverse.com/
+              https://githubuniverse.com/pricing
+              https://reg.githubuniverse.com/flow/github/universe26/attendee-portal/page/sponsors
+              https://githubuniverse.com/#videos
+            repository: github/accessibility-scanner-testing
+          - id: shop
+            urls: |
+              https://thegithubshop.com/
+              https://thegithubshop.com/collections/all
+              https://thegithubshop.com/collections/apparel
+              https://thegithubshop.com/collections/lifestyle
+              https://thegithubshop.com/collections/new-arrivals
+            repository: github/accessibility-scanner-testing
+          - id: blog
+            urls: |
+              https://github.blog/
+              https://github.blog/news-insights/
+              https://github.blog/engineering/
+              https://github.blog/open-source/
+              https://github.blog/ai-and-ml/
+            repository: github/accessibility-scanner-testing
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Stage alt-text plugin
+        run: |
+          mkdir -p .github/scanner-plugins/alt-text-scan
+          cp -r index.ts src .github/scanner-plugins/alt-text-scan/
+
+      - name: Run accessibility scanner
+        uses: github/accessibility-scanner@1b9502344c5fa3ecc95e88c5d97da9e498a73ef4 # v3.2.0
+        with:
+          urls: ${{ matrix.urls }}
+          cache_key: cached_findings-${{ matrix.id }}-${{ github.ref_name }}.json
+          repository: ${{ matrix.repository }}
+          token: ${{ secrets.GH_TOKEN }}
+          skip_copilot_assignment: true
+          scans: '["axe", "alt-text-scan"]'
