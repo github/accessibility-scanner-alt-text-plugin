@@ -125,4 +125,20 @@ describe('alt-text-quality', () => {
     expect(context).toContain('src="(omitted)"')
     expect(context).toContain('srcset="(omitted)"')
   })
+
+  it('redacts query/fragment from the link href in the judge context', async () => {
+    const fake = new FakeJudge(() => verdict())
+    __setJudge(fake)
+    await run([
+      makeImage({
+        src: DATA_URL,
+        alt: 'a dog',
+        inLink: {href: 'https://example.com/page?sig=secret123#frag'},
+      }),
+    ])
+    const context = fake.calls[0]!.context
+    expect(context).not.toContain('sig=secret123')
+    expect(context).not.toContain('#frag')
+    expect(context).toContain('https://example.com/page')
+  })
 })
