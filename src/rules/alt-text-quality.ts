@@ -5,6 +5,7 @@ import {createJudge} from '../judges/index.js'
 import type {JudgeAltText, JudgeVerdict} from '../judges/index.js'
 import type {Rule, RuleContext, RuleResult, ImageRecord} from '../types.js'
 import {loadImageAsDataUrl} from '../utils/load-image-data-url.js'
+import {redactUrl} from '../utils/redact-url.js'
 
 // Lazily build the judge so missing tokens surface only when the rule actually
 // runs
@@ -47,7 +48,7 @@ function buildContextString(image: ImageRecord, pageUrl: string): string {
   if (image.pageTitle) parts.push(`Page title: ${JSON.stringify(image.pageTitle)}`)
   if (image.sectionHeading) parts.push(`Nearest heading above the image: ${JSON.stringify(image.sectionHeading)}`)
   parts.push(`Image HTML: ${sanitizeImageHtml(image.outerHTML)}`)
-  if (image.inLink) parts.push(`The image is inside a link with href="${image.inLink.href}".`)
+  if (image.inLink) parts.push(`The image is inside a link with href="${redactUrl(image.inLink.href)}".`)
   if (image.inButton) parts.push('The image is inside a button (or role="button" element).')
   if (image.figcaption) parts.push(`Adjacent figcaption: ${JSON.stringify(image.figcaption)}`)
   if (image.nearbyText) parts.push(`Surrounding body text: ${JSON.stringify(image.nearbyText)}`)
@@ -102,7 +103,7 @@ export const altTextQuality: Rule = {
       try {
         dataUrl = await loadImageAsDataUrl(resolved)
       } catch (err) {
-        console.error(`[alt-text-quality] failed to load ${resolved}:`, err)
+        console.error(`[alt-text-quality] failed to load ${redactUrl(resolved)}:`, err)
         continue
       }
 
@@ -116,7 +117,7 @@ export const altTextQuality: Rule = {
           naturalHeight: image.naturalHeight,
         })
       } catch (err) {
-        console.error(`[alt-text-quality] judge failed for ${resolved}:`, err)
+        console.error(`[alt-text-quality] judge failed for ${redactUrl(resolved)}:`, err)
         continue
       }
 
