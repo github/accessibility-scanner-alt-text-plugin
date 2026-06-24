@@ -46,7 +46,7 @@ jobs:
             repository: github/accessibility-scanner-testing
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Stage alt-text plugin
         run: |
