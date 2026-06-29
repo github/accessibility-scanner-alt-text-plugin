@@ -1,6 +1,6 @@
 {
   "name": "@github/accessibility-scanner-alt-text-plugin",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Alt-text validation plugin for github/accessibility-scanner",
   "license": "MIT",
   "type": "module",
