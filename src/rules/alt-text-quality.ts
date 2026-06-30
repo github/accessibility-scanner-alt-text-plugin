@@ -103,8 +103,7 @@ export const altTextQuality: Rule = {
       try {
         dataUrl = await loadImageAsDataUrl(resolved)
       } catch (err) {
-        const msg = (err instanceof Error ? err.message : String(err)).replace(/([?#])[^\s]*/g, '$1…')
-        console.error(`[alt-text-quality] failed to load ${redactUrl(resolved)}: ${redactUrl(msg)}`)
+        console.error(`[alt-text-quality] failed to load ${redactUrl(resolved)}: ${redactUrl(String(err))}`)
         continue
       }
 
@@ -118,8 +117,7 @@ export const altTextQuality: Rule = {
           naturalHeight: image.naturalHeight,
         })
       } catch (err) {
-        const msg = (err instanceof Error ? err.message : String(err)).replace(/([?#])[^\s]*/g, '$1…')
-        console.error(`[alt-text-quality] judge failed for ${redactUrl(resolved)}: ${redactUrl(msg)}`)
+        console.error(`[alt-text-quality] judge failed for ${redactUrl(resolved)}: ${redactUrl(String(err))}`)
         continue
       }
 
