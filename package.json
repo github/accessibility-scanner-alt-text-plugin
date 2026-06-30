@@ -1,11 +1,26 @@
 {
-  "name": "accessibility-scanner-alt-text-plugin",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@github/accessibility-scanner-alt-text-plugin",
+  "version": "1.0.0",
   "description": "Alt-text validation plugin for github/accessibility-scanner",
   "license": "MIT",
   "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",

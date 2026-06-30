@@ -32,11 +32,10 @@ The project is under active development alongside the scanner's public preview. 
 
 To use the Alt-Text Plugin, you'll need:
 
-- **The [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner)** wired into a GitHub Actions workflow in your repository
-- **The plugin's source files** copied into `./.github/scanner-plugins/alt-text-scan/` in the repository that runs the scanner workflow (see [Getting started](#getting-started))
+- **The [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner)** (v3 or later) wired into a GitHub Actions workflow in your repository
 - **Everything required to run the scanner itself** (Actions enabled, Issues enabled, a `GH_TOKEN` PAT — see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
 
-This plugin is currently consumed from source: copy the plugin files into the repository that runs the scanner workflow.
+The plugin is published to npm as [`@github/accessibility-scanner-alt-text-plugin`](https://www.npmjs.com/package/@github/accessibility-scanner-alt-text-plugin). The scanner installs it for you when running the `Find` sub-action — you don't need to copy any source into your repository or run `npm install` yourself.
 
 To develop the plugin locally, you'll also need:
 
@@ -47,30 +46,9 @@ To develop the plugin locally, you'll also need:
 
 ## Getting started
 
-### 1. Add the plugin to your scanner repository
+### 1. Enable the plugin in your workflow
 
-Following the conventions in the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md), each plugin lives under `./.github/scanner-plugins/<plugin-name>/` in the repository that runs the scanner workflow. Drop the plugin's `index.ts` and supporting files into `./.github/scanner-plugins/alt-text-scan/`.
-
-```text
-.github/
-└── scanner-plugins/
-    └── alt-text-scan/
-        ├── index.ts
-        ├── src/
-        ├── schema/
-        └── config.json   # optional
-```
-
-📚 Learn more
-
-- [Plugin docs in the scanner repository](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md)
-- [Example plugin: reflow-scan](https://github.com/github/accessibility-scanner/tree/main/.github/scanner-plugins/reflow-scan)
-
----
-
-### 2. Enable the plugin in your workflow
-
-Add `"alt-text-scan"` to the scanner action's `scans` input. If you don't already set `scans`, keep `"axe"` in the list too — the scanner only runs Axe by default, and providing any value at all opts you out of that default.
+The plugin is loaded from its npm package — there's nothing to copy into your repo. Add it to the scanner action's `scans` input as an **object** with `name`, `package`, and (recommended) a pinned `version`. Keep `"axe"` in the list too, since the scanner only runs Axe by default:
 
 ```yaml
 name: Accessibility Scanner
@@ -80,7 +58,6 @@ jobs:
   accessibility_scanner:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6 # Required so the scanner can read your repo's scanner-plugins/ directory
       - uses: github/accessibility-scanner@v3
         with:
           urls: |
@@ -88,19 +65,21 @@ jobs:
           repository: REPLACE_THIS/REPLACE_THIS
           token: ${{ secrets.GH_TOKEN }}
           cache_key: REPLACE_THIS
-          scans: '["axe", "alt-text-scan"]' # Add "alt-text-scan" to enable this plugin
+          scans: |
+            ["axe", {"name": "alt-text-scan", "package": "@github/accessibility-scanner-alt-text-plugin", "version": "1.0.0"}]
 ```
 
-> 👉 Update all `REPLACE_THIS` placeholders with your actual values. See the [scanner's Action inputs](https://github.com/github/accessibility-scanner#action-inputs) for the full list.
+> 👉 Update all `REPLACE_THIS` placeholders with your actual values. See the [scanner's Action inputs](https://github.com/github/accessibility-scanner#action-inputs) for the full list, and the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for how NPM plugins are loaded.
 
 📚 Learn more
 
+- [Plugin docs in the scanner repository](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md)
 - [Scanner getting-started guide](https://github.com/github/accessibility-scanner#getting-started)
 - [Writing workflows](https://docs.github.com/en/actions/how-tos/write-workflows)
 
 ---
 
-### 3. Run your first scan
+### 2. Run your first scan
 
 Trigger your scanner workflow manually or on its configured schedule. The plugin runs on every URL the scanner visits, extracts each image exposed to assistive technology, and emits a finding for every rule violation. The scanner then turns those findings into GitHub issues.
 
@@ -157,11 +136,10 @@ The scanner uses these fields to file or update a GitHub issue.
 
 ## Configuration
 
-To override the default enabled state of one or more rules, add a `config.json` file next to the plugin's `index.ts` in your scanner repository:
+To override the default enabled state of one or more rules, add a `config.json` file in your scanner repository at `.github/scanner-plugins/alt-text-scan/config.json`:
 
 ```text
 .github/scanner-plugins/alt-text-scan/
-├── index.ts
 └── config.json   ← optional
 ```
 
