@@ -35,7 +35,7 @@ To use the Alt-Text Plugin, you'll need:
 - **The [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner)** (v3 or later) wired into a GitHub Actions workflow in your repository
 - **Everything required to run the scanner itself** (Actions enabled, Issues enabled, a `GH_TOKEN` PAT — see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
 
-The plugin is published to npm as [`@github/accessibility-scanner-alt-text-plugin`](https://www.npmjs.com/package/@github/accessibility-scanner-alt-text-plugin). The scanner installs it for you at scan time — you don't need to copy any source into your repository or run `npm install` yourself.
+The plugin is published to npm as [`@github/accessibility-scanner-alt-text-plugin`](https://www.npmjs.com/package/@github/accessibility-scanner-alt-text-plugin). The scanner installs it for you when running the `Find` sub-action — you don't need to copy any source into your repository or run `npm install` yourself.
 
 To develop the plugin locally, you'll also need:
 
