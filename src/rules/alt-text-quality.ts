@@ -44,7 +44,7 @@ function sanitizeImageHtml(outerHTML: string): string {
 }
 
 function buildContextString(image: ImageRecord, pageUrl: string): string {
-  const parts: string[] = [`Page URL: ${pageUrl}`]
+  const parts: string[] = [`Page URL: ${redactUrl(pageUrl)}`]
   if (image.pageTitle) parts.push(`Page title: ${JSON.stringify(image.pageTitle)}`)
   if (image.sectionHeading) parts.push(`Nearest heading above the image: ${JSON.stringify(image.sectionHeading)}`)
   parts.push(`Image HTML: ${sanitizeImageHtml(image.outerHTML)}`)
