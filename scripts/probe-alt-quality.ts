@@ -10,7 +10,7 @@
 //
 // Optional env:
 //   PROBE_MODEL              — model id, default "openai/gpt-4o"
-//   PROBE_CASES              — path to a cases.json
+//   PROBE_CASES              — path to a cases.json file
 //   ALT_TEXT_JUDGE_MODE      — force "copilot" or "azure-augmented". When unset,
 //                              auto-selects azure-augmented if AZURE_VISION_* are set.
 //   PROBE_MIN_INTERVAL_MS    — minimum ms between cases (rate-limit pacing).
@@ -94,7 +94,7 @@ function intrinsicSize(buf: Buffer): {width: number; height: number} {
 }
 
 async function main(): Promise<void> {
-  const here = dirname(fileURLToPath(import.meta.url))
+  const currentDirectory = dirname(fileURLToPath(import.meta.url))
   const casesPath = process.env['PROBE_CASES']
     ? resolve(process.cwd(), process.env['PROBE_CASES'])
     : resolve(here, '..', 'tests', 'fixtures', 'alt-quality', 'cases.json')
@@ -122,7 +122,7 @@ async function main(): Promise<void> {
   console.log(`Model:   ${model}`)
   console.log(`Cases:   ${casesPath}`)
   console.log(`Total:   ${cases.length}`)
-  if (minIntervalMs > 0) console.log(`Pacing:  ${minIntervalMs}ms minimum between cases`)
+  if (minIntervalMs > 0) console.log(`Pacing:  ${minIntervalMs}ms minimum between cases\n`)
   console.log('')
 
   let agreements = 0

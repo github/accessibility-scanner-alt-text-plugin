@@ -12,7 +12,7 @@
     },
     "rules": {
       "type": "object",
-      "description": "Per-rule enable/disable overrides. Rules not listed keep their default behavior (every rule defaults to enabled except alt-text-quality, which is opt-in).",
+      "description": "Per-rule enable/disable overrides. Rules not listed keep their default behavior (enabled with the exception of alt-text-quality).",
       "additionalProperties": false,
       "properties": {
         "missing-alt-text": {

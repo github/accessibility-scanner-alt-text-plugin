@@ -139,7 +139,7 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 ### Alt-text quality (model-backed, opt-in)
 
-The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image and its alt text to a vision model, which judges whether the alt text actually and sufficiently describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of a named individual.
+The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image, its alt text, and surrounding context in the DOM to a vision model, which judges whether the alt text actually and sufficiently describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of an individual named in surrounding text.
 
 Because it makes a per-image model call (cost and latency), it is **disabled by default**. To turn it on:
 
