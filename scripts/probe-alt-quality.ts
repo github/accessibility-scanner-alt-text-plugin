@@ -7,14 +7,18 @@
 //
 // Run:
 //   GITHUB_MODELS_TOKEN=<pat-with-models:read> npm run probe
+//   (GITHUB_TOKEN is used as a fallback when GITHUB_MODELS_TOKEN is not set.)
 //
 // Optional env:
-//   PROBE_MODEL              — model id, default "openai/gpt-4o"
+//   PROBE_MODEL              — model id, default "openai/gpt-4o". Must be a
+//                              vision-enabled model, since every case sends an image.
 //   PROBE_CASES              — path to a cases.json file
 //   ALT_TEXT_JUDGE_MODE      — force "copilot" or "azure-augmented". When unset,
 //                              auto-selects azure-augmented if AZURE_VISION_* are set.
 //   PROBE_MIN_INTERVAL_MS    — minimum ms between cases (rate-limit pacing).
-//                              Set to 3500 for Azure F0's 20-calls/min ceiling.
+//                              Azure's F0 (free) tier allows 20 calls/min, so setting to
+//                              3500 leaves space. See
+//                              https://azure.microsoft.com/en-us/pricing/details/cognitive-services/computer-vision/
 
 import {readFile} from 'node:fs/promises'
 import {dirname, resolve} from 'node:path'
@@ -97,9 +101,16 @@ async function main(): Promise<void> {
   const currentDirectory = dirname(fileURLToPath(import.meta.url))
   const casesPath = process.env['PROBE_CASES']
     ? resolve(process.cwd(), process.env['PROBE_CASES'])
-    : resolve(here, '..', 'tests', 'fixtures', 'alt-quality', 'cases.json')
+    : resolve(currentDirectory, '..', 'tests', 'fixtures', 'alt-quality', 'cases.json')
 
-  const cases = JSON.parse(await readFile(casesPath, 'utf8')) as ProbeCase[]
+  let cases: ProbeCase[]
+  try {
+    cases = JSON.parse(await readFile(casesPath, 'utf8')) as ProbeCase[]
+  } catch (err) {
+    console.error(`Could not read or parse cases file: ${casesPath}`)
+    console.error(`  ${err instanceof Error ? err.message : String(err)}`)
+    process.exit(1)
+  }
   const baseDir = dirname(casesPath)
 
   // Mirror createJudge()'s resolution for display: explicit env wins, else
@@ -161,8 +172,9 @@ async function main(): Promise<void> {
       console.log(`    reason:   ${verdict.reasoning}`)
       console.log('')
     } catch (err) {
-      console.log('ERROR')
-      console.log(`    ${err instanceof Error ? err.message : String(err)}`)
+      console.error('ERROR')
+      console.error(`    alt:      ${JSON.stringify(c.alt)}`)
+      console.error(`    ${err instanceof Error ? err.message : String(err)}`)
       console.log('')
     }
 

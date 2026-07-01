@@ -37,7 +37,7 @@
         },
         "alt-text-quality": {
           "type": "boolean",
-          "description": "Opt-in, model-backed. Sends each image and its alt text to a vision model (GitHub Models) to flag quality issues such as redundant prefixes, vague or context-missing descriptions, and medium-announcing link text. Disabled by default; requires GITHUB_MODELS_TOKEN and incurs per-image API cost."
+          "description": "Opt-in, model-backed. Sends each image and its alt text to a vision model (GitHub Models) to flag quality issues such as redundant prefixes, vague or context-missing descriptions, and link text that announces the destination's medium (e.g. 'PDF of…', 'Link to…') instead of naming it. Disabled by default; requires GITHUB_MODELS_TOKEN and incurs per-image API cost."
         }
       }
     }
