@@ -27,7 +27,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "probe": "tsx --env-file=.env scripts/probe-alt-quality.ts"
+    "grade": "tsx --env-file=.env scripts/grade-alt-text-quality.ts"
   },
   "prettier": "@github/prettier-config",
   "engines": {

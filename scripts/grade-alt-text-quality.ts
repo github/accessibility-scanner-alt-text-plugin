@@ -6,7 +6,7 @@
 
 //
 // Run:
-//   GITHUB_MODELS_TOKEN=<pat-with-models:read> npm run probe
+//   GITHUB_MODELS_TOKEN=<pat-with-models:read> npm run grade
 //   (GITHUB_TOKEN is used as a fallback when GITHUB_MODELS_TOKEN is not set.)
 //
 // Optional env:
@@ -28,7 +28,7 @@ import {createJudge} from '../src/judges/index.js'
 import type {Verdict} from '../src/judges/index.js'
 import {loadImageAsDataUrl} from '../src/utils/load-image-data-url.js'
 
-type ProbeCase = {
+type GradeCase = {
   id: string
   // Path relative to cases.json, OR an absolute path, OR an http(s) URL.
   image: string
@@ -103,9 +103,9 @@ async function main(): Promise<void> {
     ? resolve(process.cwd(), process.env['PROBE_CASES'])
     : resolve(currentDirectory, '..', 'tests', 'fixtures', 'alt-quality', 'cases.json')
 
-  let cases: ProbeCase[]
+  let cases: GradeCase[]
   try {
-    cases = JSON.parse(await readFile(casesPath, 'utf8')) as ProbeCase[]
+    cases = JSON.parse(await readFile(casesPath, 'utf8')) as GradeCase[]
   } catch (err) {
     console.error(`Could not read or parse cases file: ${casesPath}`)
     console.error(`  ${err instanceof Error ? err.message : String(err)}`)

@@ -1,6 +1,6 @@
 import {afterAll, afterEach, beforeAll, beforeEach, describe, expect, it} from 'vitest'
 import {chromium, type Browser, type Page} from 'playwright'
-import {extractImages} from '../src/extract.js'
+import {extractImageContext} from '../src/extract-image-context.js'
 
 let browser: Browser
 let page: Page
@@ -27,10 +27,10 @@ afterEach(async () => {
  */
 async function extractFromHTML(html: string) {
   await page.setContent(`<!doctype html><html><body>${html}</body></html>`)
-  return extractImages(page)
+  return extractImageContext(page)
 }
 
-describe('extractImages', () => {
+describe('extractImageContext', () => {
   describe('basic extraction', () => {
     it('includes a plain visible image', async () => {
       const images = await extractFromHTML(`<img src="cat.png" alt="a cat">`)
@@ -158,7 +158,7 @@ describe('extractImages', () => {
       await page.setContent(
         `<!doctype html><html><head><title>  Acid Erosion   of Rocks  </title></head><body><img src="x.png" alt="x"></body></html>`,
       )
-      const images = await extractImages(page)
+      const images = await extractImageContext(page)
       expect(images[0]!.pageTitle).toBe('Acid Erosion of Rocks')
     })
 

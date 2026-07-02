@@ -30,7 +30,7 @@ function resolveImageUrl(src: string, pageUrl: string): string | null {
 }
 
 // Build the natural-language context string handed to the judge from the
-// structured fields populated by extractImages
+// structured fields populated by extractImageContext.
 
 const MAX_IMAGE_HTML = 500
 

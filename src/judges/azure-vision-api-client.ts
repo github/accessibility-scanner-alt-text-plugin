@@ -79,7 +79,7 @@ export class AzureVisionApiClient implements AzureVisionClient {
     }
 
     const raw = (await res.json()) as AzureRawResponse
-    return shape(raw)
+    return toVisionAnalysis(raw)
   }
 }
 
@@ -89,7 +89,8 @@ function decodeDataUrl(dataUrl: string): Buffer {
   return Buffer.from(match[1]!, 'base64')
 }
 
-function shape(raw: AzureRawResponse): AzureVisionAnalysis {
+// Reduces Azure's verbose raw response to just the fields the judge consumes.
+function toVisionAnalysis(raw: AzureRawResponse): AzureVisionAnalysis {
   const out: AzureVisionAnalysis = {}
   if (raw.captionResult) out.caption = raw.captionResult
   if (raw.denseCaptionsResult?.values?.length) out.denseCaptions = raw.denseCaptionsResult.values

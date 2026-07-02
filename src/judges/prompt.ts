@@ -1,6 +1,6 @@
 // System prompt and structured-output schema for the alt-text-quality judge.
 //
-// Both the production rule and the offline probe import these constants, which
+// Both the production rule and the offline grading script import these constants, which
 // guarantees the two paths reason against the exact same instructions.
 
 export const SYSTEM_PROMPT = `# Identity

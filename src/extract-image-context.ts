@@ -4,9 +4,11 @@ import type {ImageRecord} from './types.js'
 // Maximum number of characters of nearby prose forwarded to model-backed rules.
 const NEARBY_TEXT_MAX = 600
 
-// Returns one ImageRecord per HTML <img> element that is exposed in the accessibility tree.
+// Returns one ImageRecord per HTML <img> exposed in the accessibility tree, each
+// bundled with its surrounding page context (link/button ancestry, figcaption,
+// nearby prose, section heading, page title) so model-backed rules can reason about it.
 // Using getByRole('img') filters out elements that assistive tech cannot perceive.
-export async function extractImages(page: Page): Promise<ImageRecord[]> {
+export async function extractImageContext(page: Page): Promise<ImageRecord[]> {
   return page.getByRole('img').evaluateAll((els, maxNearby) => {
     // Page-level topic, captured once and shared by every image record.
     const pageTitle = (document.title ?? '').replace(/\s+/g, ' ').trim() || null
