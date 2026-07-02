@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Alt-text validation plugin for github/accessibility-scanner",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/github/accessibility-scanner-alt-text-plugin.git"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
