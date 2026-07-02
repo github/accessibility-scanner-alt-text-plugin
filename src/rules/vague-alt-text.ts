@@ -1,3 +1,6 @@
+// vague-alt-text — flags alt text that is a single generic word or phrase
+// (e.g. "image", "logo", "photo of") carrying no real description of the image.
+
 import type {Rule, RuleResult} from '../types.js'
 import {normalizeAltText} from '../utils/normalize-alt-text.js'
 
@@ -58,18 +61,6 @@ const VAGUE_WORDS = new Set([
   'map',
   'maps',
 
-  // Placeholders
-  // Note: todo, tbd, fixme, and placeholder live in placeholder-alt-text.ts.
-  'sample',
-  'example',
-  'test',
-  'demo',
-  'default',
-  'untitled',
-  'null',
-  'undefined',
-  'none',
-
   // File format / extension names
   'jpg',
   'jpeg',
@@ -111,13 +102,6 @@ const VAGUE_PHRASES = new Set([
   'picture of',
   'graphic of',
   'screenshot of',
-  'image goes here',
-  'photo goes here',
-  'picture goes here',
-  'your image here',
-  'your photo here',
-  'insert image',
-  'insert photo',
 ])
 
 export const vagueAltText: Rule = {

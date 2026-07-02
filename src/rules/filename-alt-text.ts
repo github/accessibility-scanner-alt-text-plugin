@@ -1,3 +1,5 @@
+// filename-alt-text — flags alt text that is just an image filename (e.g. "hero.png").
+
 import type {Rule, RuleResult, RuleContext} from '../types.js'
 
 const FILENAME_PATTERN = /\.(png|jpg|jpeg|gif|svg|webp|bmp|ico)$/i

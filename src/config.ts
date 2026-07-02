@@ -1,3 +1,6 @@
+// Loads the plugin's per-repo config file and extracts per-rule enable/disable
+// overrides. Missing, unreadable, or malformed config falls back to defaults.
+
 import {readFile} from 'node:fs/promises'
 
 export type PluginConfig = {
@@ -29,6 +32,8 @@ export async function loadConfig(configPath: string, knownRuleIds: ReadonlySet<s
   return {ruleOverrides: collectRuleOverrides(parsed, knownRuleIds)}
 }
 
+// Pulls the boolean `rules` map out of parsed config, dropping unknown ids and
+// non-boolean values so a bad config can't disable an unrelated rule.
 function collectRuleOverrides(parsed: unknown, knownRuleIds: ReadonlySet<string>): Map<string, boolean> {
   const result = new Map<string, boolean>()
   if (!parsed || typeof parsed !== 'object') return result
