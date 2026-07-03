@@ -1,15 +1,38 @@
+// placeholder-alt-text — flags alt text left as placeholder/boilerplate (e.g. "TODO", "alt text").
+
 import type {Rule, RuleResult, RuleContext} from '../types.js'
 import {normalizeAltText} from '../utils/normalize-alt-text.js'
 
 // Known placeholder/boilerplate strings that signal the alt text was never written.
 const PLACEHOLDER_ALT_TEXT = new Set([
+  // Author-facing stubs
   'todo',
   'tbd',
+  'fixme',
   'placeholder',
   'alt text',
-  'insert alt text',
   'image alt',
-  'fixme',
+
+  // "Fill me in" template prompts
+  'insert alt text',
+  'insert image',
+  'insert photo',
+  'image goes here',
+  'photo goes here',
+  'picture goes here',
+  'your image here',
+  'your photo here',
+
+  // Dummy / default values
+  'sample',
+  'example',
+  'test',
+  'demo',
+  'default',
+  'untitled',
+  'null',
+  'undefined',
+  'none',
 ])
 
 export const placeholderAltText: Rule = {

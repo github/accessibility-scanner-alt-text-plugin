@@ -5,15 +5,12 @@ import {evaluateAlts, makeImage} from '../utils/helpers.js'
 
 describe('vagueAltText', () => {
   describe('flags vague single-word alt text', () => {
-    it.each(['image', 'photo', 'picture', 'icon', 'logo', 'chart', 'screenshot', 'untitled', 'below'])(
-      'flags alt="%s"',
-      alt => {
-        const results = evaluateAlts([alt], vagueAltText)
-        expect(results).toHaveLength(1)
-        expect(results[0]).toBeDefined()
-        expect(results[0]!.image.alt).toBe(alt)
-      },
-    )
+    it.each(['image', 'photo', 'picture', 'icon', 'logo', 'chart', 'screenshot', 'below'])('flags alt="%s"', alt => {
+      const results = evaluateAlts([alt], vagueAltText)
+      expect(results).toHaveLength(1)
+      expect(results[0]).toBeDefined()
+      expect(results[0]!.image.alt).toBe(alt)
+    })
   })
 
   describe('flags vague multi-word phrases', () => {
@@ -77,6 +74,11 @@ describe('vagueAltText', () => {
       expect(evaluateAlts(['tbd'], vagueAltText)).toHaveLength(0)
       expect(evaluateAlts(['fixme'], vagueAltText)).toHaveLength(0)
       expect(evaluateAlts(['placeholder'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['untitled'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['sample'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['test'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['insert image'], vagueAltText)).toHaveLength(0)
+      expect(evaluateAlts(['image goes here'], vagueAltText)).toHaveLength(0)
     })
   })
 

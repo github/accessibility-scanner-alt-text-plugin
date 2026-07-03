@@ -2,7 +2,31 @@ import {describe, it, expect} from 'vitest'
 import {placeholderAltText} from '../../src/rules/placeholder-alt-text.js'
 import {evaluateAlts} from '../utils/helpers.js'
 
-const placeholders = ['todo', 'tbd', 'placeholder', 'alt text', 'insert alt text', 'image alt', 'fixme']
+const placeholders = [
+  'todo',
+  'tbd',
+  'fixme',
+  'placeholder',
+  'alt text',
+  'image alt',
+  'insert alt text',
+  'insert image',
+  'insert photo',
+  'image goes here',
+  'photo goes here',
+  'picture goes here',
+  'your image here',
+  'your photo here',
+  'sample',
+  'example',
+  'test',
+  'demo',
+  'default',
+  'untitled',
+  'null',
+  'undefined',
+  'none',
+]
 
 describe('placeholder-alt-text', () => {
   for (const placeholder of placeholders) {

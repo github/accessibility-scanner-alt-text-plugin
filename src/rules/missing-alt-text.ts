@@ -1,3 +1,6 @@
+// missing-alt-text — flags images whose alt attribute is missing or whitespace-only.
+// alt="" is treated as an intentional decorative marker and left alone.
+
 import type {Rule, RuleResult, RuleContext} from '../types.js'
 
 export const missingAltText: Rule = {

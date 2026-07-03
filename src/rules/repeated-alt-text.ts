@@ -1,3 +1,6 @@
+// repeated-alt-text — flags runs of adjacent images that share identical alt text,
+// which usually means one caption was copied across a group of distinct images.
+
 import type {ImageRecord, Rule, RuleResult} from '../types.js'
 import {normalizeAltText} from '../utils/normalize-alt-text.js'
 
