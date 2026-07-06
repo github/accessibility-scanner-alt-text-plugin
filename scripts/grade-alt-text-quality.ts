@@ -140,7 +140,7 @@ async function main(): Promise<void> {
   let agreements = 0
   let withExpected = 0
 
-  for (const c of cases) {
+  for (const case of cases) {
     const caseStart = Date.now()
     process.stdout.write(`[${c.id}] `)
     try {
