@@ -37,8 +37,8 @@ export type ImageRecord = {
   naturalWidth: number
   naturalHeight: number
 
-  inLink: {href: string} | null
-  // True when the image's closest ancestor button exists. Used together with inLink for "functional image" detection.
+  linkContext: {href: string} | null
+  // True when the image's closest ancestor button exists. Used together with linkContext for "functional image" detection.
   inButton: boolean
   // Trimmed text content of an associated <figcaption>, if it exists.
   figcaption: string | null

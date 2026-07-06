@@ -16,7 +16,7 @@ export function makeImage(overrides: Partial<ImageRecord> = {}): ImageRecord {
     boundingBox: null,
     naturalWidth: 0,
     naturalHeight: 0,
-    inLink: null,
+    linkContext: null,
     inButton: false,
     figcaption: null,
     nearbyText: null,

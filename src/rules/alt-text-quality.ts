@@ -32,7 +32,7 @@ function resolveImageUrl(src: string, pageUrl: string): string | null {
 // Build the natural-language context string handed to the judge from the
 // structured fields populated by extractImageContext.
 
-const MAX_IMAGE_HTML = 500
+const MAX_IMAGE_HTML_LENGTH = 500
 
 // The judge already sees the image via its data URL, so the raw src/srcset add
 // only token cost and risk leaking data to the model. Strip those values and cap the length.
@@ -40,7 +40,7 @@ function sanitizeImageHtml(outerHTML: string): string {
   const stripped = outerHTML
     .replace(/\s+src\s*=\s*("[^"]*"|'[^']*')/gi, ' src="(omitted)"')
     .replace(/\s+srcset\s*=\s*("[^"]*"|'[^']*')/gi, ' srcset="(omitted)"')
-  return stripped.length > MAX_IMAGE_HTML ? `${stripped.slice(0, MAX_IMAGE_HTML)}…` : stripped
+  return stripped.length > MAX_IMAGE_HTML_LENGTH ? `${stripped.slice(0, MAX_IMAGE_HTML_LENGTH)}…` : stripped
 }
 
 function buildContextString(image: ImageRecord, pageUrl: string): string {
@@ -48,7 +48,7 @@ function buildContextString(image: ImageRecord, pageUrl: string): string {
   if (image.pageTitle) parts.push(`Page title: ${JSON.stringify(image.pageTitle)}`)
   if (image.sectionHeading) parts.push(`Nearest heading above the image: ${JSON.stringify(image.sectionHeading)}`)
   parts.push(`Image HTML: ${sanitizeImageHtml(image.outerHTML)}`)
-  if (image.inLink) parts.push(`The image is inside a link with href="${redactUrl(image.inLink.href)}".`)
+  if (image.linkContext) parts.push(`The image is inside a link with href="${redactUrl(image.linkContext.href)}".`)
   if (image.inButton) parts.push('The image is inside a button (or role="button" element).')
   if (image.figcaption) parts.push(`Adjacent figcaption: ${JSON.stringify(image.figcaption)}`)
   if (image.nearbyText) parts.push(`Surrounding body text: ${JSON.stringify(image.nearbyText)}`)
@@ -60,23 +60,28 @@ function buildContextString(image: ImageRecord, pageUrl: string): string {
 // Translate a JudgeVerdict into a RuleResult understandable by the rest of
 // the plugin. "ok" verdicts produce no finding.
 function verdictToResult(image: ImageRecord, verdict: JudgeVerdict): RuleResult | null {
-  if (verdict.verdict === 'ok') return null
+  switch (verdict.verdict) {
+    case 'ok':
+      return null
 
-  if (verdict.verdict === 'decorative') {
-    return {
-      image,
-      problemShort: `Alt text appears to describe a purely decorative or already-captioned image:\n"${image.alt ?? ''}"`,
-      solutionShort: 'Replace the alt attribute with alt="" so assistive tech skips the image.',
-      solutionLong: verdict.reasoning,
-    }
-  }
+    case 'decorative':
+      return {
+        image,
+        problemShort: `Alt text appears to describe a purely decorative or already-captioned image:\n"${image.alt ?? ''}"`,
+        solutionShort: 'Replace the alt attribute with alt="" so assistive tech skips the image.',
+        solutionLong: verdict.reasoning,
+      }
 
-  // verdict.verdict === 'needs-fix'
-  return {
-    image,
-    problemShort: `Alt text quality issue${verdict.issue ? ` (${verdict.issue})` : ''}:\n"${image.alt ?? ''}"`,
-    solutionShort: 'Revise the alt text per the reviewer reasoning below.',
-    solutionLong: verdict.reasoning,
+    case 'needs-fix':
+      return {
+        image,
+        problemShort: `Alt text quality issue${verdict.issue ? ` (${verdict.issue})` : ''}:\n"${image.alt ?? ''}"`,
+        solutionShort: 'Revise the alt text per the reviewer reasoning below.',
+        solutionLong: verdict.reasoning,
+      }
+
+    default:
+      return null
   }
 }
 

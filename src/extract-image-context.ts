@@ -28,7 +28,7 @@ export async function extractImageContext(page: Page): Promise<ImageRecord[]> {
 
           // Closest ancestor link with an href.
           const linkEl = el.closest('a[href]') as HTMLAnchorElement | null
-          const inLink = linkEl ? {href: linkEl.getAttribute('href') ?? ''} : null
+          const linkContext = linkEl ? {href: linkEl.getAttribute('href') ?? ''} : null
 
           // Closest ancestor button
           const inButton = el.closest('button, [role="button"]') !== null
@@ -76,7 +76,7 @@ export async function extractImageContext(page: Page): Promise<ImageRecord[]> {
             // Intrinsic bitmap size
             naturalWidth: (el as HTMLImageElement).naturalWidth,
             naturalHeight: (el as HTMLImageElement).naturalHeight,
-            inLink,
+            linkContext,
             inButton,
             figcaption,
             nearbyText,

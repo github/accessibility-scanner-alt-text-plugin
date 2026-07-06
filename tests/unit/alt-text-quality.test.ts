@@ -133,7 +133,7 @@ describe('alt-text-quality', () => {
       makeImage({
         src: DATA_URL,
         alt: 'a dog',
-        inLink: {href: 'https://example.com/page?sig=secret123#frag'},
+        linkContext: {href: 'https://example.com/page?sig=secret123#frag'},
       }),
     ])
     const context = fake.calls[0]!.context
