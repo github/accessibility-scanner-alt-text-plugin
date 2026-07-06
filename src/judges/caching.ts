@@ -1,7 +1,7 @@
 // Content-hash caches for the judge layer
 //
-//   • CachingJudge        — judgment cache:          hash(image, alt, context) -> verdict
-//   • CachingVisionClient — vision-extraction cache: SHA-256(image bytes)      -> Azure analysis
+//   • createCachingJudge        — judgment cache:          hash(image, alt, context) -> verdict
+//   • createCachingVisionClient — vision-extraction cache: SHA-256(image bytes)      -> Azure analysis
 //
 // Both caches live for the lifetime of the judge instance, which is a single
 // scan run (createJudge() is memoized once per process). They cut redundant,
@@ -25,30 +25,28 @@ function hashImageBytes(imageDataUrl: string): string {
   return sha256(payload)
 }
 
-export class CachingJudge implements JudgeAltText {
-  private readonly cache = new Map<string, JudgeVerdict>()
-
-  constructor(private readonly inner: JudgeAltText) {}
-
-  async judge(input: JudgeInput): Promise<JudgeVerdict> {
-    const key = sha256(`${hashImageBytes(input.imageDataUrl)}\u0000${input.alt}\u0000${input.context}`)
-    if (this.cache.has(key)) return this.cache.get(key)!
-    const verdict = await this.inner.judge(input)
-    this.cache.set(key, verdict)
-    return verdict
+export function createCachingJudge(inner: JudgeAltText): JudgeAltText {
+  const cache = new Map<string, JudgeVerdict>()
+  return {
+    async judge(input: JudgeInput): Promise<JudgeVerdict> {
+      const key = sha256(`${hashImageBytes(input.imageDataUrl)}\u0000${input.alt}\u0000${input.context}`)
+      if (cache.has(key)) return cache.get(key)!
+      const verdict = await inner.judge(input)
+      cache.set(key, verdict)
+      return verdict
+    },
   }
 }
 
-export class CachingVisionClient implements AzureVisionClient {
-  private readonly cache = new Map<string, AzureVisionAnalysis>()
-
-  constructor(private readonly inner: AzureVisionClient) {}
-
-  async analyze(imageDataUrl: string): Promise<AzureVisionAnalysis> {
-    const key = hashImageBytes(imageDataUrl)
-    if (this.cache.has(key)) return this.cache.get(key)!
-    const analysis = await this.inner.analyze(imageDataUrl)
-    this.cache.set(key, analysis)
-    return analysis
+export function createCachingVisionClient(inner: AzureVisionClient): AzureVisionClient {
+  const cache = new Map<string, AzureVisionAnalysis>()
+  return {
+    async analyze(imageDataUrl: string): Promise<AzureVisionAnalysis> {
+      const key = hashImageBytes(imageDataUrl)
+      if (cache.has(key)) return cache.get(key)!
+      const analysis = await inner.analyze(imageDataUrl)
+      cache.set(key, analysis)
+      return analysis
+    },
   }
 }

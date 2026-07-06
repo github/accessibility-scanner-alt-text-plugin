@@ -1,5 +1,5 @@
 // Real Azure AI Vision (Image Analysis 4.0) client. Implements the
-// AzureVisionClient interface that AzureAugmentedJudge depends on.
+// AzureVisionClient interface that the Azure-augmented judge depends on.
 
 import {Buffer} from 'node:buffer'
 import type {AzureVisionAnalysis, AzureVisionClient} from './azure-augmented-judge.js'
@@ -36,58 +36,52 @@ type AzureRawResponse = {
   tagsResult?: {values: Array<{name: string; confidence: number}>}
 }
 
-export class AzureVisionApiClient implements AzureVisionClient {
-  private readonly endpoint: string
-  private readonly key: string
-  private readonly apiVersion: string
-  private readonly features: string
-
-  constructor(config: AzureVisionApiClientConfig = {}) {
-    const endpoint = config.endpoint ?? process.env['AZURE_VISION_ENDPOINT']
-    const key = config.key ?? process.env['AZURE_VISION_KEY']
-    if (!endpoint) {
-      throw new Error(
-        'AzureVisionApiClient requires an endpoint. Set AZURE_VISION_ENDPOINT or pass {endpoint} to the constructor.',
-      )
-    }
-    if (!key) {
-      throw new Error('AzureVisionApiClient requires a key. Set AZURE_VISION_KEY or pass {key} to the constructor.')
-    }
-    this.endpoint = endpoint.replace(/\/$/, '')
-    this.key = key
-    this.apiVersion = config.apiVersion ?? process.env['AZURE_VISION_API_VERSION'] ?? DEFAULT_API_VERSION
-    this.features = config.features ?? process.env['AZURE_VISION_FEATURES'] ?? DEFAULT_FEATURES
+export function createAzureVisionApiClient(config: AzureVisionApiClientConfig = {}): AzureVisionClient {
+  const rawEndpoint = config.endpoint ?? process.env['AZURE_VISION_ENDPOINT']
+  const key = config.key ?? process.env['AZURE_VISION_KEY']
+  if (!rawEndpoint) {
+    throw new Error(
+      'createAzureVisionApiClient requires an endpoint. Set AZURE_VISION_ENDPOINT or pass {endpoint} to the factory.',
+    )
   }
+  if (!key) {
+    throw new Error('createAzureVisionApiClient requires a key. Set AZURE_VISION_KEY or pass {key} to the factory.')
+  }
+  const endpoint = rawEndpoint.replace(/\/$/, '')
+  const apiVersion = config.apiVersion ?? process.env['AZURE_VISION_API_VERSION'] ?? DEFAULT_API_VERSION
+  const features = config.features ?? process.env['AZURE_VISION_FEATURES'] ?? DEFAULT_FEATURES
 
-  async analyze(imageDataUrl: string): Promise<AzureVisionAnalysis> {
-    const bytes = decodeDataUrl(imageDataUrl)
+  return {
+    async analyze(imageDataUrl: string): Promise<AzureVisionAnalysis> {
+      const bytes = decodeDataUrl(imageDataUrl)
 
-    const url = new URL(`${this.endpoint}/computervision/imageanalysis:analyze`)
-    url.searchParams.set('api-version', this.apiVersion)
-    url.searchParams.set('features', this.features)
+      const url = new URL(`${endpoint}/computervision/imageanalysis:analyze`)
+      url.searchParams.set('api-version', apiVersion)
+      url.searchParams.set('features', features)
 
-    const res = await fetchWithRetry(url, {
-      method: 'POST',
-      headers: {
-        'Ocp-Apim-Subscription-Key': this.key,
-        'Content-Type': 'application/octet-stream',
-      },
-      body: new Blob([Uint8Array.from(bytes)]),
-    })
+      const res = await fetchWithRetry(url, {
+        method: 'POST',
+        headers: {
+          'Ocp-Apim-Subscription-Key': key,
+          'Content-Type': 'application/octet-stream',
+        },
+        body: new Blob([Uint8Array.from(bytes)]),
+      })
 
-    if (!res.ok) {
-      const errText = await res.text()
-      throw new Error(`Azure Vision request failed: ${res.status} ${res.statusText}\n${errText}`)
-    }
+      if (!res.ok) {
+        const errText = await res.text()
+        throw new Error(`Azure Vision request failed: ${res.status} ${res.statusText}\n${errText}`)
+      }
 
-    const raw = (await res.json()) as AzureRawResponse
-    return toVisionAnalysis(raw)
+      const raw = (await res.json()) as AzureRawResponse
+      return toVisionAnalysis(raw)
+    },
   }
 }
 
 function decodeDataUrl(dataUrl: string): Buffer {
   const match = /^data:[^,]*;base64,(.+)$/s.exec(dataUrl)
-  if (!match) throw new Error('AzureVisionApiClient.analyze expects a base64 data URL.')
+  if (!match) throw new Error('createAzureVisionApiClient: analyze expects a base64 data URL.')
   return Buffer.from(match[1]!, 'base64')
 }
 

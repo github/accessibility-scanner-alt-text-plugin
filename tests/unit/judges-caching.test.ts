@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {CachingJudge, CachingVisionClient} from '../../src/judges/caching.js'
+import {createCachingJudge, createCachingVisionClient} from '../../src/judges/caching.js'
 import type {AzureVisionAnalysis, AzureVisionClient} from '../../src/judges/index.js'
 import type {JudgeAltText, JudgeInput, JudgeVerdict} from '../../src/judges/index.js'
 
@@ -15,29 +15,37 @@ function input(overrides: Partial<JudgeInput> = {}): JudgeInput {
 }
 
 // Counts how many times the inner judge actually runs.
-class CountingJudge implements JudgeAltText {
-  calls = 0
-  constructor(private readonly responder: (input: JudgeInput) => JudgeVerdict = () => verdict()) {}
-  async judge(input: JudgeInput): Promise<JudgeVerdict> {
-    this.calls++
-    return this.responder(input)
+type CountingJudge = JudgeAltText & {calls: number}
+function createCountingJudge(responder: (input: JudgeInput) => JudgeVerdict = () => verdict()): CountingJudge {
+  const counter: CountingJudge = {
+    calls: 0,
+    async judge(input: JudgeInput): Promise<JudgeVerdict> {
+      counter.calls++
+      return responder(input)
+    },
   }
+  return counter
 }
 
 // Counts how many times the inner vision client actually runs.
-class CountingVisionClient implements AzureVisionClient {
-  calls = 0
-  constructor(private readonly responder: () => AzureVisionAnalysis = () => ({readText: 'text'})) {}
-  async analyze(): Promise<AzureVisionAnalysis> {
-    this.calls++
-    return this.responder()
+type CountingVisionClient = AzureVisionClient & {calls: number}
+function createCountingVisionClient(
+  responder: () => AzureVisionAnalysis = () => ({readText: 'text'}),
+): CountingVisionClient {
+  const counter: CountingVisionClient = {
+    calls: 0,
+    async analyze(): Promise<AzureVisionAnalysis> {
+      counter.calls++
+      return responder()
+    },
   }
+  return counter
 }
 
-describe('CachingJudge', () => {
+describe('createCachingJudge', () => {
   it('judges an identical (image, alt, context) tuple only once', async () => {
-    const inner = new CountingJudge()
-    const judge = new CachingJudge(inner)
+    const inner = createCountingJudge()
+    const judge = createCachingJudge(inner)
 
     const first = await judge.judge(input())
     const second = await judge.judge(input())
@@ -47,8 +55,8 @@ describe('CachingJudge', () => {
   })
 
   it('re-judges when the context differs', async () => {
-    const inner = new CountingJudge()
-    const judge = new CachingJudge(inner)
+    const inner = createCountingJudge()
+    const judge = createCachingJudge(inner)
 
     await judge.judge(input({context: 'Page URL: https://a.example'}))
     await judge.judge(input({context: 'Page URL: https://b.example'}))
@@ -57,8 +65,8 @@ describe('CachingJudge', () => {
   })
 
   it('re-judges when the alt text differs', async () => {
-    const inner = new CountingJudge()
-    const judge = new CachingJudge(inner)
+    const inner = createCountingJudge()
+    const judge = createCachingJudge(inner)
 
     await judge.judge(input({alt: 'a dog'}))
     await judge.judge(input({alt: 'a cat'}))
@@ -67,8 +75,8 @@ describe('CachingJudge', () => {
   })
 
   it('re-judges when the image bytes differ', async () => {
-    const inner = new CountingJudge()
-    const judge = new CachingJudge(inner)
+    const inner = createCountingJudge()
+    const judge = createCachingJudge(inner)
 
     await judge.judge(input({imageDataUrl: IMG_A}))
     await judge.judge(input({imageDataUrl: IMG_B}))
@@ -77,8 +85,8 @@ describe('CachingJudge', () => {
   })
 
   it('returns the cached verdict on a hit', async () => {
-    const inner = new CountingJudge(() => verdict({verdict: 'needs-fix', issue: 'vague'}))
-    const judge = new CachingJudge(inner)
+    const inner = createCountingJudge(() => verdict({verdict: 'needs-fix', issue: 'vague'}))
+    const judge = createCachingJudge(inner)
 
     const hit = await judge.judge(input())
     const cached = await judge.judge(input())
@@ -89,12 +97,12 @@ describe('CachingJudge', () => {
 
   it('does not cache a thrown error', async () => {
     let attempt = 0
-    const inner = new CountingJudge(() => {
+    const inner = createCountingJudge(() => {
       attempt++
       if (attempt === 1) throw new Error('transient')
       return verdict()
     })
-    const judge = new CachingJudge(inner)
+    const judge = createCachingJudge(inner)
 
     await expect(judge.judge(input())).rejects.toThrow('transient')
     await expect(judge.judge(input())).resolves.toEqual(verdict())
@@ -102,10 +110,10 @@ describe('CachingJudge', () => {
   })
 })
 
-describe('CachingVisionClient', () => {
+describe('createCachingVisionClient', () => {
   it('analyzes identical image bytes only once', async () => {
-    const inner = new CountingVisionClient()
-    const client = new CachingVisionClient(inner)
+    const inner = createCountingVisionClient()
+    const client = createCachingVisionClient(inner)
 
     const first = await client.analyze(IMG_A)
     const second = await client.analyze(IMG_A)
@@ -115,8 +123,8 @@ describe('CachingVisionClient', () => {
   })
 
   it('re-analyzes when the image bytes differ', async () => {
-    const inner = new CountingVisionClient()
-    const client = new CachingVisionClient(inner)
+    const inner = createCountingVisionClient()
+    const client = createCachingVisionClient(inner)
 
     await client.analyze(IMG_A)
     await client.analyze(IMG_B)
@@ -133,7 +141,7 @@ describe('CachingVisionClient', () => {
         return {readText: 'text'}
       },
     }
-    const client = new CachingVisionClient(inner)
+    const client = createCachingVisionClient(inner)
 
     await expect(client.analyze(IMG_A)).rejects.toThrow('azure down')
     await expect(client.analyze(IMG_A)).resolves.toEqual({readText: 'text'})

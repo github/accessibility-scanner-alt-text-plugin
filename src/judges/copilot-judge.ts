@@ -1,8 +1,8 @@
-// CopilotJudge — calls a vision-capable model on GitHub Models with the
+// createCopilotJudge — calls a vision-capable model on GitHub Models with the
 // shared SYSTEM_PROMPT and VERDICT_SCHEMA, returns a JudgeVerdict.
 //
-// This is the default JudgeAltText implementation. The AzureAugmentedJudge wraps
-// an instance of this class and feeds it an enriched context.
+// This is the default JudgeAltText implementation. createAzureAugmentedJudge wraps
+// one of these and feeds it an enriched context.
 
 import {SYSTEM_PROMPT} from './prompt.js'
 import {VERDICT_SCHEMA} from './verdict-schema.js'
@@ -30,72 +30,65 @@ type ChatCompletionResponse = {
   choices?: Array<{message?: {content?: string}}>
 }
 
-export class CopilotJudge implements JudgeAltText {
-  private readonly token: string
-  private readonly model: string
-  private readonly endpoint: string
-  private readonly apiVersion: string
-  private readonly temperature: number
-
-  constructor(config: CopilotJudgeConfig = {}) {
-    const token = config.token ?? process.env['GITHUB_MODELS_TOKEN'] ?? process.env['GITHUB_TOKEN']
-    if (!token) {
-      throw new Error(
-        'CopilotJudge requires a token. Set GITHUB_MODELS_TOKEN (or GITHUB_TOKEN) ' +
-          'to a PAT with the `models:read` scope, or pass {token} to the constructor.',
-      )
-    }
-    this.token = token
-    this.model = config.model ?? process.env['PROBE_MODEL'] ?? DEFAULT_MODEL
-    this.endpoint = config.endpoint ?? DEFAULT_ENDPOINT
-    this.apiVersion = config.apiVersion ?? DEFAULT_API_VERSION
-    this.temperature = config.temperature ?? 0
+export function createCopilotJudge(config: CopilotJudgeConfig = {}): JudgeAltText {
+  const token = config.token ?? process.env['GITHUB_MODELS_TOKEN'] ?? process.env['GITHUB_TOKEN']
+  if (!token) {
+    throw new Error(
+      'createCopilotJudge requires a token. Set GITHUB_MODELS_TOKEN (or GITHUB_TOKEN) ' +
+        'to a PAT with the `models:read` scope, or pass {token} to the factory.',
+    )
   }
+  const model = config.model ?? process.env['PROBE_MODEL'] ?? DEFAULT_MODEL
+  const endpoint = config.endpoint ?? DEFAULT_ENDPOINT
+  const apiVersion = config.apiVersion ?? DEFAULT_API_VERSION
+  const temperature = config.temperature ?? 0
 
-  async judge(input: JudgeInput): Promise<JudgeVerdict> {
-    const userText =
-      `Surrounding context: ${input.context || '(none provided)'}\n` +
-      `Current alt text: ${JSON.stringify(input.alt)}\n\n` +
-      `Evaluate the alt text against the image and respond with the required JSON object.`
+  return {
+    async judge(input: JudgeInput): Promise<JudgeVerdict> {
+      const userText =
+        `Surrounding context: ${input.context || '(none provided)'}\n` +
+        `Current alt text: ${JSON.stringify(input.alt)}\n\n` +
+        `Evaluate the alt text against the image and respond with the required JSON object.`
 
-    const body = {
-      model: this.model,
-      messages: [
-        {role: 'system', content: SYSTEM_PROMPT},
-        {
-          role: 'user',
-          content: [
-            {type: 'text', text: userText},
-            {type: 'image_url', image_url: {url: input.imageDataUrl, detail: 'high'}},
-          ],
+      const body = {
+        model,
+        messages: [
+          {role: 'system', content: SYSTEM_PROMPT},
+          {
+            role: 'user',
+            content: [
+              {type: 'text', text: userText},
+              {type: 'image_url', image_url: {url: input.imageDataUrl, detail: 'high'}},
+            ],
+          },
+        ],
+        response_format: {type: 'json_schema', json_schema: VERDICT_SCHEMA},
+        temperature,
+      }
+
+      const res = await fetchWithRetry(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${token}`,
+          'X-GitHub-Api-Version': apiVersion,
         },
-      ],
-      response_format: {type: 'json_schema', json_schema: VERDICT_SCHEMA},
-      temperature: this.temperature,
-    }
+        body: JSON.stringify(body),
+      })
 
-    const res = await fetchWithRetry(this.endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${this.token}`,
-        'X-GitHub-Api-Version': this.apiVersion,
-      },
-      body: JSON.stringify(body),
-    })
+      if (!res.ok) {
+        const errText = await res.text()
+        throw new Error(`inference failed: ${res.status} ${res.statusText}\n${errText}`)
+      }
 
-    if (!res.ok) {
-      const errText = await res.text()
-      throw new Error(`inference failed: ${res.status} ${res.statusText}\n${errText}`)
-    }
-
-    const json = (await res.json()) as ChatCompletionResponse
-    const raw = json.choices?.[0]?.message?.content ?? ''
-    try {
-      return JSON.parse(raw) as JudgeVerdict
-    } catch {
-      throw new Error(`failed to parse model output as JSON:\n${raw}`)
-    }
+      const json = (await res.json()) as ChatCompletionResponse
+      const raw = json.choices?.[0]?.message?.content ?? ''
+      try {
+        return JSON.parse(raw) as JudgeVerdict
+      } catch {
+        throw new Error(`failed to parse model output as JSON:\n${raw}`)
+      }
+    },
   }
 }

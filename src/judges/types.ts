@@ -17,7 +17,7 @@ export type JudgeInput = {
   alt: string
   context: string
   // Intrinsic pixel dimensions of the image, when known (0/undefined = unknown).
-  // AzureAugmentedJudge uses these to skip the Azure pre-pass for images below
+  // The Azure-augmented judge uses these to skip the Azure pre-pass for images below
   // Azure's minimum size; the inner judge still runs.
   naturalWidth?: number
   naturalHeight?: number
