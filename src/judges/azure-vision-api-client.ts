@@ -15,7 +15,9 @@ export type AzureVisionApiClientConfig = {
   // Comma-separated feature list. The decorator's composeContext can use any
   // subset of: caption, denseCaptions, read, tags. Note: caption and
   // denseCaptions are restricted to specific regions (East US, West US,
-  // West Europe, etc.)
+  // West Europe, etc.). See the Image Analysis 4.0 docs for the full feature
+  // set and region availability:
+  // https://learn.microsoft.com/azure/ai-services/computer-vision/how-to/call-analyze-image-40
   features?: string
 }
 

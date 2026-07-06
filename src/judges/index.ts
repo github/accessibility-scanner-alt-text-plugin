@@ -16,7 +16,8 @@ export type {AzureVisionClient, AzureVisionAnalysis, AzureAugmentedJudgeConfig} 
 export {AzureVisionApiClient} from './azure-vision-api-client.js'
 export {CachingJudge, CachingVisionClient} from './caching.js'
 export type {AzureVisionApiClientConfig} from './azure-vision-api-client.js'
-export {SYSTEM_PROMPT, VERDICT_SCHEMA} from './prompt.js'
+export {SYSTEM_PROMPT} from './prompt.js'
+export {VERDICT_SCHEMA} from './verdict-schema.js'
 
 export type CreateJudgeOptions = {
   mode?: JudgeMode

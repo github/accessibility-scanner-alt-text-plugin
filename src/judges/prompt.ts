@@ -1,7 +1,8 @@
-// System prompt and structured-output schema for the alt-text-quality judge.
+// System prompt for the alt-text-quality judge.
 //
-// Both the production rule and the offline grading script import these constants, which
-// guarantees the two paths reason against the exact same instructions.
+// Both the production rule and the offline grading script import this prompt, which
+// guarantees the two paths reason against the exact same instructions. The
+// structured-output schema lives in verdict-schema.ts.
 
 export const SYSTEM_PROMPT = `# Identity
 
@@ -128,23 +129,3 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <alt>Painting of George Washington crossing the Delaware River</alt>
 <output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>`
-
-// JSON Schema for Structured Outputs strict mode. Field order in `properties`
-// is the generation order; reasoning is generated before verdict to force
-// chain-of-thought before classification.
-export const VERDICT_SCHEMA = {
-  name: 'alt_text_verdict',
-  strict: true,
-  schema: {
-    type: 'object',
-    additionalProperties: false,
-    properties: {
-      step: {type: 'integer', enum: [1, 2, 3, 4]},
-      reasoning: {type: 'string'},
-      verdict: {type: 'string', enum: ['ok', 'needs-fix', 'decorative']},
-      issue: {type: 'string'},
-      confidence: {type: 'number', minimum: 0, maximum: 1},
-    },
-    required: ['step', 'reasoning', 'verdict', 'issue', 'confidence'],
-  },
-} as const

@@ -4,7 +4,8 @@
 // This is the default JudgeAltText implementation. The AzureAugmentedJudge wraps
 // an instance of this class and feeds it an enriched context.
 
-import {SYSTEM_PROMPT, VERDICT_SCHEMA} from './prompt.js'
+import {SYSTEM_PROMPT} from './prompt.js'
+import {VERDICT_SCHEMA} from './verdict-schema.js'
 import type {JudgeAltText, JudgeInput, JudgeVerdict} from './types.js'
 import {fetchWithRetry} from '../utils/fetch-with-retry.js'
 
