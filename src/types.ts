@@ -32,6 +32,24 @@ export type ImageRecord = {
   ariaLabelledBy: string | null
   outerHTML: string
   boundingBox: BoundingBox | null
+  // Intrinsic (natural) pixel dimensions of the image bitmap, independent of
+  // CSS rendering.
+  naturalWidth: number
+  naturalHeight: number
+
+  linkContext: {href: string} | null
+  // True when the image's closest ancestor button exists. Used together with linkContext for "functional image" detection.
+  inButton: boolean
+  // Trimmed text content of an associated <figcaption>, if it exists.
+  figcaption: string | null
+  // Trimmed text content of the closest enclosing block-level element.
+  nearbyText: string | null
+  // Trimmed text of the page's <title>, used as topical context for the
+  // model-backed rule.
+  pageTitle: string | null
+  // Trimmed text of the nearest heading (h1–h6) preceding the image in
+  // document order, naming the section the image sits under.
+  sectionHeading: string | null
 }
 
 // Pixel position and size of an image in the page's rendered layout.
@@ -56,12 +74,11 @@ export type RuleResult = {
   solutionLong?: string
 }
 
-// A rule is a pure, synchronous function over RuleContext.
+// A rule evaluates a RuleContext and returns its findings.
 export type Rule = {
   id: string
   problemUrl: string
   // Whether the rule runs when the consumer hasn't explicitly configured it.
-  // Optional; treated as `true` when absent.
   defaultEnabled?: boolean
-  evaluate(ctx: RuleContext): RuleResult[]
+  evaluate(ctx: RuleContext): RuleResult[] | Promise<RuleResult[]>
 }

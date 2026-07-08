@@ -20,12 +20,12 @@ describe('missing-alt-text', () => {
     expect(evaluateAlts(['   '], missingAltText)).toHaveLength(1)
   })
 
-  it('returns one result per missing-alt image and preserves order', () => {
+  it('returns one result per missing-alt image and preserves order', async () => {
     const context: RuleContext = {
       url: 'https://example.com',
       images: [null, 'a dog', null, '', null].map((alt, i) => makeImage({alt, src: `image-${i}.png`})),
     }
-    const results = missingAltText.evaluate(context)
+    const results = await missingAltText.evaluate(context)
     expect(results).toHaveLength(3)
     expect(results.map(r => r.image.src)).toEqual(['image-0.png', 'image-2.png', 'image-4.png'])
   })

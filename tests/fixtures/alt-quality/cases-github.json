@@ -1,0 +1,205 @@
+[
+  {
+    "id": "ghdocs-repo-create-recommended",
+    "image": "https://docs.github.com/assets/cb-29762/mw-1440/images/help/repository/repo-create-global-nav-update.webp",
+    "alt": "Screenshot of a GitHub dropdown menu showing options to create new items. The menu item \"New repository\" is outlined in dark orange.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 1: Create a repository. Instruction text immediately before the image: \"In the upper-right corner of any page, select Create something new, then click New repository.\" The image is not inside a link. It illustrates which menu item to click.",
+    "expected": "ok"
+  },
+  {
+    "id": "ghdocs-repo-create-vague",
+    "image": "https://docs.github.com/assets/cb-29762/mw-1440/images/help/repository/repo-create-global-nav-update.webp",
+    "alt": "A menu.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 1: Create a repository. Instruction text immediately before the image: \"In the upper-right corner of any page, select Create something new, then click New repository.\" The image is not inside a link. It needs to convey which specific menu item is highlighted.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "ghdocs-repo-create-redundant-prefix",
+    "image": "https://docs.github.com/assets/cb-29762/mw-1440/images/help/repository/repo-create-global-nav-update.webp",
+    "alt": "Image of a GitHub dropdown menu showing options to create new items, with \"New repository\" outlined in dark orange.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 1: Create a repository. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "ghdocs-branch-dropdown-recommended",
+    "image": "https://docs.github.com/assets/cb-16584/mw-1440/images/help/branches/branch-selection-dropdown-global-nav-update.webp",
+    "alt": "Screenshot of the repository page. A dropdown menu, labeled with a branch icon and \"main\", is highlighted with an orange outline.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 2: Create a branch. Instruction text before the image: \"Above the file list, click the dropdown menu that says main.\" The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "ghdocs-branch-dropdown-mismatch",
+    "image": "https://docs.github.com/assets/cb-16584/mw-1440/images/help/branches/branch-selection-dropdown-global-nav-update.webp",
+    "alt": "Screenshot of the repository page with the Settings tab highlighted in orange.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 2: Create a branch. The image illustrates one step of the branch-creation instructions. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "ghdocs-new-branch-recommended",
+    "image": "https://docs.github.com/assets/cb-31023/mw-1440/images/help/repository/new-branch.webp",
+    "alt": "Screenshot of the branch dropdown for a repository. \"Create branch: readme-edits from 'main'\" is outlined in dark orange.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 2: Create a branch. Instruction before the image: \"Type a branch name, readme-edits, into the text box. Click Create branch: readme-edits from main.\" The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "ghdocs-new-branch-vague",
+    "image": "https://docs.github.com/assets/cb-31023/mw-1440/images/help/repository/new-branch.webp",
+    "alt": "A button to click.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 2: Create a branch. The image shows the branch dropdown with the \"Create branch: readme-edits from 'main'\" option highlighted. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "ghdocs-branching-diagram-recommended",
+    "image": "https://docs.github.com/assets/cb-23923/mw-1440/images/help/repository/branching.webp",
+    "alt": "Diagram of the two branches. The \"feature\" branch diverges from the \"main\" branch and is then merged back into main.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 2: Create a branch. Surrounding text explains that a feature branch is created off main, goes through \"Commit changes\", \"Submit pull request\", and \"Discuss proposed changes\", then is merged back into main. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "ghdocs-branching-diagram-mismatch",
+    "image": "https://docs.github.com/assets/cb-23923/mw-1440/images/help/repository/branching.webp",
+    "alt": "Diagram showing three separate branches running in parallel that are never merged together.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 2: Create a branch. A conceptual diagram illustrating how branching works. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "ghdocs-diff-recommended",
+    "image": "https://docs.github.com/assets/cb-32937/mw-1440/images/help/repository/diffs.webp",
+    "alt": "Screenshot of a diff for the README.md file. 3 red lines list the text that's being removed, and 3 green lines list the text being added.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 4: Open a pull request. Instruction before the image: \"Look over your changes in the diffs on the Compare page, make sure they're what you want to submit.\" The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "ghdocs-diff-mismatch",
+    "image": "https://docs.github.com/assets/cb-32937/mw-1440/images/help/repository/diffs.webp",
+    "alt": "Screenshot of a diff for the README.md file showing only added green lines with no removals.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 4: Open a pull request. Instruction near the image: \"Look over your changes in the diffs on the Compare page.\" The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "ghdocs-diff-vague",
+    "image": "https://docs.github.com/assets/cb-32937/mw-1440/images/help/repository/diffs.webp",
+    "alt": "A code diff.",
+    "context": "GitHub Docs \"Hello World\" tutorial, Step 4: Open a pull request. The image shows a README.md diff with 3 removed (red) and 3 added (green) lines. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "mdn-devtools-inspector-recommended",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/devtools_63_inspector.png",
+    "alt": "Screenshot of a browser with developer tools open. The web page is displayed in the top half of the browser, the developer tools occupy the bottom half. There are three panels open in the developer tools: HTML, with the body element selected, a CSS panel showing styles blocks targeting the highlighted body, and a computed styles panel showing all the author styles; the browser styles checkbox is not checked.",
+    "context": "MDN tutorial \"What are browser developer tools?\", section on opening the devtools. The surrounding text says the devtools live inside the browser in a subwindow. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "mdn-devtools-inspector-vague",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/devtools_63_inspector.png",
+    "alt": "Developer tools.",
+    "context": "MDN tutorial \"What are browser developer tools?\", section on opening the devtools. The image shows a browser with the HTML, CSS, and computed-styles panels open. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "mdn-debugger-source-recommended",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/source_code.png",
+    "alt": "Snippet of developer tools debugger panel with the breakpoint at line 18 highlighted.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript debugger section, illustrating how to set a breakpoint in the source pane. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "mdn-debugger-source-mismatch",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/source_code.png",
+    "alt": "Debugger panel with a breakpoint highlighted at line 42.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript debugger section, illustrating how to set a breakpoint in the source pane. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "mdn-console-recommended",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/console_only.png",
+    "alt": "The Console tab of the browser developer tools. Two JavaScript functions have been executed in the console. The user entered functions, and the console displayed the return values.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript console section. Surrounding text explains the console lets you run lines of JavaScript against the loaded page. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "mdn-console-mismatch",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/console_only.png",
+    "alt": "The Console tab of the developer tools showing two red JavaScript error messages.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript console section, showing the console after the user runs some JavaScript. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "mdn-console-vague",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/console_only.png",
+    "alt": "A console.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript console section. The image shows the Console tab with two executed functions and their return values. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "mdn-debugger-full-recommended",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/firefox_debugger.png",
+    "alt": "A test website that is served locally on port 8080. The developer tools sub-window is open. The JavaScript debugger tab is selected. It allows you to watch the value of variables and set breakpoints. A file with name 'example.js' is selected from the sources pane. A breakpoint is set at line number 18 of the file.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript debugger section. Surrounding text describes the debugger panes: file list, source code, and watch expressions/breakpoints. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "mdn-debugger-full-mismatch",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/firefox_debugger.png",
+    "alt": "The developer tools debugger with a file named 'index.html' selected and a breakpoint set at line 5.",
+    "context": "MDN tutorial \"What are browser developer tools?\", JavaScript debugger section, showing the debugger watching variables and breakpoints on a locally served test site. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "mdn-context-menu-recommended",
+    "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/inspector_context.png",
+    "alt": "The Firefox logo as a DOM element in an example website with a context menu showing. A context menu appears when any item on the web page is right-clicked. The last menu item is 'Inspect element'.",
+    "context": "MDN tutorial \"What are browser developer tools?\", section on opening the devtools via the context menu. Surrounding text explains right-clicking an item and choosing Inspect Element. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-chart-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/chart.png",
+    "alt": "Bar chart showing monthly and total visitors for the first quarter 2025 for sites 1 to 3",
+    "context": "W3C WAI Images Tutorial, Complex Images example. A separate long description of the image is provided in adjacent text on the page, so the alt only needs to give a short identifying summary. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-chart-mismatch",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/chart.png",
+    "alt": "Pie chart showing annual revenue by region.",
+    "context": "W3C WAI Images Tutorial, Complex Images example. A separate long description of the image is provided in adjacent text on the page. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-chart-vague",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/chart.png",
+    "alt": "A chart.",
+    "context": "W3C WAI Images Tutorial, Complex Images. The image is a bar chart of quarterly website visitors for sites 1 to 3. A separate long description is provided adjacent to the image, but the short alt still needs to identify what the chart depicts. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-slogan-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/bad-top-text.png",
+    "alt": "City Lights: your access to the city.",
+    "context": "W3C WAI Images Tutorial, Images of Text. The image is a styled slogan with decorative text effects. Per guidance, the text alternative is the same as the slogan presented in the image; the decorative effects are not described. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-slogan-mismatch",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/bad-top-text.png",
+    "alt": "Welcome to the downtown shopping center.",
+    "context": "W3C WAI Images Tutorial, Images of Text example. The image is a styled slogan graphic; per guidance the text alternative should match the text shown in the image. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-math-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/repeat1.png",
+    "alt": "0.3333 recurring. (The recurrence is indicated by a line over the '3' in the fourth decimal place)",
+    "context": "W3C WAI Images Tutorial, Images of Text, mathematical expressions example. The image shows a recurring decimal; the recurrence is indicated by a line over a digit, which should be conveyed. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-math-mismatch",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/repeat1.png",
+    "alt": "0.6666 recurring, with a line over the final 6.",
+    "context": "W3C WAI Images Tutorial, Images of Text, mathematical expressions example. The image shows a recurring decimal; the recurrence is indicated by a line over a digit, which should be conveyed. The image is not inside a link.",
+    "expected": "needs-fix"
+  }
+]

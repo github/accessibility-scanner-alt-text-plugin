@@ -1,0 +1,359 @@
+[
+  {
+    "id": "webaim-ex1-recommended",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Astronaut Ellen Ochoa",
+    "context": "Body text near the image: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link. The image visually conveys both her identity and that she is an astronaut (her uniform); the body text names her but does not state she is an astronaut.",
+    "expected": "ok"
+  },
+  {
+    "id": "webaim-ex1-redundant-prefix",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Image of Ellen Ochoa, Astronaut",
+    "context": "Body text near the image: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex1-extra-info",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Ellen Ochoa, the first Hispanic woman to go into space",
+    "context": "Body text near the image: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex1-empty",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "",
+    "context": "Body text near the image: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link. The body text names her but does not state she is an astronaut; the uniform in the image conveys that.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex2-empty-correct",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "",
+    "context": "Adjacent caption text immediately above the image: \"Ellen Ochoa, Astronaut\". Body text below: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link. The image's content is fully captured by the adjacent caption.",
+    "expected": "ok"
+  },
+  {
+    "id": "webaim-ex2-vague",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Image",
+    "context": "Adjacent caption text immediately above the image: \"Ellen Ochoa, Astronaut\". Body text below: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link. The image's content is fully captured by the adjacent caption.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex2-redundant",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Ellen Ochoa",
+    "context": "Adjacent caption text immediately above the image: \"Ellen Ochoa, Astronaut\". Body text below: \"As the first Hispanic woman to go to space, and, later, the first Hispanic director of Johnson Space Center, Ellen Ochoa is widely regarded as a role model.\" The image is not inside a link. The image's content is fully captured by the adjacent caption.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex3-recommended-link",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Astronaut Ellen Ochoa",
+    "context": "The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The text \"Ellen Ochoa, Astronaut\" appears OUTSIDE the link, immediately after it. The link's accessible name comes entirely from the image's alt text.",
+    "expected": "ok"
+  },
+  {
+    "id": "webaim-ex3-read-more-link",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Read More",
+    "context": "The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The text \"Ellen Ochoa, Astronaut\" appears OUTSIDE the link, immediately after it. The link's accessible name comes entirely from the image's alt text.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex3-destination-info-link",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "Wikipedia entry for Ellen Ochoa, Astronaut",
+    "context": "The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The text \"Ellen Ochoa, Astronaut\" appears OUTSIDE the link, immediately after it. The link's accessible name comes entirely from the image's alt text.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex3-empty-link",
+    "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
+    "alt": "",
+    "context": "The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The text \"Ellen Ochoa, Astronaut\" appears OUTSIDE the link, immediately after it. With empty alt, the link has no accessible name at all.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex5-empty-correct",
+    "image": "https://webaim.org/techniques/alttext/media/separator.gif",
+    "alt": "",
+    "context": "The image is a horizontal separator graphic placed between two document sections. The structural separation between sections is already conveyed by the page's headings and layout. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "webaim-ex5-decorative-line",
+    "image": "https://webaim.org/techniques/alttext/media/separator.gif",
+    "alt": "Decorative line",
+    "context": "The image is a horizontal separator graphic placed between two document sections. The structural separation between sections is already conveyed by the page's headings and layout. The image is not inside a link.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex5-separator",
+    "image": "https://webaim.org/techniques/alttext/media/separator.gif",
+    "alt": "Separator",
+    "context": "The image is a horizontal separator graphic placed between two document sections. The structural separation between sections is already conveyed by the page's headings and layout. The image is not inside a link.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex6-empty-correct",
+    "image": "https://webaim.org/techniques/alttext/media/handshake.jpg",
+    "alt": "",
+    "context": "Marketing page about customer service. Body text near the image: \"Our business promises the best service you will find on the planet. Our team is professionally trained to offer excellent customer service throughout the contract negotiation process. Customer satisfaction is our top priority and is guaranteed, or your money back.\" The image is generic stock photography that does not convey content unique to or important for this page.",
+    "expected": "ok"
+  },
+  {
+    "id": "webaim-ex6-handshake",
+    "image": "https://webaim.org/techniques/alttext/media/handshake.jpg",
+    "alt": "Handshake",
+    "context": "Marketing page about customer service. Body text near the image: \"Our business promises the best service you will find on the planet. Our team is professionally trained to offer excellent customer service throughout the contract negotiation process.\" The image is generic stock photography that does not convey content unique to or important for this page.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex6-verbose-description",
+    "image": "https://webaim.org/techniques/alttext/media/handshake.jpg",
+    "alt": "Businessmen shake hands to complete a contract",
+    "context": "Marketing page about customer service. Body text near the image: \"Our business promises the best service you will find on the planet. Our team is professionally trained to offer excellent customer service throughout the contract negotiation process.\" The image is generic stock photography that does not convey content unique to or important for this page.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex6-marketing-injection",
+    "image": "https://webaim.org/techniques/alttext/media/handshake.jpg",
+    "alt": "We guarantee our professional services",
+    "context": "Marketing page about customer service. Body text near the image: \"Our business promises the best service you will find on the planet. Our team is professionally trained to offer excellent customer service throughout the contract negotiation process.\" The image is generic stock photography that does not convey content unique to or important for this page.",
+    "expected": "decorative"
+  },
+  {
+    "id": "webaim-ex7-too-brief",
+    "image": "https://webaim.org/techniques/alttext/media/gw2.jpg",
+    "alt": "George Washington",
+    "context": "Body text near the image: \"In this painting, the artist Emanuel Leutze used light, color, form, perspective, proportion, and motion to create the composition.\" The image is not inside a link. The painting is widely known as 'Washington Crossing the Delaware'.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "webaim-ex7-recommended",
+    "image": "https://webaim.org/techniques/alttext/media/gw2.jpg",
+    "alt": "Painting of George Washington crossing the Delaware River",
+    "context": "Body text near the image: \"In this painting, the artist Emanuel Leutze used light, color, form, perspective, proportion, and motion to create the composition.\" The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "poet-context-mitosis-too-brief",
+    "image": "https://poet.bornaccessible.org/images/general01.jpg",
+    "alt": "Mitosis",
+    "context": "This illustration is found in the chapter summary of a biology textbook with the following question: \"Which of the following is not typically described as one of the four main stages of Mitosis? Where, in mitosis, is that process likely to be covered?\" To answer the question, the reader must identify the four main mitosis stages depicted in the image.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-context-mitosis-recommended",
+    "image": "https://poet.bornaccessible.org/images/general01.jpg",
+    "alt": "Mitosis stages: Prophase, Prometaphase, Metaphase, Anaphase, and Telophase",
+    "context": "This illustration is found in the chapter summary of a biology textbook with the following question: \"Which of the following is not typically described as one of the four main stages of Mitosis? Where, in mitosis, is that process likely to be covered?\" To answer the question, the reader must identify the four main mitosis stages depicted in the image.",
+    "expected": "ok"
+  },
+  {
+    "id": "poet-context-mitosis-excessive-details",
+    "image": "https://poet.bornaccessible.org/images/general01.jpg",
+    "alt": "Cells progressing through the stages of mitosis: Prophase is when chromatin become condensed; Prometaphase; Metaphase is the longest stage; Anaphase is the shortage stage; and Telophase is when two daughter nuclei form in the cell.",
+    "context": "This illustration is found in the chapter summary of a biology textbook with the following question: \"Which of the following is not typically described as one of the four main stages of Mitosis? Where, in mitosis, is that process likely to be covered?\" Per-stage details would lead the reader to the answer and inconsistent treatment of \"Prometaphase\" calls extra attention to it.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-audience-louvre-recommended",
+    "image": "https://poet.bornaccessible.org/images/general02.jpg",
+    "alt": "This is a photograph of the Louvre Museum in France at night. The entrance to the museum is a large pyramid made out of glass.",
+    "context": "Children's book describing the photograph of the Louvre Museum entrance (designed by architect I.M. Pei) to a young child. Vocabulary and references should match the audience's age and background knowledge.",
+    "expected": "ok"
+  },
+  {
+    "id": "poet-audience-louvre-too-complex",
+    "image": "https://poet.bornaccessible.org/images/general02.jpg",
+    "alt": "This is a night photograph of the Louvre Pyramids in front of the Louvre Palace. The juxtaposition of the architectural structures highlight I.M. Pei's proclivity for combining modern structures and classical forms.",
+    "context": "Children's book describing the photograph of the Louvre Museum entrance (designed by architect I.M. Pei) to a young child. Vocabulary and references should match the audience's age and background knowledge.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-audience-louvre-too-technical",
+    "image": "https://poet.bornaccessible.org/images/general02.jpg",
+    "alt": "This is a photograph of the Louvre Pyramids was taken at night. The low-angle shot, paired with indirect lighting of key architectural elements, makes for a dramatic composition.",
+    "context": "Children's book describing the photograph of the Louvre Museum entrance (designed by architect I.M. Pei) to a young child. Vocabulary and references should match the audience's age and background knowledge; photography-composition jargon is inappropriate.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-concise-solar-system-recommended",
+    "image": "https://poet.bornaccessible.org/images/general03.jpg",
+    "alt": "Figure 1.1",
+    "context": "Fifth-grade science textbook section about our solar system. The image has an adjacent caption immediately below it: \"Figure 1.1: The orbiting paths of the eight planets in our solar system around the sun - Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.\" The caption already provides the full description; the alt only needs to identify the figure for in-text references.",
+    "expected": "ok"
+  },
+  {
+    "id": "poet-concise-solar-system-redundant",
+    "image": "https://poet.bornaccessible.org/images/general03.jpg",
+    "alt": "The sun and planets make up our galaxy. The orbiting paths are represented by a dark-orange line for Mercury, yellow line for Venus, green line for Earth, red line for Mars, light-orange line for Jupiter, pastel-yellow line for Saturn, light-blue line for Uranus, and dark-blue line for Neptune.",
+    "context": "Fifth-grade science textbook section about our solar system. The image has an adjacent caption immediately below it: \"Figure 1.1: The orbiting paths of the eight planets in our solar system around the sun - Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.\" The caption already names all eight planets; the line colors are arbitrary visual styling and not meaningful.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-concise-solar-system-extra-info",
+    "image": "https://poet.bornaccessible.org/images/general03.jpg",
+    "alt": "The sun and planets are in order of their distance from the sun. Pluto, previously known as the ninth planet in our solar system, is now considered a dwarf planet. This declassification took place in August of 2006, and Pluto's orbit is represented by a purple line.",
+    "context": "Fifth-grade science textbook section about our solar system. The image has an adjacent caption immediately below it: \"Figure 1.1: The orbiting paths of the eight planets in our solar system around the sun - Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune.\" Image descriptions should not introduce concepts not present in the surrounding text.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-objective-puffins-omits-key-detail",
+    "image": "https://poet.bornaccessible.org/images/general04.jpg",
+    "alt": "A close-up of a puffin, which is a fluffy, black-and-white bird with bright orange feet and a colorful beak comprised by wide bands of red, yellow, and black stripes.",
+    "context": "Geology website section discussing events that lead to the acid erosion of rock formations over time. The article identifies bird droppings as a contributor to acid erosion. The image clearly shows the puffin defecating on the rock; that defecation is the educationally relevant content.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-objective-puffins-subjective",
+    "image": "https://poet.bornaccessible.org/images/general04.jpg",
+    "alt": "A cute puffin doing his business on an earthy, red rock.",
+    "context": "Geology website section discussing events that lead to the acid erosion of rock formations over time. The article identifies bird droppings as a contributor to acid erosion. Descriptions should be objective and avoid aesthetic judgments or euphemisms.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-objective-puffins-recommended",
+    "image": "https://poet.bornaccessible.org/images/general04.jpg",
+    "alt": "A puffin bird with white liquid projecting from its tail end stands on a rocky mound covered by white excrements.",
+    "context": "Geology website section discussing events that lead to the acid erosion of rock formations over time. The article identifies bird droppings as a contributor to acid erosion.",
+    "expected": "ok"
+  },
+  {
+    "id": "poet-general-to-specific-map-too-simple",
+    "image": "https://poet.bornaccessible.org/images/general05.jpg",
+    "alt": "Artistic depiction of a US map.",
+    "context": "Art history book section introducing the concept of using recycled materials to produce art. The image shows a map of the United States assembled out of cut-up recycled license plates from each respective state.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-general-to-specific-map-recommended",
+    "image": "https://poet.bornaccessible.org/images/general05.jpg",
+    "alt": "A map of the United States made out of recycled license plates. This \"recycled map\" is about five feet wide, with each state represented by license plate cutouts from the respective state. Large states such as Texas and California are made of one or more colorful metal license plates while smaller New England states are represented by just a few inches of their license plates.",
+    "context": "Art history book section introducing the concept of using recycled materials to produce art. The image shows a map of the United States assembled out of cut-up recycled license plates from each respective state.",
+    "expected": "ok"
+  },
+  {
+    "id": "poet-general-to-specific-map-no-overview",
+    "image": "https://poet.bornaccessible.org/images/general05.jpg",
+    "alt": "California is made from two white license plates, each including a setting sun. Arizona is made from one red license plate with an off-white cactus on it. (The description would continue to describe each individual license plate.) This is an artistic depiction of a map of the United States.",
+    "context": "Art history book section introducing the concept of using recycled materials to produce art. The image shows a map of the United States assembled out of cut-up recycled license plates from each respective state. Descriptions should orient the reader with a high-level overview before diving into details.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-tone-grand-canyon-misused-vocab",
+    "image": "https://poet.bornaccessible.org/images/general06.jpg",
+    "alt": "An auspicious photograph of the Grand Canyon. A blue sky peaks through grey clouds, casting an glow across Arizona.",
+    "context": "Book about national parks in the United States. The photograph was taken in early September during Arizona's monsoon season, immediately after a violent storm described in the surrounding text. The image shows only a portion of the Grand Canyon, not all of Arizona.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-tone-grand-canyon-abbreviation",
+    "image": "https://poet.bornaccessible.org/images/general06.jpg",
+    "alt": "An image of a blue sky peeking through grey storm clouds over the Grand Canyon in early Sept.",
+    "context": "Book about national parks in the United States. The photograph was taken in early September during Arizona's monsoon season, immediately after a violent storm described in the surrounding text. Screen readers may announce abbreviations like \"Sept\" literally rather than expanding them.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "poet-tone-grand-canyon-recommended",
+    "image": "https://poet.bornaccessible.org/images/general06.jpg",
+    "alt": "A photograph of a blue sky peeking through grey storm clouds over the Grand Canyon in early September.",
+    "context": "Book about national parks in the United States. The photograph was taken in early September during Arizona's monsoon season, immediately after a violent storm described in the surrounding text.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-complex-chart-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/chart.png",
+    "alt": "Bar chart showing monthly and total visitors for the first quarter 2025 for sites 1 to 3",
+    "context": "A bar chart on a quarterly analytics report page. Immediately adjacent to the image is a text link reading \"Example.com Site visitors Jan to March 2025 text description of the bar chart\" that points to a separate long-description page containing the full underlying data table and trend analysis. The image is not inside a link.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-complex-chart-too-vague",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/chart.png",
+    "alt": "Chart",
+    "context": "A bar chart on a quarterly analytics report page. Immediately adjacent to the image is a text link reading \"Example.com Site visitors Jan to March 2025 text description of the bar chart\" that points to a separate long-description page containing the full underlying data table and trend analysis. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-complex-chart-no-quarter",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/chart.png",
+    "alt": "Bar chart",
+    "context": "A bar chart on a quarterly analytics report page. Immediately adjacent to the image is a text link reading \"Example.com Site visitors Jan to March 2025 text description of the bar chart\" that points to a separate long-description page containing the full underlying data table and trend analysis. The image is not inside a link.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-functional-logo-link-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/w3c.png",
+    "alt": "W3C home",
+    "context": "The image is the only content inside a link pointing to https://www.w3.org/ (the W3C home page). The image is the W3C logo (the letters 'W3C' rendered as an image of text). The link's accessible name comes entirely from the image's alt text.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-functional-logo-link-describes-image",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/w3c.png",
+    "alt": "W3C logo",
+    "context": "The image is the only content inside a link pointing to https://www.w3.org/ (the W3C home page). The image is the W3C logo. The link's accessible name comes entirely from the image's alt text.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-functional-logo-supplementing-link-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/w3c.png",
+    "alt": "",
+    "context": "The image is the W3C logo. It is inside a link pointing to https://www.w3.org/, and the visible text \"W3C Home\" appears within the same link immediately next to the image. The link's accessible name is provided by the visible text \"W3C Home\".",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-functional-logo-supplementing-link-redundant",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/w3c.png",
+    "alt": "W3C Home",
+    "context": "The image is the W3C logo. It is inside a link pointing to https://www.w3.org/, and the visible text \"W3C Home\" appears within the same link immediately next to the image. The link already has an accessible name from the visible text; the image's alt text duplicates that visible text.",
+    "expected": "decorative"
+  },
+  {
+    "id": "w3c-functional-print-icon-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/print.png",
+    "alt": "Print this page",
+    "context": "The image is a printer icon that is the only content inside a link/button whose function is to open the browser's print dialog. The image's alt text provides the entire accessible name for the control.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-functional-print-icon-describes-image",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/print.png",
+    "alt": "Printer",
+    "context": "The image is a printer icon that is the only content inside a link/button whose function is to open the browser's print dialog. The image's alt text provides the entire accessible name for the control.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-functional-search-button-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/searchbutton.png",
+    "alt": "Search",
+    "context": "The image is a magnifying-glass icon used as a submit button on a search form (an HTML <input type=\"image\">). The image's alt text provides the entire accessible name for the button. Activating the button submits the search.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-functional-search-button-describes-image",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/searchbutton.png",
+    "alt": "Magnifying glass",
+    "context": "The image is a magnifying-glass icon used as a submit button on a search form (an HTML <input type=\"image\">). The image's alt text provides the entire accessible name for the button. Activating the button submits the search.",
+    "expected": "needs-fix"
+  },
+  {
+    "id": "w3c-textual-unlinked-logo-recommended",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/wai.png",
+    "alt": "Web Accessibility Initiative",
+    "context": "The image is the Web Accessibility Initiative (WAI) logo, which is an image of styled text reading \"Web Accessibility Initiative\". The image is NOT inside a link. It appears in the page header as a brand mark, and no nearby text repeats the organization's full name.",
+    "expected": "ok"
+  },
+  {
+    "id": "w3c-textual-unlinked-logo-with-logo-suffix",
+    "image": "https://www.w3.org/WAI/content-images/tutorials/images/wai.png",
+    "alt": "Web Accessibility Initiative logo",
+    "context": "The image is the Web Accessibility Initiative (WAI) logo, which is an image of styled text reading \"Web Accessibility Initiative\". The image is NOT inside a link. It appears in the page header as a brand mark, and no nearby text repeats the organization's full name. Per W3C: for images used as logos, there is no need to mention in the alt text that the image is a logo.",
+    "expected": "needs-fix"
+  }
+]

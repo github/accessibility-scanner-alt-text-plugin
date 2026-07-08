@@ -1,0 +1,119 @@
+// createAzureAugmentedJudge — decorator over a JudgeAltText
+// that runs an Azure Computer Vision pre-pass and folds the result into the
+// context handed to the inner judge.
+
+import type {JudgeAltText, JudgeInput, JudgeVerdict} from './types.js'
+
+// Narrowed shape of an Azure AI Vision 4.0 Image Analysis response
+export type AzureVisionAnalysis = {
+  caption?: {text: string; confidence: number}
+  denseCaptions?: Array<{text: string; confidence: number}>
+  readText?: string
+  tags?: Array<{name: string; confidence: number}>
+}
+
+export interface AzureVisionClient {
+  analyze(imageDataUrl: string): Promise<AzureVisionAnalysis>
+}
+
+export type AzureAugmentedJudgeConfig = {
+  inner: JudgeAltText
+  vision: AzureVisionClient
+  // Tags below this confidence are dropped before being passed to the model.
+  tagConfidenceThreshold?: number
+  maxTags?: number
+  // Skip the Azure pre-pass when either known intrinsic dimension is at or below
+  // this many pixels
+  minImageDimension?: number
+}
+
+const DEFAULT_TAG_CONFIDENCE = 0.7
+const DEFAULT_MAX_TAGS = 8
+// Azure's documented hard minimum: images must be greater than 50x50 px.
+const DEFAULT_MIN_IMAGE_DIMENSION = 50
+
+export function createAzureAugmentedJudge(config: AzureAugmentedJudgeConfig): JudgeAltText {
+  const {inner, vision} = config
+  const tagConfidenceThreshold = config.tagConfidenceThreshold ?? DEFAULT_TAG_CONFIDENCE
+  const maxTags = config.maxTags ?? DEFAULT_MAX_TAGS
+  const minImageDimension = config.minImageDimension ?? DEFAULT_MIN_IMAGE_DIMENSION
+
+  return {
+    async judge(input: JudgeInput): Promise<JudgeVerdict> {
+      let analysis: AzureVisionAnalysis | null = null
+      if (belowSizeFloor(input, minImageDimension)) {
+        // Too small for Azure to analyze usefully (it returns 400
+        // InvalidImageSize below its minimum).
+      } else {
+        try {
+          analysis = await vision.analyze(input.imageDataUrl)
+        } catch (err) {
+          // If it fails (image too small, transient 5xx, rate-limit, etc.), degrade
+          // to Copilot-only for this image
+          console.warn(
+            `[alt-text-quality] Azure pre-pass failed; falling back to Copilot-only for this image. ${err instanceof Error ? err.message : String(err)}`,
+          )
+        }
+      }
+      const enriched = analysis
+        ? composeContext(input.context, analysis, tagConfidenceThreshold, maxTags)
+        : input.context
+      return inner.judge({...input, context: enriched})
+    },
+  }
+}
+
+// True when the intrinsic size is known and at or below the floor in either
+// dimension.
+function belowSizeFloor(input: JudgeInput, minImageDimension: number): boolean {
+  const {naturalWidth, naturalHeight} = input
+  if (!naturalWidth || !naturalHeight) return false
+  return naturalWidth <= minImageDimension || naturalHeight <= minImageDimension
+}
+
+function composeContext(
+  original: string,
+  a: AzureVisionAnalysis,
+  tagConfidenceThreshold: number,
+  maxTags: number,
+): string {
+  const parts: string[] = []
+  if (a.caption) parts.push(`Azure CV caption: ${a.caption.text}`)
+  if (a.denseCaptions?.length) {
+    parts.push(`Azure CV regions: ${a.denseCaptions.map(c => c.text).join('; ')}`)
+  }
+  if (a.readText) parts.push(`Azure CV OCR: ${a.readText}`)
+  if (a.tags?.length) {
+    const top = a.tags
+      .filter(t => t.confidence >= tagConfidenceThreshold)
+      .slice(0, maxTags)
+      .map(t => t.name)
+    if (top.length) parts.push(`Azure CV tags: ${top.join(', ')}`)
+  }
+  if (parts.length === 0) return original
+  const preamble =
+    'Azure Computer Vision pre-analysis (supplementary signals only — treat with skepticism). ' +
+    "The page's own context above and your own direct view of the image are authoritative and override these signals. " +
+    'Azure can be wrong: ignore any OCR text that does not visibly appear in the image, and disregard tags that ' +
+    'conflict with what you see. ' +
+    'When the image is a link, button, or other functional control, these signals describe the picture itself, ' +
+    "not the control's purpose — do not let them push you toward a longer or more literal description, and do not " +
+    'penalize a concise alt that correctly conveys where the link goes or what the control does. ' +
+    'Lean on these signals mainly to confirm fine-grained, hard-to-read details ' +
+    '(exact line numbers, filenames, digits, embedded labels) that you would otherwise be unsure of:'
+  return `${original}\n\n${preamble}\n${parts.join('\n')}`
+}
+
+// Fallback AzureVisionClient used when azure-augmented mode is selected but no
+// Azure credentials are configured.
+export function createNotImplementedAzureVisionClient(): AzureVisionClient {
+  return {
+    async analyze(_imageDataUrl: string): Promise<AzureVisionAnalysis> {
+      throw new Error(
+        'The Azure-augmented judge was invoked but no Azure Vision credentials are configured. ' +
+          'Set AZURE_VISION_ENDPOINT and AZURE_VISION_KEY so createJudge() auto-wires createAzureVisionApiClient, ' +
+          'or pass an explicit client via createJudge({mode: "azure-augmented", visionClient}).',
+      )
+    },
+  }
+}

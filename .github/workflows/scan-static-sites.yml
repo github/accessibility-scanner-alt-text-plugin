@@ -12,6 +12,11 @@ permissions:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    # Plugin config for the model-backed alt-text-quality rule.
+    env:
+      GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+      AZURE_VISION_ENDPOINT: ${{ secrets.AZURE_VISION_ENDPOINT }}
+      AZURE_VISION_KEY: ${{ secrets.AZURE_VISION_KEY }}
     strategy:
       fail-fast: false
       matrix:

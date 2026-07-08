@@ -83,7 +83,7 @@ describe('vagueAltText', () => {
   })
 
   describe('output shape', () => {
-    it('returns one result per offending image, and preserves the image reference', () => {
+    it('returns one result per offending image, and preserves the image reference', async () => {
       const context: RuleContext = {
         url: 'example website',
         images: [
@@ -92,7 +92,7 @@ describe('vagueAltText', () => {
           makeImage({alt: 'photo', src: 'c.png'}),
         ],
       }
-      const results = vagueAltText.evaluate(context)
+      const results = await vagueAltText.evaluate(context)
       expect(results).toHaveLength(2)
       expect(results.map(r => r.image.src)).toEqual(['a.png', 'c.png'])
     })

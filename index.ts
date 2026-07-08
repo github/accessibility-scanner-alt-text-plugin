@@ -1,5 +1,8 @@
+// Plugin entry point: loads config, extracts each image with its page context,
+// runs the enabled rules, and emits findings to the accessibility scanner.
+
 import {join} from 'node:path'
-import {extractImages} from './src/extract.js'
+import {extractImageContext} from './src/extract-image-context.js'
 import {allRules} from './src/rules/index.js'
 import {emitFindings} from './src/findings.js'
 import {loadConfig} from './src/config.js'
@@ -18,10 +21,10 @@ export default async function altTextScan({page, addFinding}: PluginArgs): Promi
   const {ruleOverrides} = await configPromise
   const enabledRules = allRules.filter(rule => ruleOverrides.get(rule.id) ?? rule.defaultEnabled ?? true)
 
-  // Extract images from the page.
+  // Extract images and their page context.
   let images
   try {
-    images = await extractImages(page)
+    images = await extractImageContext(page)
   } catch (err) {
     console.error(`[alt-text-scan] failed to extract images from ${url}:`, err)
     return
@@ -35,7 +38,8 @@ export default async function altTextScan({page, addFinding}: PluginArgs): Promi
   for (const rule of enabledRules) {
     let results
     try {
-      results = rule.evaluate(ctx)
+      // Rules may be sync or async; await both shapes uniformly.
+      results = await rule.evaluate(ctx)
     } catch (err) {
       console.error(`[alt-text-scan] rule "${rule.id}" threw on ${url}:`, err)
       continue

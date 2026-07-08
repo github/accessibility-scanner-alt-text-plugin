@@ -12,7 +12,7 @@
     },
     "rules": {
       "type": "object",
-      "description": "Per-rule enable/disable overrides. Rules not listed keep their default behavior (today, every rule defaults to enabled).",
+      "description": "Per-rule enable/disable overrides. Rules not listed keep their default behavior (enabled with the exception of alt-text-quality).",
       "additionalProperties": false,
       "properties": {
         "missing-alt-text": {
@@ -34,6 +34,10 @@
         "repeated-alt-text": {
           "type": "boolean",
           "description": "Flags two or more adjacent images in the rendered page that share the same normalized alt text."
+        },
+        "alt-text-quality": {
+          "type": "boolean",
+          "description": "Opt-in, model-backed. Sends each image and its alt text to a vision model (GitHub Models) to flag quality issues such as redundant prefixes, vague or context-missing descriptions, and link text that announces the destination's medium (e.g. 'PDF of…', 'Link to…') instead of naming it. Disabled by default; requires GITHUB_MODELS_TOKEN and incurs per-image API cost."
         }
       }
     }
