@@ -59,7 +59,7 @@ jobs:
           cp -r index.ts src .github/scanner-plugins/alt-text-scan/
 
       - name: Run accessibility scanner
-        uses: github/accessibility-scanner@1b9502344c5fa3ecc95e88c5d97da9e498a73ef4 # v3.2.0
+        uses: github/accessibility-scanner@84a8f6de0b0f7df7ac2083386222388d0e74eeb9 # v3.3.0
         with:
           urls: ${{ matrix.urls }}
           cache_key: cached_findings-${{ matrix.id }}-${{ github.ref_name }}.json
