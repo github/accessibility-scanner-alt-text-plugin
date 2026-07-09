@@ -73,6 +73,14 @@ function verdictToResult(image: ImageRecord, verdict: JudgeVerdict): RuleResult 
       }
 
     case 'needs-fix':
+      if (verdict.issue === 'keyword-stuffing') {
+        return {
+          image,
+          problemShort: `Alt text appears keyword-stuffed for SEO rather than describing the image:\n"${image.alt ?? ''}"`,
+          solutionShort: 'Replace the keyword list with a concise description of what the image actually shows.',
+          solutionLong: verdict.reasoning,
+        }
+      }
       return {
         image,
         problemShort: `Alt text quality issue${verdict.issue ? ` (${verdict.issue})` : ''}:\n"${image.alt ?? ''}"`,

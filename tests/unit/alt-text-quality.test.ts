@@ -62,6 +62,21 @@ describe('alt-text-quality', () => {
     expect(results[0]!.solutionShort).toContain('alt=""')
   })
 
+  it('maps a "keyword-stuffing" needs-fix verdict to a tailored SEO-abuse finding', async () => {
+    const stuffed = 'running shoes, cheap shoes, buy shoes online, best shoes 2026, nike adidas shoes'
+    __setJudge(
+      new FakeJudge(() =>
+        verdict({verdict: 'needs-fix', issue: 'keyword-stuffing', reasoning: 'It is a keyword list.'}),
+      ),
+    )
+    const results = await run([makeImage({src: DATA_URL, alt: stuffed})])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.problemShort).toContain('keyword-stuffed')
+    expect(results[0]!.problemShort).toContain(stuffed)
+    expect(results[0]!.solutionShort).toContain('concise description')
+    expect(results[0]!.solutionLong).toBe('It is a keyword list.')
+  })
+
   it('skips images with alt === null without calling the judge', async () => {
     const fake = new FakeJudge(() => verdict())
     __setJudge(fake)
