@@ -7,7 +7,7 @@ const IMG_A = 'data:image/png;base64,iVBORw0KGgoAAAA='
 const IMG_B = 'data:image/png;base64,Zm9vYmFyYmF6Cg=='
 
 function verdict(overrides: Partial<JudgeVerdict> = {}): JudgeVerdict {
-  return {step: 4, reasoning: 'reasoning', verdict: 'ok', issue: '', confidence: 0.9, ...overrides}
+  return {step: 4, reasoning: 'reasoning', verdict: 'ok', issue: '', confidence: 0.9, suggestion: '', ...overrides}
 }
 
 function input(overrides: Partial<JudgeInput> = {}): JudgeInput {

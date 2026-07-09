@@ -72,13 +72,15 @@ function verdictToResult(image: ImageRecord, verdict: JudgeVerdict): RuleResult 
         solutionLong: verdict.reasoning,
       }
 
-    case 'needs-fix':
+    case 'needs-fix': {
+      const suggestion = verdict.suggestion.trim()
       if (verdict.issue === 'keyword-stuffing') {
         return {
           image,
           problemShort: `Alt text appears keyword-stuffed for SEO rather than describing the image:\n"${image.alt ?? ''}"`,
-          solutionShort:
-            verdict.step === 3
+          solutionShort: suggestion
+            ? `Consider this alt text: "${suggestion}"`
+            : verdict.step === 3
               ? 'Replace the keyword list with a concise name for the link or button target or action.'
               : 'Replace the keyword list with a concise description of what the image actually shows.',
           solutionLong: verdict.reasoning,
@@ -87,9 +89,12 @@ function verdictToResult(image: ImageRecord, verdict: JudgeVerdict): RuleResult 
       return {
         image,
         problemShort: `Alt text quality issue${verdict.issue ? ` (${verdict.issue})` : ''}:\n"${image.alt ?? ''}"`,
-        solutionShort: 'Revise the alt text per the reviewer reasoning below.',
+        solutionShort: suggestion
+          ? `Consider this alt text: "${suggestion}"`
+          : 'Revise the alt text per the reviewer reasoning below.',
         solutionLong: verdict.reasoning,
       }
+    }
 
     default:
       return null

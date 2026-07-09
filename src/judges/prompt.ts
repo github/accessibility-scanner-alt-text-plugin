@@ -72,84 +72,91 @@ R6. **Keyword stuffing is a failure (SEO abuse).** Some authors pack the alt att
 
 # Output
 
-Return a single JSON object with EXACTLY these fields, in this order: step, reasoning, verdict, issue, confidence.
+Return a single JSON object with EXACTLY these fields, in this order: step, reasoning, verdict, issue, confidence, suggestion.
+
+# Remediation suggestion
+
+Populate "suggestion" with a concrete, improved alt text ONLY when verdict = "needs-fix"; otherwise set it to "" (empty).
+- Ground the suggestion in what the image actually shows and in the surrounding context. Use relevant nearby text to enrich it (e.g., replacing a generic "player" with the specific player named in the caption), but do NOT invent names, numbers, or facts that are not visible in the image or stated in the context.
+- Fix only the flagged problem: drop a redundant prefix, name the link or button target, collapse a keyword list into a real description, or add the missing context-relevant content. Keep register and length appropriate to the context (R1).
+- The suggestion is the replacement alt value only — no "alt=" wrapper, no quotes, and no explanation; the explanation belongs in "reasoning".
 
 # Examples
 
 <example id="empty-alt-on-decorative-image">
 <context>The image is a horizontal separator graphic placed between two sections. The structural separation is conveyed by the page's headings and layout.</context>
 <alt></alt>
-<output>{"step":1,"reasoning":"Step 1 matches: the image is a purely decorative separator. The current alt is empty, which is correct, so no action is needed.","verdict":"ok","issue":"","confidence":0.95}</output>
+<output>{"step":1,"reasoning":"Step 1 matches: the image is a purely decorative separator. The current alt is empty, which is correct, so no action is needed.","verdict":"ok","issue":"","confidence":0.95,"suggestion":""}</output>
 </example>
 
 <example id="empty-alt-redundant-with-caption">
 <context>Adjacent caption immediately above the image: "Ellen Ochoa, Astronaut". Body text below names her achievements.</context>
 <alt></alt>
-<output>{"step":2,"reasoning":"Step 2 matches: the image's content is fully conveyed by the adjacent caption. The current alt is empty, which is correct per R4, so no action is needed.","verdict":"ok","issue":"","confidence":0.95}</output>
+<output>{"step":2,"reasoning":"Step 2 matches: the image's content is fully conveyed by the adjacent caption. The current alt is empty, which is correct per R4, so no action is needed.","verdict":"ok","issue":"","confidence":0.95,"suggestion":""}</output>
 </example>
 
 <example id="semantic-prefix-not-redundant">
 <context>Book about national parks. Photograph of the Grand Canyon during monsoon season, surrounding text describes a violent storm.</context>
 <alt>A photograph of a blue sky peeking through grey storm clouds over the Grand Canyon in early September.</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R2, 'A photograph of' is a semantic prefix communicating medium and is not penalized.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R2, 'A photograph of' is a semantic prefix communicating medium and is not penalized.","verdict":"ok","issue":"","confidence":0.9,"suggestion":""}</output>
 </example>
 
 <example id="labeled-diagram-alt">
 <context>Biology textbook chapter-summary question: which of the following is not a main stage of mitosis? The image is a hand-drawn diagram with each stage labeled.</context>
 <alt>Mitosis stages: Prophase, Prometaphase, Metaphase, Anaphase, and Telophase</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R3, naming the diagram's labels is the correct alt content for a labeled diagram tied to a textbook question about those labels.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R3, naming the diagram's labels is the correct alt content for a labeled diagram tied to a textbook question about those labels.","verdict":"ok","issue":"","confidence":0.9,"suggestion":""}</output>
 </example>
 
 <example id="vague-alt-on-informative-image">
 <context>Geology page about acid erosion of rock formations; bird droppings are cited as a contributor.</context>
 <alt>A close-up of a puffin with bright orange feet and a colorful beak.</alt>
-<output>{"step":4,"reasoning":"Step 4 matches but criterion B fails: the alt omits the contextually relevant content (the bird defecating, which is what makes the image relevant to acid erosion).","verdict":"needs-fix","issue":"missing-context-relevant-content","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches but criterion B fails: the alt omits the contextually relevant content (the bird defecating, which is what makes the image relevant to acid erosion).","verdict":"needs-fix","issue":"missing-context-relevant-content","confidence":0.9,"suggestion":"A puffin defecating onto the rocks below, illustrating how bird droppings contribute to acid erosion."}</output>
 </example>
 
 <example id="redundant-prefix-on-link">
 <context>Image is the only content inside a link to an Ellen Ochoa Wikipedia page.</context>
 <alt>Read More</alt>
-<output>{"step":3,"reasoning":"Step 3 matches: the image is the only content of a link, and 'Read More' does not describe the destination.","verdict":"needs-fix","issue":"missing-link-name","confidence":0.95}</output>
+<output>{"step":3,"reasoning":"Step 3 matches: the image is the only content of a link, and 'Read More' does not describe the destination.","verdict":"needs-fix","issue":"missing-link-name","confidence":0.95,"suggestion":"Astronaut Ellen Ochoa"}</output>
 </example>
 
 <example id="body-prose-not-caption">
 <context>Body text near the image: "As the first Hispanic woman to go to space, Ellen Ochoa is widely regarded as a role model." The image is not inside a link. The body text names her but does not state she is an astronaut; the uniform in the image conveys that.</context>
 <alt>Image of Ellen Ochoa, Astronaut</alt>
-<output>{"step":4,"reasoning":"Step 2 does not apply because the surrounding text is body prose, not a caption or label. Step 4 applies and criterion E fails: 'Image of' is a redundant prefix per R2 and should be removed; the rest of the alt is otherwise fine.","verdict":"needs-fix","issue":"redundant-prefix","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 2 does not apply because the surrounding text is body prose, not a caption or label. Step 4 applies and criterion E fails: 'Image of' is a redundant prefix per R2 and should be removed; the rest of the alt is otherwise fine.","verdict":"needs-fix","issue":"redundant-prefix","confidence":0.9,"suggestion":"Ellen Ochoa, Astronaut"}</output>
 </example>
 
 <example id="named-target-link-ok">
 <context>The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The link's accessible name comes entirely from the image's alt text.</context>
 <alt>Astronaut Ellen Ochoa</alt>
-<output>{"step":3,"reasoning":"Step 3 matches and all of F–I hold. The alt names the entity at the destination ('Astronaut Ellen Ochoa'), does not announce the medium, and is not generic. Per F, naming the entity is sufficient — the alt does not need to say 'link' or 'page'.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":3,"reasoning":"Step 3 matches and all of F–I hold. The alt names the entity at the destination ('Astronaut Ellen Ochoa'), does not announce the medium, and is not generic. Per F, naming the entity is sufficient — the alt does not need to say 'link' or 'page'.","verdict":"ok","issue":"","confidence":0.9,"suggestion":""}</output>
 </example>
 
 <example id="medium-announcing-link">
 <context>The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The link's accessible name comes entirely from the image's alt text.</context>
 <alt>Wikipedia entry for Ellen Ochoa, Astronaut</alt>
-<output>{"step":3,"reasoning":"Step 3 matches but criterion G fails: 'Wikipedia entry for' announces the destination's medium, which screen readers already convey through the link role. Drop the medium announcement.","verdict":"needs-fix","issue":"medium-announcing","confidence":0.9}</output>
+<output>{"step":3,"reasoning":"Step 3 matches but criterion G fails: 'Wikipedia entry for' announces the destination's medium, which screen readers already convey through the link role. Drop the medium announcement.","verdict":"needs-fix","issue":"medium-announcing","confidence":0.9,"suggestion":"Ellen Ochoa, Astronaut"}</output>
 </example>
 
 <example id="surrounding-analysis-not-detail-requirement">
 <context>An art-history textbook chapter on artistic technique. The surrounding paragraph analyzes the painting's use of light, color, form, perspective, proportion, and motion to depict the iconic crossing.</context>
 <alt>Painting of George Washington crossing the Delaware River</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9,"suggestion":""}</output>
 </example>
 
 <example id="keyword-stuffed-alt">
 <context>Product page for a running shoe. The image shows a single blue running shoe. Surrounding body text describes the shoe's cushioning. The image is not inside a link.</context>
 <alt>running shoes, blue running shoes, best running shoes 2026, cheap running shoes, buy shoes online, marathon shoes, nike adidas shoes, mens womens shoes, shoe sale</alt>
-<output>{"step":4,"reasoning":"Step 4 matches but criterion F fails per R6: the alt is a comma-separated list of search keywords — 'shoes' repeated, unrelated brands, and commercial terms like 'buy' and 'sale' — rather than a description of the single blue running shoe shown. This is keyword stuffing.","verdict":"needs-fix","issue":"keyword-stuffing","confidence":0.95}</output>
+<output>{"step":4,"reasoning":"Step 4 matches but criterion F fails per R6: the alt is a comma-separated list of search keywords — 'shoes' repeated, unrelated brands, and commercial terms like 'buy' and 'sale' — rather than a description of the single blue running shoe shown. This is keyword stuffing.","verdict":"needs-fix","issue":"keyword-stuffing","confidence":0.95,"suggestion":"A single blue running shoe."}</output>
 </example>
 
 <example id="subtle-keyword-stuffed-alt">
 <context>Blog post about a hiking trail. The image shows a wooden trail sign in a forest. The image is not inside a link.</context>
 <alt>Wooden trail sign in a forest, hiking, camping, national parks, outdoor gear, best hiking boots, travel tips, adventure tourism</alt>
-<output>{"step":4,"reasoning":"Step 4 matches but criterion F fails per R6: the alt opens with an accurate description ('wooden trail sign in a forest') then appends unrelated SEO keywords (camping, outdoor gear, hiking boots, travel tips) the image does not depict. The trailing keyword pile-up is stuffing.","verdict":"needs-fix","issue":"keyword-stuffing","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches but criterion F fails per R6: the alt opens with an accurate description ('wooden trail sign in a forest') then appends unrelated SEO keywords (camping, outdoor gear, hiking boots, travel tips) the image does not depict. The trailing keyword pile-up is stuffing.","verdict":"needs-fix","issue":"keyword-stuffing","confidence":0.9,"suggestion":"A wooden trail sign in a forest."}</output>
 </example>
 
 <example id="comma-list-not-stuffing">
 <context>Biology textbook figure. The image is a labeled diagram showing the stages of mitosis in order.</context>
 <alt>Mitosis stages: Prophase, Prometaphase, Metaphase, Anaphase, and Telophase</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Although the alt is comma-separated, per R6 it is not stuffing: it enumerates the diagram's actual labeled content (the mitosis stages) rather than listing search keywords. Per R3, naming the labels is the correct alt content.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Although the alt is comma-separated, per R6 it is not stuffing: it enumerates the diagram's actual labeled content (the mitosis stages) rather than listing search keywords. Per R3, naming the labels is the correct alt content.","verdict":"ok","issue":"","confidence":0.9,"suggestion":""}</output>
 </example>`
