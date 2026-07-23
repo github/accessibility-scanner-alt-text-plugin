@@ -4,63 +4,72 @@
     "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
     "alt": "Ellen Ochoa, astronaut, NASA, space shuttle, women in STEM, Hispanic astronaut, space exploration, role model, inspirational women, science careers, aerospace engineer",
     "context": "Biography page about Ellen Ochoa. The image is a portrait of her in a NASA flight suit. Body text describes her career. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-mdn-inspector-stuffed-blatant",
     "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/devtools_63_inspector.png",
     "alt": "developer tools, browser inspector, web development, HTML, CSS, JavaScript, debugging, front end, coding tutorial, learn web dev, best dev tools 2026, chrome firefox devtools",
     "context": "MDN tutorial page explaining browser developer tools. The image is a screenshot of the Firefox DevTools Inspector showing the HTML and CSS panels. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-w3c-logo-link-stuffed",
     "image": "https://www.w3.org/WAI/content-images/tutorials/images/w3c.png",
     "alt": "W3C, web standards, HTML, CSS, JavaScript, web development, accessibility, world wide web consortium, best web standards, coding, learn html, w3c logo",
     "context": "Page footer. The image is the W3C logo and is the only content of a link pointing to https://www.w3.org. The link's accessible name comes entirely from the image's alt text.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-gw-painting-stuffed",
     "image": "https://webaim.org/techniques/alttext/media/gw2.jpg",
     "alt": "George Washington, American history, revolution, painting, art, Delaware, patriotic, USA, founding fathers, 1776, war, famous paintings, buy art prints online",
     "context": "History article about the American Revolution. The image is a painting of George Washington crossing the Delaware River. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-print-icon-button-stuffed",
     "image": "https://www.w3.org/WAI/content-images/tutorials/images/print.png",
     "alt": "print, printer, print page, printing, print document, save as PDF, print button, cheap printers, best printer 2026, buy printer online",
     "context": "Article toolbar. The image is a printer icon and is the only content of a button that opens the browser's print dialog.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-branching-diagram-stuffed",
     "image": "https://docs.github.com/assets/cb-23923/mw-1440/images/help/repository/branching.webp",
     "alt": "git branching, github, version control, git flow, branches, merge, pull request, devops, ci cd, best git tutorial, learn git, git for beginners",
     "context": "GitHub Docs tutorial, Step 2: Create a branch. The image is a diagram of a feature branch diverging from main and merging back. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-ellen-ochoa-stuffed-subtle",
     "image": "https://webaim.org/techniques/alttext/media/ellen-ochoa.jpg",
     "alt": "Astronaut Ellen Ochoa in a NASA flight suit — space, NASA, engineering, inspiration, leadership, STEM careers, women in science",
     "context": "Biography page about Ellen Ochoa. The image is a portrait of her in a NASA flight suit. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-firefox-debugger-stuffed-subtle",
     "image": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools/firefox_debugger.png",
     "alt": "Firefox JavaScript debugger paused at a breakpoint — debugging, web development, coding tutorial, best debugger, learn javascript, front end jobs",
     "context": "MDN tutorial page on browser developer tools. The image is a screenshot of the Firefox JavaScript debugger stopped at a breakpoint. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-github-diffs-stuffed",
     "image": "https://docs.github.com/assets/cb-32937/mw-1440/images/help/repository/diffs.webp",
     "alt": "github diff, code review, pull request, version control, git, compare changes, software engineering, best code review tool, devops, learn github",
     "context": "GitHub Docs page about viewing diffs. The image is a screenshot of a file diff showing added and removed lines. The image is not inside a link.",
-    "expected": "needs-fix"
+    "expected": "needs-fix",
+    "expectedIssue": "keyword-stuffing"
   },
   {
     "id": "kw-ellen-ochoa-good",

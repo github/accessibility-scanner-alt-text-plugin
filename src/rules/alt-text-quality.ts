@@ -77,7 +77,10 @@ function verdictToResult(image: ImageRecord, verdict: JudgeVerdict): RuleResult 
         return {
           image,
           problemShort: `Alt text appears keyword-stuffed for SEO rather than describing the image:\n"${image.alt ?? ''}"`,
-          solutionShort: 'Replace the keyword list with a concise description of what the image actually shows.',
+          solutionShort:
+            verdict.step === 3
+              ? 'Replace the keyword list with a concise name for the link or button target or action.'
+              : 'Replace the keyword list with a concise description of what the image actually shows.',
           solutionLong: verdict.reasoning,
         }
       }

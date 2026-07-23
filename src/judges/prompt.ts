@@ -91,13 +91,13 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <example id="semantic-prefix-not-redundant">
 <context>Book about national parks. Photograph of the Grand Canyon during monsoon season, surrounding text describes a violent storm.</context>
 <alt>A photograph of a blue sky peeking through grey storm clouds over the Grand Canyon in early September.</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R2, 'A photograph of' is a semantic prefix communicating medium and is not penalized.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R2, 'A photograph of' is a semantic prefix communicating medium and is not penalized.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="labeled-diagram-alt">
 <context>Biology textbook chapter-summary question: which of the following is not a main stage of mitosis? The image is a hand-drawn diagram with each stage labeled.</context>
 <alt>Mitosis stages: Prophase, Prometaphase, Metaphase, Anaphase, and Telophase</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R3, naming the diagram's labels is the correct alt content for a labeled diagram tied to a textbook question about those labels.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R3, naming the diagram's labels is the correct alt content for a labeled diagram tied to a textbook question about those labels.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="vague-alt-on-informative-image">
@@ -121,7 +121,7 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <example id="named-target-link-ok">
 <context>The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The link's accessible name comes entirely from the image's alt text.</context>
 <alt>Astronaut Ellen Ochoa</alt>
-<output>{"step":3,"reasoning":"Step 3 matches and all of F–H hold. The alt names the entity at the destination ('Astronaut Ellen Ochoa'), does not announce the medium, and is not generic. Per F, naming the entity is sufficient — the alt does not need to say 'link' or 'page'.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":3,"reasoning":"Step 3 matches and all of F–I hold. The alt names the entity at the destination ('Astronaut Ellen Ochoa'), does not announce the medium, and is not generic. Per F, naming the entity is sufficient — the alt does not need to say 'link' or 'page'.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="medium-announcing-link">
@@ -133,7 +133,7 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <example id="surrounding-analysis-not-detail-requirement">
 <context>An art-history textbook chapter on artistic technique. The surrounding paragraph analyzes the painting's use of light, color, form, perspective, proportion, and motion to depict the iconic crossing.</context>
 <alt>Painting of George Washington crossing the Delaware River</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="keyword-stuffed-alt">
