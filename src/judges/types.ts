@@ -9,6 +9,8 @@ export type JudgeVerdict = {
   verdict: Verdict
   issue: string
   confidence: number
+  // Suggested replacement alt text for needs-fix verdicts; "" otherwise.
+  suggestion: string
 }
 
 // What the rule hands to a judge

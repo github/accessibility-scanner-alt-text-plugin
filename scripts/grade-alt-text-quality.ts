@@ -42,7 +42,7 @@ type GradeCase = {
 
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
 
-// Decodes an image's intrinsic pixel dimensions straight from its bytes, supporting PNG, GIF, WebP and JPEG.
+// Decodes an image's intrinsic pixel dimensions from its bytes, supporting PNG, GIF, WebP and JPEG.
 // This lets the grader report size (and mirror the browser's naturalWidth/naturalHeight) without a browser or
 // image library. Returns {0, 0} for unrecognized or truncated data.
 function intrinsicSize(buf: Buffer): {width: number; height: number} {
@@ -174,6 +174,7 @@ async function main(): Promise<void> {
       console.log(`    alt:      ${JSON.stringify(c.alt)}`)
       if (c.expected !== undefined) console.log(`    expected: ${c.expected}`)
       if (verdict.issue) console.log(`    issue:    ${verdict.issue}`)
+      if (verdict.suggestion) console.log(`    suggest:  ${JSON.stringify(verdict.suggestion)}`)
       console.log(`    reason:   ${verdict.reasoning}`)
       console.log('')
     } catch (err) {
