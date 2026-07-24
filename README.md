@@ -2,13 +2,15 @@
 
 The Alt-Text Plugin is a [plugin](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for the [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner) that flags low-quality `alt` text on images. It complements axe-core's built-in `image-alt` rule, helping teams ship images with descriptive, screen-reader-friendly alternative text.
 
-The plugin helps teams:
+Five deterministic rules run by default and help teams:
 
 - 🖼️ Catch vague, generic, or filler `alt` text (`"image"`, `"photo"`, `"icon"`)
 - 📛 Catch raw filenames used as `alt` text (`"IMG_1234.png"`)
 - 🔁 Catch adjacent images that share the same `alt` text
 - 🚧 Catch boilerplate placeholder `alt` text (`"todo"`, `"tbd"`, `"fixme"`)
 - ♿ Catch images missing an `alt` attribute entirely (without flagging intentional decorative `alt=""`)
+
+An additional opt-in, model-backed `alt-text-quality` rule evaluates whether alt text accurately describes its image and flags SEO keyword stuffing. It is disabled by default and requires a GitHub Models token.
 
 > ⚠️ **Note:** This plugin is in active development alongside the a11y scanner's public preview. New rules are still being added and end-to-end integration with the scanner's issue-filing workflow is still maturing. Always review filed issues before acting on them.
 
@@ -66,7 +68,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           cache_key: REPLACE_THIS
           scans: |
-            ["axe", {"name": "alt-text-scan", "package": "@github/accessibility-scanner-alt-text-plugin", "version": "1.0.0"}]
+            ["axe", {"name": "alt-text-scan", "package": "@github/accessibility-scanner-alt-text-plugin", "version": "1.1.0"}]
 ```
 
 > 👉 Update all `REPLACE_THIS` placeholders with your actual values. See the [scanner's Action inputs](https://github.com/github/accessibility-scanner#action-inputs) for the full list, and the scanner's [PLUGINS.md](https://github.com/github/accessibility-scanner/blob/main/PLUGINS.md) for how NPM plugins are loaded.
@@ -118,7 +120,7 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 ### Alt-text quality (model-backed, opt-in)
 
-The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image, its alt text, and surrounding context in the DOM to a vision model, which judges whether the alt text accurately and completely describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of an individual named in surrounding text.
+The five default rules are deterministic pattern matches and never call a model. `alt-text-quality` is a separate opt-in rule: it sends each image, its alt text, and surrounding DOM context to a vision model, which judges whether the alt text accurately and completely describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of an individual named in surrounding text.
 
 It also flags **keyword stuffing** (SEO abuse), where the alt is padded with search keywords instead of describing the image — for example `alt="running shoes, cheap shoes, buy shoes online, best shoes 2026"`.
 
