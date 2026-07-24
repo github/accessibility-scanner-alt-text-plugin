@@ -120,7 +120,9 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image, its alt text, and surrounding context in the DOM to a vision model, which judges whether the alt text actually and sufficiently describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of an individual named in surrounding text.
 
-It also flags **keyword stuffing** (SEO abuse), where the alt is padded with search keywords instead of describing the image — for example `alt="running shoes, cheap shoes, buy shoes online, best shoes 2026"`. When it flags an image, the model also returns a **suggested replacement alt** grounded in the image and page context, which the plugin includes in the finding's `solutionShort`.
+It also flags **keyword stuffing** (SEO abuse), where the alt is padded with search keywords instead of describing the image — for example `alt="running shoes, cheap shoes, buy shoes online, best shoes 2026"`.
+
+When `alt-text-quality` flags an image, it doesn't just report the problem — it also returns a **suggested replacement alt**, grounded in the image and surrounding page context, along with the reasoning behind it. The plugin surfaces the suggestion in the finding's `solutionShort` and the explanation in `solutionLong`, so a fix is proposed alongside every quality issue.
 
 Because it makes a per-image model call (cost and latency), it is **disabled by default**. To turn it on:
 
