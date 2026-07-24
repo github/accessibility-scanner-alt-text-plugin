@@ -6,7 +6,7 @@ The plugin helps teams:
 
 - 🖼️ Catch vague, generic, or filler `alt` text (`"image"`, `"photo"`, `"icon"`)
 - 📛 Catch raw filenames used as `alt` text (`"IMG_1234.png"`)
-- 🔁 Catch runs of adjacent images that share the same `alt` text
+- 🔁 Catch adjacent images that share the same `alt` text
 - 🚧 Catch boilerplate placeholder `alt` text (`"todo"`, `"tbd"`, `"fixme"`)
 - ♿ Catch images missing an `alt` attribute entirely (without flagging intentional decorative `alt=""`)
 
@@ -16,13 +16,13 @@ The plugin helps teams:
 
 ## [Frequently-Asked Questions (FAQ)](https://github.com/github/accessibility-scanner/blob/main/FAQ.md)
 
-The plugin inherits the a11y scanner's general FAQ — see the link above for questions about scanning, caching, GitHub Enterprise, and more. Plugin-specific questions are answered inline below.
+The plugin inherits the a11y scanner's general FAQ. See the link above for questions about scanning, caching, GitHub Enterprise, and more. Plugin-specific questions are answered inline below.
 
 ---
 
 ## Background
 
-This plugin catches low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot — vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. The scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
+This plugin catches low-quality `alt` text that axe-core's built-in [`image-alt`](https://dequeuniversity.com/rules/axe/4.10/image-alt) rule cannot: vague single-word `alt`, raw filenames, runs of duplicate `alt`, and never-filled-in placeholders. The scope is intentionally narrow: deterministic, heuristic checks on `<img>` elements only. Non-`<img>` `role="img"` elements, decorative `alt=""`, and hidden subtrees are filtered out before any rule runs.
 
 The project is under active development alongside the scanner's public preview. Roadmap and open work live in this repo's [Issues](https://github.com/github/accessibility-scanner-alt-text-plugin/issues). See [CONTRIBUTING.md](./CONTRIBUTING.md) for how to contribute, including local setup, expected checks, and PR conventions.
 
@@ -33,13 +33,13 @@ The project is under active development alongside the scanner's public preview. 
 To use the Alt-Text Plugin, you'll need:
 
 - **The [AI-powered Accessibility Scanner](https://github.com/github/accessibility-scanner)** (v3 or later) wired into a GitHub Actions workflow in your repository
-- **Everything required to run the scanner itself** (Actions enabled, Issues enabled, a `GH_TOKEN` PAT — see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
+- **Everything required to run the scanner itself** (Actions enabled, Issues enabled, and a `GH_TOKEN` PAT; see the [scanner README](https://github.com/github/accessibility-scanner#requirements) for the full list)
 
-The plugin is published to npm as [`@github/accessibility-scanner-alt-text-plugin`](https://www.npmjs.com/package/@github/accessibility-scanner-alt-text-plugin). The scanner installs it for you when running the `Find` sub-action — you don't need to copy any source into your repository or run `npm install` yourself.
+The plugin is published to npm as [`@github/accessibility-scanner-alt-text-plugin`](https://www.npmjs.com/package/@github/accessibility-scanner-alt-text-plugin). The scanner installs it for you when running the `Find` sub-action, so you don't need to copy any source into your repository or run `npm install` yourself.
 
 To develop the plugin locally, you'll also need:
 
-- **Node.js** matching the `engines` field in [`package.json`](./package.json) — currently `^22.13.0 || ^24 || ^26`
+- **Node.js** matching the `engines` field in [`package.json`](./package.json) (currently `^22.13.0 || ^24 || ^26`)
 - **npm** (ships with Node)
 
 ---
@@ -48,7 +48,7 @@ To develop the plugin locally, you'll also need:
 
 ### 1. Enable the plugin in your workflow
 
-The plugin is loaded from its npm package — there's nothing to copy into your repo. Add it to the scanner action's `scans` input as an **object** with `name`, `package`, and (recommended) a pinned `version`. Keep `"axe"` in the list too, since the scanner only runs Axe by default:
+The plugin is loaded from its npm package, so there's nothing to copy into your repo. Add it to the scanner action's `scans` input as an **object** with `name`, `package`, and (recommended) a pinned `version`. Keep `"axe"` in the list too, since the scanner only runs Axe by default:
 
 ```yaml
 name: Accessibility Scanner
@@ -94,20 +94,20 @@ Trigger your scanner workflow manually or on its configured schedule. The plugin
 
 The plugin runs every extracted image through an append-only registry of rules. Each rule returns a finding when an image fails its criteria, and the scanner turns each finding into an issue.
 
-| Rule                     | ID                     | Fires when                                                                                                                                                                                                                                                                                                                                                                                 | Example (flagged)                                                        |
-| ------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| **Missing alt**          | `missing-alt-text`     | The `alt` attribute is absent (`null`) or whitespace-only (`"   "`). `alt=""` is treated as intentional decorative use and is **not** flagged.                                                                                                                                                                                                                                             | `<img src="cat.png">`<br>`<img src="cat.png" alt="   ">`                 |
-| **Vague alt**            | `vague-alt-text`       | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped.                                                                        | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
-| **Filename as alt**      | `filename-alt-text`    | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                                                                                                     | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
-| **Repeated alt**         | `repeated-alt-text`    | Two or more adjacent images on the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                                                                                                   | Five consecutive `<img alt="3/5 stars">` elements                        |
-| **Placeholder alt**      | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                                                                                           | `<img alt="TODO">`<br>`<img alt="insert alt text">`                      |
-| **Alt quality** (opt-in) | `alt-text-quality`     | A vision model judges the alt text against the image itself and flags it when the text is inaccurate, incomplete, keyword-stuffed for SEO, or otherwise low-quality — plausible-looking alt that the deterministic rules can't catch. **Disabled by default**; requires a GitHub Models token (optionally Azure AI Vision). See [Alt-text quality](#alt-text-quality-model-backed-opt-in). | `<img src="jane-doe-ceo.jpg" alt="a person">`                            |
+| Rule                     | ID                     | Fires when                                                                                                                                                                                                                                                                                                                                                                           | Example (flagged)                                                        |
+| ------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
+| **Missing alt**          | `missing-alt-text`     | The `alt` attribute is absent (`null`) or whitespace-only (`"   "`). `alt=""` is treated as intentional decorative use and is **not** flagged.                                                                                                                                                                                                                                       | `<img src="cat.png">`<br>`<img src="cat.png" alt="   ">`                 |
+| **Vague alt**            | `vague-alt-text`       | The alt text is one of a curated set of generic single words (`image`, `photo`, `icon`, `logo`, `screenshot`, `chart`, `untitled`, etc.) or short filler phrases (`an image of`, `a photo of`). Normalization is applied before matching: case-insensitive, whitespace-collapsed, surrounding punctuation stripped.                                                                  | `<img alt="image">`<br>`<img alt="An image of">`<br>`<img alt="PHOTO.">` |
+| **Filename as alt**      | `filename-alt-text`    | The alt text ends in a common image file extension (`.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico`).                                                                                                                                                                                                                                                               | `<img alt="IMG_1234.png">`<br>`<img alt="Screenshot 2024-04-28.jpg">`    |
+| **Repeated alt**         | `repeated-alt-text`    | Two or more adjacent images on the rendered page share the same normalized alt text. Useful for patterns like five star icons all labeled `"3/5 stars"`.                                                                                                                                                                                                                             | Five consecutive `<img alt="3/5 stars">` elements                        |
+| **Placeholder alt**      | `placeholder-alt-text` | The alt text matches a known boilerplate string that signals it was never written (`todo`, `tbd`, `fixme`, `placeholder`, `alt text`, `insert alt text`, `image alt`). Normalization is applied before matching.                                                                                                                                                                     | `<img alt="TODO">`<br>`<img alt="insert alt text">`                      |
+| **Alt quality** (opt-in) | `alt-text-quality`     | A vision model judges the alt text against the image itself and flags it when the text is inaccurate, incomplete, keyword-stuffed for SEO, or otherwise low-quality: plausible-looking alt the deterministic rules can't catch. **Disabled by default**; requires a GitHub Models token (optionally Azure AI Vision). See [Alt-text quality](#alt-text-quality-model-backed-opt-in). | `<img src="jane-doe-ceo.jpg" alt="a person">`                            |
 
 ### Image extraction
 
 Before rules run, the plugin extracts images from the page through Playwright's accessibility tree (`page.getByRole('img')`) and narrows the result to actual `<img>` elements. The following are filtered out automatically and never reach the rules:
 
-- Non-`<img>` elements with `role="img"` (e.g. `<svg role="img">`, `<div role="img">`) — this plugin's rules only apply to HTML `<img>` tags
+- Non-`<img>` elements with `role="img"` (e.g. `<svg role="img">`, `<div role="img">`); this plugin's rules only apply to HTML `<img>` tags
 - Images inside `aria-hidden="true"` subtrees
 - Images inside `display: none` or `visibility: hidden` subtrees
 - Decorative images with `alt=""` (implicit `role="presentation"`)
@@ -118,11 +118,13 @@ The scanner's built-in Axe scan includes a rule called [`image-alt`](https://deq
 
 ### Alt-text quality (model-backed, opt-in)
 
-The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image, its alt text, and surrounding context in the DOM to a vision model, which judges whether the alt text actually and sufficiently describes the image. This catches plausible-looking but wrong or incomplete alt text — for example `alt="a person"` on a photo of an individual named in surrounding text.
+The five rules above are deterministic pattern matches. `alt-text-quality` goes further: it sends each image, its alt text, and surrounding context in the DOM to a vision model, which judges whether the alt text accurately and completely describes the image. This catches plausible-looking but wrong or incomplete alt text, for example `alt="a person"` on a photo of an individual named in surrounding text.
 
-It also flags **keyword stuffing** (SEO abuse), where the alt is padded with search keywords instead of describing the image — for example `alt="running shoes, cheap shoes, buy shoes online, best shoes 2026"`.
+It also flags **keyword stuffing** (SEO abuse), where the alt is padded with search keywords instead of describing the image, for example `alt="running shoes, cheap shoes, buy shoes online, best shoes 2026"`.
 
-When `alt-text-quality` flags an image, it doesn't just report the problem — it also returns a **suggested replacement alt**, grounded in the image and surrounding page context, along with the reasoning behind it. The plugin surfaces the suggestion in the finding's `solutionShort` and the explanation in `solutionLong`, so a fix is proposed alongside every quality issue.
+Moreover, when `alt-text-quality` flags an image, it can also return a **suggested replacement alt**, grounded in the image and surrounding page context, with the reasoning behind it. The plugin surfaces the suggestion in the finding's `solutionShort` and the explanation in `solutionLong` when the model provides one.
+
+In this mode, each image (as a data URL), its `alt` text, and nearby page text are sent to GitHub Models, and to Azure AI Vision if you configure it.
 
 Because it makes a per-image model call (cost and latency), it is **disabled by default**. To turn it on:
 
@@ -160,14 +162,14 @@ jobs:
 
 When a rule fires, the plugin emits a finding with the following shape (matching the scanner's [`Finding` type](https://github.com/github/accessibility-scanner/blob/main/.github/actions/find/src/types.d.ts)):
 
-- `scannerType` — always `'alt-text-scan'`; identifies which plugin produced the finding
-- `ruleId` — the ID of the rule that fired (e.g. `'vague-alt-text'`)
-- `url` — the page URL where the image was found
-- `html` — the offending `<img>` element's outer HTML
-- `problemShort` — one-sentence description of what's wrong, including the offending alt text where applicable
-- `problemUrl` — link to the relevant WCAG technique or W3C tutorial
-- `solutionShort` — one-sentence description of how to fix it (for `alt-text-quality`, a suggested replacement alt when the model provides one)
-- `solutionLong` — optional longer explanation when one sentence isn't enough
+- `scannerType`: always `'alt-text-scan'`; identifies which plugin produced the finding
+- `ruleId`: the ID of the rule that fired (e.g. `'vague-alt-text'`)
+- `url`: the page URL where the image was found
+- `html`: the offending `<img>` element's outer HTML
+- `problemShort`: one-sentence description of what's wrong, including the offending alt text where applicable
+- `problemUrl`: link to the relevant WCAG technique or W3C tutorial
+- `solutionShort`: one-sentence description of how to fix it (for `alt-text-quality`, a suggested replacement alt when the model provides one)
+- `solutionLong`: optional longer explanation when one sentence isn't enough
 
 The scanner uses these fields to file or update a GitHub issue.
 
@@ -260,18 +262,18 @@ tests/
   unit/
     *.test.ts               # One file per rule, plus config.test.ts for the loader
   utils/
-    helpers.ts              # makeImage() and evaluateAlts() — shared across rule tests
+    helpers.ts              # makeImage() and evaluateAlts(), shared across rule tests
 ```
 
 ### Adding a new rule
 
-1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape — `id`, `problemUrl`, and `evaluate(context)`). Filenames under `src/` and `tests/` must be kebab-case; ESLint's `check-file/filename-naming-convention` rule enforces this.
-2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`. The registry is append-only — don't reorder existing rules.
+1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape: `id`, `problemUrl`, and `evaluate(context)`). Filenames under `src/` and `tests/` must be kebab-case; ESLint's `check-file/filename-naming-convention` rule enforces this.
+2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`. The registry is append-only, so don't reorder existing rules.
 3. Add a `tests/unit/<rule-name>.test.ts` file. Use `evaluateAlts(alts, rule)` and `makeImage(overrides)` from [`tests/utils/helpers.ts`](./tests/utils/helpers.ts) for the common cases; construct an explicit `RuleContext` only when you need control over `src` or other per-image fields.
 4. Run `npm run test && npm run typecheck && npm run lint` locally before opening a PR. CI re-runs them.
 
 > [!IMPORTANT]
-> Image extraction happens once per page, before any rule runs, so every rule sees the same filtered list regardless of which rules are enabled. Don't reach into the DOM from a rule — work from the `ImageRecord[]` the rule's context provides.
+> Image extraction happens once per page, before any rule runs, so every rule sees the same filtered list regardless of which rules are enabled. Don't reach into the DOM from a rule; work from the `ImageRecord[]` the rule's context provides.
 
 ---
 
