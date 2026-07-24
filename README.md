@@ -92,7 +92,7 @@ Trigger your scanner workflow manually or on its configured schedule. The plugin
 
 ## Rules
 
-The plugin runs every extracted image through an append-only registry of rules. Each rule returns a finding when an image fails its criteria, and the scanner turns each finding into an issue.
+The plugin runs every extracted image through a registry of rules. Each rule returns a finding when an image fails its criteria, and the scanner turns each finding into an issue.
 
 | Rule                     | ID                     | Fires when                                                                                                                                                                                                                                                                                                                                                                           | Example (flagged)                                                        |
 | ------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
@@ -246,7 +246,7 @@ src/
   extract.ts                # Pulls visible <img> records from a Playwright page
   findings.ts               # Translates each RuleResult into the scanner's Finding shape
   rules/
-    index.ts                # Append-only rule registry
+    index.ts                # Rule registry
     missing-alt-text.ts
     vague-alt-text.ts
     filename-alt-text.ts
@@ -268,7 +268,7 @@ tests/
 ### Adding a new rule
 
 1. Create `src/rules/<rule-name>.ts` exporting a `Rule` (see [`src/types.ts`](./src/types.ts) for the shape: `id`, `problemUrl`, and `evaluate(context)`). Filenames under `src/` and `tests/` must be kebab-case; ESLint's `check-file/filename-naming-convention` rule enforces this.
-2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`. The registry is append-only, so don't reorder existing rules.
+2. Import the rule in [`src/rules/index.ts`](./src/rules/index.ts) and append it to `allRules`.
 3. Add a `tests/unit/<rule-name>.test.ts` file. Use `evaluateAlts(alts, rule)` and `makeImage(overrides)` from [`tests/utils/helpers.ts`](./tests/utils/helpers.ts) for the common cases; construct an explicit `RuleContext` only when you need control over `src` or other per-image fields.
 4. Run `npm run test && npm run typecheck && npm run lint` locally before opening a PR. CI re-runs them.
 
