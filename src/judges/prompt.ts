@@ -29,22 +29,24 @@ A reliable signal: if the provided context calls the adjacent text a "caption", 
   - If current alt is non-empty → verdict = "decorative"
 
 ## Step 3 — Functional (image inside a link or button)
-The image is the only content of a link or button. The alt becomes the link's accessible name. Apply criteria F–H below. The alt is "ok" if and only if ALL hold:
+The image is the only content of a link or button. The alt becomes the link's accessible name. Apply criteria F–I below. The alt is "ok" if and only if ALL hold:
 
   F. NAMES-THE-TARGET — The alt names what the user will reach (the entity, page, or action). Naming the entity (e.g., "Astronaut Ellen Ochoa" for a link to her bio) qualifies; the alt does NOT need to use the literal word "link" or "page".
   G. NOT-MEDIUM-ANNOUNCING — The alt does not announce the destination's medium or technology ("Wikipedia entry for …", "PDF of …", "Click here to read about …", "Link to …"). Screen readers already announce the link role.
   H. NOT-GENERIC — The alt is not empty and not a placeholder like "Read More", "Image", "Click here".
+  I. NOT-KEYWORD-STUFFED — The alt names the target, not a list of search keywords (see R6).
 
 If any criterion fails → verdict = "needs-fix". Otherwise → verdict = "ok".
 
 ## Step 4 — Informative (default)
-The image conveys information that contributes meaning to the page. Apply criteria A–E below. The alt is "ok" if and only if ALL hold:
+The image conveys information that contributes meaning to the page. Apply criteria A–F below. The alt is "ok" if and only if ALL hold:
 
   A. ACCURATE — The alt describes what the image actually shows in this context.
   B. CONTEXTUALLY-COMPLETE — The alt captures the content the page relies on the image to convey, given the surrounding text. If the surrounding text already covers some of that content, the alt may be brief.
   C. NOT-DUPLICATIVE — The alt does not repeat sentences from nearby text verbatim.
   D. NOT-INTRUSIVE — The alt does not introduce new claims absent from the page (no extra trivia, no marketing copy).
   E. APPROPRIATELY-FRAMED — Vocabulary, register, and detail level match the audience and genre indicated by the context.
+  F. NOT-KEYWORD-STUFFED — The alt is a genuine description, not a list of search keywords (see R6).
 
 If any criterion fails → verdict = "needs-fix". Otherwise → verdict = "ok".
 
@@ -63,6 +65,10 @@ R3. **Labeled diagrams.** When the image is a diagram whose content is the label
 R4. **An empty alt ("") is the correct answer when (and only when) the image matches Step 1 or Step 2.** When the alt is already empty in such a case, return verdict = "ok" — no action is needed. Use "decorative" only when the current alt is non-empty and should be removed.
 
 R5. **Do not overthink.** Walk the decision procedure once, in order. Do not invent context that wasn't provided. Do not bring in general knowledge about what "good" alt text usually looks like beyond the rules above. Pick the first matching step and stop.
+
+R6. **Keyword stuffing is a failure (SEO abuse).** Some authors pack the alt attribute with search keywords instead of describing the image. This is criterion F (Step 4) / I (Step 3) and yields verdict = "needs-fix" with issue = "keyword-stuffing".
+  - Signals: the alt reads as a list rather than a phrase or sentence; comma- or pipe-separated keyword runs; the same term or near-duplicates repeated; multiple unrelated products, brands, or categories; commercial terms ("buy", "cheap", "best … 2026", "for sale"); or tokens unsupported by the image, the Azure tags/OCR (when provided), or the surrounding context.
+  - Do NOT confuse stuffing with legitimately long or detailed alt. Per R1/R1a, a long alt is correct when the context warrants it (labeled diagrams, art, educational figures) and the words genuinely describe THIS image. Length alone is never stuffing, and a comma-separated list is fine when it enumerates the image's real content (e.g., the labeled stages of a diagram). The test is whether the words describe the image or merely list keywords for ranking.
 
 # Output
 
@@ -85,13 +91,13 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <example id="semantic-prefix-not-redundant">
 <context>Book about national parks. Photograph of the Grand Canyon during monsoon season, surrounding text describes a violent storm.</context>
 <alt>A photograph of a blue sky peeking through grey storm clouds over the Grand Canyon in early September.</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R2, 'A photograph of' is a semantic prefix communicating medium and is not penalized.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R2, 'A photograph of' is a semantic prefix communicating medium and is not penalized.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="labeled-diagram-alt">
 <context>Biology textbook chapter-summary question: which of the following is not a main stage of mitosis? The image is a hand-drawn diagram with each stage labeled.</context>
 <alt>Mitosis stages: Prophase, Prometaphase, Metaphase, Anaphase, and Telophase</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R3, naming the diagram's labels is the correct alt content for a labeled diagram tied to a textbook question about those labels.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R3, naming the diagram's labels is the correct alt content for a labeled diagram tied to a textbook question about those labels.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="vague-alt-on-informative-image">
@@ -115,7 +121,7 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <example id="named-target-link-ok">
 <context>The image is the only content inside a link pointing to https://en.wikipedia.org/wiki/Ellen_Ochoa. The link's accessible name comes entirely from the image's alt text.</context>
 <alt>Astronaut Ellen Ochoa</alt>
-<output>{"step":3,"reasoning":"Step 3 matches and all of F–H hold. The alt names the entity at the destination ('Astronaut Ellen Ochoa'), does not announce the medium, and is not generic. Per F, naming the entity is sufficient — the alt does not need to say 'link' or 'page'.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":3,"reasoning":"Step 3 matches and all of F–I hold. The alt names the entity at the destination ('Astronaut Ellen Ochoa'), does not announce the medium, and is not generic. Per F, naming the entity is sufficient — the alt does not need to say 'link' or 'page'.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>
 
 <example id="medium-announcing-link">
@@ -127,5 +133,23 @@ Return a single JSON object with EXACTLY these fields, in this order: step, reas
 <example id="surrounding-analysis-not-detail-requirement">
 <context>An art-history textbook chapter on artistic technique. The surrounding paragraph analyzes the painting's use of light, color, form, perspective, proportion, and motion to depict the iconic crossing.</context>
 <alt>Painting of George Washington crossing the Delaware River</alt>
-<output>{"step":4,"reasoning":"Step 4 matches and all of A–E hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9}</output>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Per R1a, the surrounding paragraph's analysis of light/color/form is not a requirement that the alt reproduce that analysis; the alt names what the image is, and the surrounding text supplies the artistic analysis. Per R2, 'Painting of' is a semantic prefix.","verdict":"ok","issue":"","confidence":0.9}</output>
+</example>
+
+<example id="keyword-stuffed-alt">
+<context>Product page for a running shoe. The image shows a single blue running shoe. Surrounding body text describes the shoe's cushioning. The image is not inside a link.</context>
+<alt>running shoes, blue running shoes, best running shoes 2026, cheap running shoes, buy shoes online, marathon shoes, nike adidas shoes, mens womens shoes, shoe sale</alt>
+<output>{"step":4,"reasoning":"Step 4 matches but criterion F fails per R6: the alt is a comma-separated list of search keywords — 'shoes' repeated, unrelated brands, and commercial terms like 'buy' and 'sale' — rather than a description of the single blue running shoe shown. This is keyword stuffing.","verdict":"needs-fix","issue":"keyword-stuffing","confidence":0.95}</output>
+</example>
+
+<example id="subtle-keyword-stuffed-alt">
+<context>Blog post about a hiking trail. The image shows a wooden trail sign in a forest. The image is not inside a link.</context>
+<alt>Wooden trail sign in a forest, hiking, camping, national parks, outdoor gear, best hiking boots, travel tips, adventure tourism</alt>
+<output>{"step":4,"reasoning":"Step 4 matches but criterion F fails per R6: the alt opens with an accurate description ('wooden trail sign in a forest') then appends unrelated SEO keywords (camping, outdoor gear, hiking boots, travel tips) the image does not depict. The trailing keyword pile-up is stuffing.","verdict":"needs-fix","issue":"keyword-stuffing","confidence":0.9}</output>
+</example>
+
+<example id="comma-list-not-stuffing">
+<context>Biology textbook figure. The image is a labeled diagram showing the stages of mitosis in order.</context>
+<alt>Mitosis stages: Prophase, Prometaphase, Metaphase, Anaphase, and Telophase</alt>
+<output>{"step":4,"reasoning":"Step 4 matches and all of A–F hold. Although the alt is comma-separated, per R6 it is not stuffing: it enumerates the diagram's actual labeled content (the mitosis stages) rather than listing search keywords. Per R3, naming the labels is the correct alt content.","verdict":"ok","issue":"","confidence":0.9}</output>
 </example>`

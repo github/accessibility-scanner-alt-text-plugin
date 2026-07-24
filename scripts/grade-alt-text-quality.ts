@@ -36,6 +36,8 @@ type GradeCase = {
   // The "page context" the production rule passes in.
   context?: string
   expected?: Verdict
+  // When set, the grader also requires verdict.issue to equal this value.
+  expectedIssue?: string
 }
 
 const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
@@ -160,7 +162,9 @@ async function main(): Promise<void> {
       let agreeMark = ''
       if (c.expected !== undefined) {
         withExpected++
-        const agree = c.expected === verdict.verdict
+        const verdictAgrees = c.expected === verdict.verdict
+        const issueAgrees = c.expectedIssue === undefined || c.expectedIssue === verdict.issue
+        const agree = verdictAgrees && issueAgrees
         if (agree) agreements++
         agreeMark = agree ? '  ✓' : '  ✗'
       }
