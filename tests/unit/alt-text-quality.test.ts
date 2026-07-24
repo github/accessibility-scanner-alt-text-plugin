@@ -20,7 +20,7 @@ class FakeJudge implements JudgeAltText {
 }
 
 function verdict(overrides: Partial<JudgeVerdict> = {}): JudgeVerdict {
-  return {step: 4, reasoning: 'reasoning', verdict: 'ok', issue: '', confidence: 0.9, ...overrides}
+  return {step: 4, reasoning: 'reasoning', verdict: 'ok', issue: '', confidence: 0.9, suggestion: '', ...overrides}
 }
 
 async function run(images: ImageRecord[]): Promise<RuleResult[]> {
@@ -83,6 +83,25 @@ describe('alt-text-quality', () => {
     expect(results).toHaveLength(1)
     expect(results[0]!.problemShort).toContain('keyword-stuffed')
     expect(results[0]!.solutionShort).toContain('link or button target')
+  })
+
+  it('surfaces a needs-fix suggestion in the finding solutionShort', async () => {
+    __setJudge(
+      new FakeJudge(() =>
+        verdict({verdict: 'needs-fix', issue: 'redundant-prefix', suggestion: 'Ellen Ochoa, Astronaut'}),
+      ),
+    )
+    const results = await run([makeImage({src: DATA_URL, alt: 'Image of Ellen Ochoa, Astronaut'})])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.solutionShort).toContain('Ellen Ochoa, Astronaut')
+    expect(results[0]!.solutionShort).toContain('Consider')
+  })
+
+  it('falls back to generic advice when a needs-fix verdict has no suggestion', async () => {
+    __setJudge(new FakeJudge(() => verdict({verdict: 'needs-fix', issue: 'vague', suggestion: ''})))
+    const results = await run([makeImage({src: DATA_URL, alt: 'a thing'})])
+    expect(results).toHaveLength(1)
+    expect(results[0]!.solutionShort).toContain('Revise the alt text')
   })
 
   it('skips images with alt === null without calling the judge', async () => {
