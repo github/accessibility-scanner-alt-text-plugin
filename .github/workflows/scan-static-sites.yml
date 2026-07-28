@@ -50,6 +50,14 @@ jobs:
               https://github.blog/ai-and-ml/
             repository: github/accessibility-scanner-testing
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Stage alt-text plugin
+        run: |
+          mkdir -p .github/scanner-plugins/alt-text-scan
+          cp -r index.ts src .github/scanner-plugins/alt-text-scan/
+
       - name: Run accessibility scanner
         uses: github/accessibility-scanner@da2381e50d31f6e21c4fb6fad14e75f26e682ae1 # v3.4.0
         with:
@@ -58,5 +66,4 @@ jobs:
           repository: ${{ matrix.repository }}
           token: ${{ secrets.GH_TOKEN }}
           skip_copilot_assignment: true
-          scans: |
-            ["axe", {"name": "alt-text-scan", "package": "@github/accessibility-scanner-alt-text-plugin", "version": "1.1.0"}]
+          scans: '["axe", "alt-text-scan"]'
