@@ -7,6 +7,12 @@ A small Jekyll site that demos the
 and adds a [page whose images each intentionally trip one of the plugin's
 rules](alt-text-errors.html).
 
+The site also includes an
+[advanced model-backed demo page](advanced-alt-text-errors.html). Its three
+synthetic cases demonstrate keyword stuffing, plausible but contextually wrong
+alt text, and an accurate control. None of those cases trips a deterministic
+rule; enable `alt-text-quality` to evaluate them.
+
 Use it for:
 
 - **Manual testing** — build and serve the site, then point the scanner at it.
@@ -47,6 +53,7 @@ TEST_USERNAME=demo TEST_PASSWORD=demo bundle exec rackup
 ```
 
 The errors page is then available at `/alt-text-errors/`.
+The advanced page is available at `/advanced-alt-text-errors/`.
 
 ## Scan it with the plugin
 
@@ -63,3 +70,23 @@ The `example site-with-errors` test loads
 [`alt-text-errors.html`](alt-text-errors.html), runs the real `alt-text-scan`
 plugin against it, and asserts that every rule in the table above produces a
 finding.
+
+For a credential-free, machine-readable demo of both the baseline and the
+model-backed finding contract:
+
+```sh
+npm run demo:verify
+```
+
+The model verdicts in that command are explicitly marked as mocked. They prove
+the production rule-to-finding mapping without making network calls. To run the
+real GitHub Models judge against only the synthetic advanced page, set
+`GITHUB_MODELS_TOKEN` to a PAT with `models:read` and run:
+
+```sh
+npm run demo:live
+```
+
+If `AZURE_VISION_ENDPOINT` and `AZURE_VISION_KEY` are also set, the live command
+automatically uses Azure Vision enrichment. Set `ALT_TEXT_JUDGE_MODE=copilot`
+to force GitHub Models only.

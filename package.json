@@ -31,7 +31,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "grade": "tsx --env-file=.env scripts/grade-alt-text-quality.ts"
+    "grade": "tsx --env-file=.env scripts/grade-alt-text-quality.ts",
+    "demo:verify": "tsx scripts/verify-demo.ts",
+    "demo:live": "tsx scripts/run-live-demo.ts"
   },
   "prettier": "@github/prettier-config",
   "engines": {
