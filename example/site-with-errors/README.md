@@ -107,11 +107,40 @@ From the repository root:
 ```sh
 npm ci
 npx playwright install chromium
-npm test -- tests/example-site.test.ts --reporter=verbose
+npm test -- tests/example-site.test.ts tests/unit/azure-augmented-judge.test.ts --reporter=verbose
 ```
 
-The targeted test loads
+The targeted tests load
 [`alt-text-errors.html`](alt-text-errors.html), runs the real `alt-text-scan`
 plugin against it, asserts exactly one finding for each deterministic rule,
-and separately checks the four model cases through fixed fake-judge verdicts.
-No model or Azure credentials are used.
+checks the four model cases through fixed fake-judge verdicts, and exercise the
+production Azure enrichment and fallback layers with a fake Azure client. No
+model or Azure credentials are used.
+
+## Evidence and limitations
+
+| Feature                          | Evidence layer                 | Expected result                                                             |
+| -------------------------------- | ------------------------------ | --------------------------------------------------------------------------- |
+| Scanner v3.4.1 action            | Hosted workflow                | Immutable scanner commit is downloaded and the scan step succeeds.          |
+| npm plugin loading               | Hosted workflow                | npm installs v1.1.0, then Scanner discovers and runs `alt-text-scan`.       |
+| Five deterministic rules         | Hosted artifact and local test | Exactly one plugin finding for each rule.                                   |
+| Rule configuration               | Local test                     | Disabling `missing-alt-text` suppresses only that finding.                  |
+| Context extraction               | Local test                     | Model input includes the page title, nearest heading, and figure caption.   |
+| Keyword stuffing                 | Fixed fake judge               | Production mapping emits the tailored SEO-abuse finding.                    |
+| Inaccurate alt and remediation   | Fixed fake judge               | Production mapping emits an `inaccurate` finding and suggested replacement. |
+| Decorative and accurate controls | Fixed fake judge               | Decorative yields an `alt=""` recommendation; accurate yields no finding.   |
+| Azure caption, OCR, and tags     | Fake Azure client              | Production enrichment adds high-confidence signals to model context.        |
+| Azure failure fallback           | Fake Azure client              | Production enrichment falls back to unmodified Copilot-only context.        |
+| Axe alongside the plugin         | Hosted artifact                | Axe findings and plugin findings appear in the same scanner results file.   |
+
+The hosted Scanner action proves only behavior available through the published
+npm package without model credentials: npm loading, Axe, and the five default
+rules. Scanner cannot inject the repository's fake judge into the published
+package, so model and Azure evidence comes from the checked-in v1.1.0 source
+through `demo:verify` and targeted tests. The optional `demo:live` path is the
+only evidence that calls GitHub Models or Azure; its output is intentionally
+not asserted in CI because it requires secrets and is nondeterministic.
+
+Supporting reliability behavior such as judge/vision caching, URL redaction,
+image loading retries, and accessibility-tree filtering remains covered by the
+existing unit and extraction test suites rather than by presentation output.
