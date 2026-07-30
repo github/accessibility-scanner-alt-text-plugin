@@ -2,6 +2,10 @@ name: Scan controlled demo site
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/scan-demo-site.yml
+      - example/site-with-errors/**
 
 permissions:
   contents: read
