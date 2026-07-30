@@ -1,0 +1,65 @@
+name: Scan controlled demo site
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+          working-directory: example/site-with-errors
+
+      - name: Build demo site
+        working-directory: example/site-with-errors
+        run: bundle exec jekyll build
+
+      - name: Serve demo site
+        run: |
+          python3 -m http.server 4000 --directory example/site-with-errors/_site > "$RUNNER_TEMP/demo-site.log" 2>&1 &
+          echo "$!" > "$RUNNER_TEMP/demo-site.pid"
+
+          for attempt in {1..10}; do
+            if curl --fail --silent --show-error http://127.0.0.1:4000/alt-text-errors/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+
+          cat "$RUNNER_TEMP/demo-site.log"
+          exit 1
+
+      - name: Run accessibility scanner
+        id: scanner
+        uses: github/accessibility-scanner@745198705c4aecb2af83732eaafe1f6e3f7787c2 # v3.4.1
+        with:
+          urls: http://127.0.0.1:4000/alt-text-errors/
+          cache_key: cached_findings-controlled-demo-${{ github.run_id }}.json
+          repository: ${{ github.repository }}
+          token: ${{ github.token }}
+          skip_copilot_assignment: true
+          dry_run: true
+          scans: |
+            ["axe", {"name": "alt-text-scan", "package": "@github/accessibility-scanner-alt-text-plugin", "version": "1.1.0"}]
+
+      - name: Upload scanner results
+        if: ${{ always() && steps.scanner.outputs.results_file }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: controlled-demo-results-${{ github.run_id }}
+          path: ${{ steps.scanner.outputs.results_file }}
+          if-no-files-found: error
+
+      - name: Stop demo site
+        if: ${{ always() }}
+        run: kill "$(cat "$RUNNER_TEMP/demo-site.pid")"
