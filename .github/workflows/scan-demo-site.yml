@@ -2,6 +2,12 @@ name: Scan controlled demo site
 
 on:
   workflow_dispatch:
+    inputs:
+      run_live_quality:
+        description: Run the optional credentialed GitHub Models quality demo
+        required: false
+        default: false
+        type: boolean
   pull_request:
     paths:
       - .github/workflows/scan-demo-site.yml
@@ -24,6 +30,18 @@ jobs:
           bundler-cache: true
           working-directory: example/site-with-errors
 
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install plugin dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
       - name: Build demo site
         working-directory: example/site-with-errors
         run: bundle exec jekyll build
@@ -43,6 +61,17 @@ jobs:
           cat "$RUNNER_TEMP/demo-site.log"
           exit 1
 
+      - name: Produce deterministic demo evidence
+        run: npm run --silent demo:verify > "$RUNNER_TEMP/demo-evidence.json"
+
+      - name: Run optional live quality demo
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_quality }}
+        env:
+          GITHUB_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+          AZURE_VISION_ENDPOINT: ${{ secrets.AZURE_VISION_ENDPOINT }}
+          AZURE_VISION_KEY: ${{ secrets.AZURE_VISION_KEY }}
+        run: npm run --silent demo:live > "$RUNNER_TEMP/live-demo-evidence.json"
+
       - name: Run accessibility scanner
         id: scanner
         uses: github/accessibility-scanner@745198705c4aecb2af83732eaafe1f6e3f7787c2 # v3.4.1
@@ -61,7 +90,10 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: controlled-demo-results-${{ github.run_id }}
-          path: ${{ steps.scanner.outputs.results_file }}
+          path: |
+            ${{ steps.scanner.outputs.results_file }}
+            ${{ runner.temp }}/demo-evidence.json
+            ${{ runner.temp }}/live-demo-evidence.json
           if-no-files-found: error
 
       - name: Stop demo site

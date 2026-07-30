@@ -118,7 +118,7 @@ describe('example site-with-errors', () => {
 
   it('maps model-backed fixture cases through deterministic mocked verdicts', async () => {
     const body = loadErrorsPageBody()
-    await page.setContent(`<!doctype html><html><body>${body}</body></html>`)
+    await page.setContent(`<!doctype html><html><head><title>Alt text demo</title></head><body>${body}</body></html>`)
 
     const images = await extractImageContext(page)
     const modelCases = images
@@ -135,6 +135,9 @@ describe('example site-with-errors', () => {
 
     expect(fakeJudge.calls).toHaveLength(4)
     expect(results).toHaveLength(3)
+    expect(fakeJudge.calls.every(call => call.context.includes('Page title: "Alt text demo"'))).toBe(true)
+    expect(fakeJudge.calls.every(call => call.context.includes('Nearest heading above the image'))).toBe(true)
+    expect(fakeJudge.calls.every(call => call.context.includes('Adjacent figcaption'))).toBe(true)
 
     const keywordStuffing = results.find(result => result.image.alt?.startsWith('running shoes'))
     expect(keywordStuffing?.problemShort).toContain('keyword-stuffed')

@@ -51,6 +51,33 @@ targeted test injects fixed judge verdicts, then runs the production
 and credential-free while clearly showing behavior that would otherwise
 require GitHub Models and, optionally, Azure AI Vision.
 
+The credential-free verifier prints all demo evidence as JSON:
+
+```sh
+npm run demo:verify
+```
+
+Its output separates:
+
+- the real deterministic plugin findings,
+- mocked quality verdicts using real context extraction, remediation mapping,
+  and scanner finding emission, and
+- mocked Azure caption, OCR, and tag signals passed through the production
+  Azure context-enrichment layer.
+
+For an optional live run, set `GITHUB_MODELS_TOKEN` to a PAT with `models:read`
+and run:
+
+```sh
+npm run demo:live
+```
+
+If `AZURE_VISION_ENDPOINT` and `AZURE_VISION_KEY` are also set, the live command
+automatically requests Azure-augmented mode. Set
+`ALT_TEXT_JUDGE_MODE=copilot` or `ALT_TEXT_JUDGE_MODE=azure-augmented` to force
+a mode. Live output is credentialed and nondeterministic; it is not part of the
+required CI evidence.
+
 ## Run it locally
 
 The site is a standard Jekyll site served as a static build behind Rack/Puma.
