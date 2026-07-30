@@ -5,28 +5,76 @@ permalink: /alt-text-errors/
 ---
 
 <!--
-  Each <img> on this page intentionally uses bad alt text to exercise a single
-  rule in the accessibility-scanner-alt-text-plugin. See README.md in this
-  folder for the full image-to-rule mapping.
-
-  Every image points at the same throwaway SVG; the scanner only inspects the
-  `alt` attribute, not the image itself.
+  The first section exercises the five deterministic rules. The second section
+  supplies controlled inputs for the opt-in model rule; tests inject fixed
+  verdicts for those cases and never present them as live model output.
 -->
 
 <h1>Alt text errors</h1>
 
+<h2>Deterministic rules</h2>
+
 <!-- Rule: missing-alt-text — the alt attribute is absent entirely. -->
-<img src="/assets/img/test-image.svg" />
+<img data-expected-rule="missing-alt-text" src="/assets/img/test-image.svg" />
 
 <!-- Rule: placeholder-alt-text — "TODO" is boilerplate placeholder text. -->
-<img src="/assets/img/test-image.svg" alt="TODO" />
+<img data-expected-rule="placeholder-alt-text" src="/assets/img/test-image.svg" alt="TODO" />
 
 <!-- Rule: filename-alt-text — the alt text is a raw image filename. -->
-<img src="/assets/img/test-image.svg" alt="screenshot_2024.png" />
+<img data-expected-rule="filename-alt-text" src="/assets/img/test-image.svg" alt="screenshot_2024.png" />
 
 <!-- Rule: vague-alt-text — "image" says nothing about the content. -->
-<img src="/assets/img/test-image.svg" alt="image" />
+<img data-expected-rule="vague-alt-text" src="/assets/img/test-image.svg" alt="image" />
 
-<!-- Rule: repeated-alt-text — two consecutive images share identical alt text. -->
-<img src="/assets/img/test-image.svg" alt="company logo" />
-<img src="/assets/img/test-image.svg" alt="company logo" />
+<!-- Rule: repeated-alt-text — a tight visual group shares identical alt text. -->
+<span style="display: inline-flex; gap: 8px">
+  <img
+    data-expected-rule="repeated-alt-text"
+    src="/assets/img/test-image.svg"
+    alt="company logo"
+    width="48"
+    height="48"
+  />
+  <img
+    data-expected-rule="repeated-alt-text"
+    src="/assets/img/test-image.svg"
+    alt="company logo"
+    width="48"
+    height="48"
+  />
+</span>
+
+<h2>Opt-in model-backed quality cases</h2>
+
+<p>
+  These examples require a model verdict. The automated demo test uses fixed fake-judge responses so its evidence is
+  deterministic and does not call GitHub Models or Azure AI Vision.
+</p>
+
+<figure>
+  <img
+    data-model-case="keyword-stuffing"
+    src="/assets/img/test-image.svg"
+    alt="running shoes, cheap shoes, buy shoes online, best shoes 2026"
+  />
+  <figcaption>A keyword list that should be replaced with a concise description.</figcaption>
+</figure>
+
+<figure>
+  <img data-model-case="inaccurate" src="/assets/img/test-image.svg" alt="A team collaborating around a table" />
+  <figcaption>The image is actually a blue square containing the word test.</figcaption>
+</figure>
+
+<figure>
+  <img data-model-case="decorative" src="/assets/img/test-image.svg" alt="Blue divider pattern" />
+  <figcaption>The visible caption already communicates the decorative divider's purpose.</figcaption>
+</figure>
+
+<figure>
+  <img
+    data-model-case="accurate-control"
+    src="/assets/img/test-image.svg"
+    alt="A blue square with the word test in white"
+  />
+  <figcaption>An accurate control that should not produce a quality finding.</figcaption>
+</figure>

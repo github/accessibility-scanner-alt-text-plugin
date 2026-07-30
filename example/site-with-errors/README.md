@@ -14,10 +14,10 @@ Use it for:
   suite (see [`tests/example-site.test.ts`](../../tests/example-site.test.ts)),
   so the rules stay exercised against real markup in CI.
 
-## Image → rule mapping
+## Deterministic image → rule mapping
 
-Every image on [`alt-text-errors.html`](alt-text-errors.html) points at the same
-placeholder SVG (`assets/img/test-image.svg`); only the `alt` attribute differs.
+The first section of [`alt-text-errors.html`](alt-text-errors.html) exercises
+each rule that runs by default in plugin v1.1.0.
 
 | Image `alt` value            | Rule triggered         | Why it triggers                                  |
 | ---------------------------- | ---------------------- | ------------------------------------------------ |
@@ -26,6 +26,30 @@ placeholder SVG (`assets/img/test-image.svg`); only the `alt` attribute differs.
 | `screenshot_2024.png`        | `filename-alt-text`    | The alt text is a raw image filename.            |
 | `image`                      | `vague-alt-text`       | A single generic word that describes nothing.    |
 | `company logo` (×2 in a row) | `repeated-alt-text`    | Two consecutive images share identical alt text. |
+
+These are real, credential-free plugin findings. The dedicated
+[`scan-demo-site.yml`](../../.github/workflows/scan-demo-site.yml) workflow
+builds this Jekyll site, serves only `/alt-text-errors/`, and runs Scanner
+v3.4.1 with Axe plus the npm-published plugin v1.1.0. It uses scanner dry-run
+mode and uploads `scanner-results.json`, so the workflow proves npm
+installation and execution without writing issues.
+
+## Model-backed quality cases
+
+The second section contains four inputs for the opt-in `alt-text-quality` rule:
+
+| Case             | Expected mocked verdict | Evidence shown                       |
+| ---------------- | ----------------------- | ------------------------------------ |
+| Keyword stuffing | `needs-fix`             | Tailored SEO-abuse finding           |
+| Inaccurate alt   | `needs-fix`             | Finding with a suggested replacement |
+| Decorative image | `decorative`            | Recommendation to use `alt=""`       |
+| Accurate control | `ok`                    | No finding                           |
+
+These outcomes are **mocked test evidence**, not live model results. The
+targeted test injects fixed judge verdicts, then runs the production
+`alt-text-quality` rule-to-finding mapping. This keeps the demo deterministic
+and credential-free while clearly showing behavior that would otherwise
+require GitHub Models and, optionally, Azure AI Vision.
 
 ## Run it locally
 
@@ -54,12 +78,13 @@ You don't need Ruby or a running server to confirm the plugin flags this page.
 From the repository root:
 
 ```sh
-npm install
+npm ci
 npx playwright install chromium
-npm test
+npm test -- tests/example-site.test.ts --reporter=verbose
 ```
 
-The `example site-with-errors` test loads
+The targeted test loads
 [`alt-text-errors.html`](alt-text-errors.html), runs the real `alt-text-scan`
-plugin against it, and asserts that every rule in the table above produces a
-finding.
+plugin against it, asserts exactly one finding for each deterministic rule,
+and separately checks the four model cases through fixed fake-judge verdicts.
+No model or Azure credentials are used.
