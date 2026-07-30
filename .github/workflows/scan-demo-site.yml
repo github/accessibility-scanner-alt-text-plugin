@@ -85,15 +85,22 @@ jobs:
           scans: |
             ["axe", {"name": "alt-text-scan", "package": "@github/accessibility-scanner-alt-text-plugin", "version": "1.1.0"}]
 
+      - name: Stage demo evidence
+        if: ${{ always() && steps.scanner.outputs.results_file }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/controlled-demo-evidence"
+          cp "${{ steps.scanner.outputs.results_file }}" "$RUNNER_TEMP/controlled-demo-evidence/scanner-results.json"
+          cp "$RUNNER_TEMP/demo-evidence.json" "$RUNNER_TEMP/controlled-demo-evidence/demo-evidence.json"
+          if [[ -f "$RUNNER_TEMP/live-demo-evidence.json" ]]; then
+            cp "$RUNNER_TEMP/live-demo-evidence.json" "$RUNNER_TEMP/controlled-demo-evidence/live-demo-evidence.json"
+          fi
+
       - name: Upload scanner results
         if: ${{ always() && steps.scanner.outputs.results_file }}
         uses: actions/upload-artifact@v7
         with:
           name: controlled-demo-results-${{ github.run_id }}
-          path: |
-            ${{ steps.scanner.outputs.results_file }}
-            ${{ runner.temp }}/demo-evidence.json
-            ${{ runner.temp }}/live-demo-evidence.json
+          path: ${{ runner.temp }}/controlled-demo-evidence
           if-no-files-found: error
 
       - name: Stop demo site
