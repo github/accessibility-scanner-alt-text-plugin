@@ -51,7 +51,7 @@ jobs:
             repository: github/accessibility-scanner-testing
     steps:
       - name: Run accessibility scanner
-        uses: github/accessibility-scanner@da2381e50d31f6e21c4fb6fad14e75f26e682ae1 # v3.4.0
+        uses: github/accessibility-scanner@745198705c4aecb2af83732eaafe1f6e3f7787c2 # v3.4.1
         with:
           urls: ${{ matrix.urls }}
           cache_key: cached_findings-${{ matrix.id }}-${{ github.ref_name }}.json
